@@ -1,5 +1,7 @@
 # Demo data strategy
 
+Phase 2 note: theme, sidebar, table page-size and demo-role preferences now persist in a separate UI key. Domain export/reset/seed remain unchanged. The UI-only form example is transient and excluded from both the business snapshot and saved preferences. No larger dataset has been generated in Phase 2.
+
 ## Single connected source
 
 The central `DomainState` is the only persistent source used by the dashboard, selectors and future module screens. `createScenarioState()` constructs deterministic related master records and unposted foundation documents. `createSeedState()` replays the implemented goods-receipt, processing-issue and partial-receipt transactions to produce the historical golden state. Seed creation is not independent random generation of totals.

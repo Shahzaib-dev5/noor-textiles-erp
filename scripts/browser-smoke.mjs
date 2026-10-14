@@ -22,11 +22,12 @@ async function storedSnapshot(page) {
 }
 
 async function checkDashboard(page) {
-  await expect(page.getByRole('heading', { name: 'کاروبار، ایک نظر میں', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'کاروباری ڈیش بورڈ', exact: true })).toBeVisible();
   const stock = page.getByRole('region', { name: 'کپڑے کے موجودہ بیلنس' });
   await expect(stock.getByText('600', { exact: true })).toBeVisible();
   await expect(stock.getByText('380', { exact: true })).toBeVisible();
-  await expect(stock.getByText('10', { exact: true })).toHaveCount(2);
+  await expect(stock.getByText('10', { exact: true })).toHaveCount(1);
+  await expect(page.locator('p').filter({ hasText: 'تسلیم شدہ نقصان:' })).toContainText('10');
   assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
   assert.equal(await page.locator('html').getAttribute('lang'), 'ur');
 }
@@ -73,14 +74,14 @@ try {
   await page.getByLabel('ڈیمو JSON', { exact: true }).fill('{');
   await page.getByRole('checkbox', { name: 'میں سمجھتا ہوں کہ درست درآمد میرے موجودہ ڈیمو ریکارڈ کی جگہ لے گی۔' }).check();
   await page.getByRole('button', { name: 'جانچ کر کے درآمد کریں', exact: true }).click();
-  await expect(page.getByRole('alert')).toBeVisible();
+  await expect(page.getByRole('alert').first()).toBeVisible();
   assert.equal(await storedSnapshot(page), initialSnapshot, 'Invalid imports must preserve the current snapshot.');
 
   const company = Object.values(exported.data.companies)[0];
   company.name = 'نور ٹیکسٹائلز — آزمائشی درآمد';
   await page.getByLabel('ڈیمو JSON', { exact: true }).fill(JSON.stringify(exported));
   await page.getByRole('button', { name: 'جانچ کر کے درآمد کریں', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('ڈیمو ڈیٹا محفوظ ہو گیا');
+  await expect(page.getByRole('status').first()).toContainText('ڈیمو ڈیٹا محفوظ ہو گیا');
   await page.goto(`${baseURL}/dashboard`);
   await expect(page.getByText(company.name, { exact: true })).toBeVisible();
   await checkDashboard(page);
@@ -89,7 +90,8 @@ try {
   await page.goto(`${baseURL}/settings`);
   await page.getByRole('checkbox', { name: 'میں موجودہ ڈیمو ڈیٹا تبدیل کر کے ابتدائی ریکارڈ بحال کرنا چاہتا ہوں۔' }).check();
   await page.getByRole('button', { name: 'اصل ڈیمو ری سیٹ کریں', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('ڈیمو ڈیٹا محفوظ ہو گیا');
+  await page.getByRole('button', { name: 'تصدیق کر کے ری سیٹ کریں', exact: true }).click();
+  await expect(page.getByRole('status').first()).toContainText('ڈیمو ڈیٹا محفوظ ہو گیا');
   assert.deepEqual(JSON.parse(await storedSnapshot(page)).data, JSON.parse(initialSnapshot).data, 'Explicit reset must restore deterministic domain data.');
   await desktop.close();
 
@@ -101,12 +103,12 @@ try {
   await checkDashboard(mobilePage);
   await expect(mobilePage.locator('#erp-sidebar')).toBeHidden();
   await mobilePage.getByRole('button', { name: 'مینو کھولیں', exact: true }).click();
-  await expect(mobilePage.locator('#erp-sidebar')).toBeVisible();
-  await mobilePage.locator('#erp-sidebar').getByRole('link', { name: 'خریداری زیرِ تعمیر', exact: true }).click();
+  await expect(mobilePage.getByRole('dialog', { name: 'مرکزی نیویگیشن' })).toBeVisible();
+  await mobilePage.getByRole('dialog', { name: 'مرکزی نیویگیشن' }).getByRole('link', { name: 'خریداری زیرِ تعمیر', exact: true }).click();
   await expect(mobilePage.getByRole('heading', { name: 'خریداری کا مکمل ماڈیول جلد آئے گا' })).toBeVisible();
   await expect(mobilePage.locator('#erp-sidebar')).toBeHidden();
   await mobilePage.getByRole('button', { name: 'مینو کھولیں', exact: true }).click();
-  await mobilePage.locator('#erp-sidebar').getByRole('link', { name: 'ڈیش بورڈ', exact: true }).click();
+  await mobilePage.getByRole('dialog', { name: 'مرکزی نیویگیشن' }).getByRole('link', { name: 'ڈیش بورڈ', exact: true }).click();
   await checkDashboard(mobilePage);
   await mobilePage.getByRole('button', { name: 'مینو کھولیں', exact: true }).click();
   await mobilePage.keyboard.press('Escape');
@@ -126,7 +128,7 @@ try {
   await checkDashboard(recoveryPage);
   await recoveryPage.evaluate((key) => localStorage.setItem(key, '{broken-snapshot'), storageKey);
   await recoveryPage.reload();
-  await expect(recoveryPage.getByRole('alert')).toContainText('محفوظ ڈیٹا پڑھا نہیں جا سکا');
+  await expect(recoveryPage.getByRole('alert').first()).toContainText('محفوظ ڈیٹا پڑھا نہیں جا سکا');
   assert.equal(await storedSnapshot(recoveryPage), '{broken-snapshot', 'Corrupt saved data must never be silently overwritten.');
   await recovery.close();
 

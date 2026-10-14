@@ -26,7 +26,7 @@ describe('Urdu foundation application', () => {
     await renderRoute();
     expect(document.documentElement).toHaveAttribute('lang', 'ur');
     expect(document.documentElement).toHaveAttribute('dir', 'rtl');
-    expect(screen.getByRole('heading', { level: 1, name: 'کاروبار، ایک نظر میں' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'کاروباری ڈیش بورڈ' })).toBeInTheDocument();
     const balances = screen.getByRole('region', { name: 'کپڑے کے موجودہ بیلنس' });
     expect(within(balances).getByText('600')).toBeInTheDocument();
     expect(within(balances).getByText('380')).toBeInTheDocument();

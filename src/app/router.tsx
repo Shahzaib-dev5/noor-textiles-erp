@@ -7,6 +7,7 @@ import { routeRegistry, type ERPRoute } from '@/routes/registry';
 const DashboardPage = lazy(() => import('@/features/dashboard/DashboardPage'));
 const DiagnosticsPage = lazy(() => import('@/features/diagnostics/DiagnosticsPage'));
 const SettingsPage = lazy(() => import('@/features/settings/SettingsPage'));
+const DesignSystemPage = lazy(() => import('@/features/design-system/DesignSystemPage'));
 
 function routeElement(route: ERPRoute) {
   switch (route.id) {
@@ -14,6 +15,7 @@ function routeElement(route: ERPRoute) {
     case 'diagnostics': return <DiagnosticsPage />;
     case 'settings': return <SettingsPage />;
     case 'modules': return <ModulesPage />;
+    case 'design-system': return <DesignSystemPage />;
     default: return <PlannedModulePage route={route} />;
   }
 }

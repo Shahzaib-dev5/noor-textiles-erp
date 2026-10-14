@@ -71,3 +71,7 @@ localStorage's individual `setItem` operation is not a database transaction. It 
 No server, remote API, multi-company tenancy, real authorization, secure authentication, tax integration, live payment gateway or real-time warehouse synchronization is provided. A role selection changes the demonstration context only. Financial entities are contracts for later phases; the three foundation inventory transactions do not post fictitious invoices, supplier payments or accounting entries.
 
 Future phases must reuse these entities, transaction boundaries, store and route metadata, and add tests for each new critical transaction before exposing it in the UI. Business plans and typed contracts are not completed operational features.
+
+## Phase 2 UI extension
+
+The authorized Phase 2 is the Urdu RTL design system, replacing the earlier provisional master-record Phase 2 handoff. `useUIStore` now persists theme/sidebar/groups/page-size/demo-role preferences under `noor-textiles-erp-ui-v1`, separately from the unchanged version-1 domain envelope. The live ERP instance mirrors theme/role for compatibility; independent store factories retain Phase 1 behavior. Notifications/search/dashboard are pure domain projections. The single example form record and toast messages are transient UI data, and file previews never enter domain storage. See [design system](DESIGN_SYSTEM.md) and [component library](COMPONENT_LIBRARY.md).

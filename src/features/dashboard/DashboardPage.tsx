@@ -1,48 +1,60 @@
-import { ArrowLeft, ArrowUpLeft, Check, CircleCheck, FlaskConical, Layers3, PackageCheck, Users } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { Cell, Pie, PieChart } from 'recharts';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Boxes, Factory, FlaskConical, Package, ReceiptText, ShoppingBag, TrendingUp, Wallet } from 'lucide-react';
 import { PageHeading } from '@/components/common/PageHeading';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { StatCard } from '@/components/dashboard/StatCard';
+import { QuickActions } from '@/components/dashboard/QuickActions';
+import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
+import { DonutChart, BarChart } from '@/components/charts/Charts';
+import { DataTable, type TableColumn } from '@/components/tables/DataTable';
+import { StatusBadge } from '@/components/tables/StatusBadge';
+import { DetailsDrawer } from '@/components/dialogs/Dialog';
+import { EmptyState } from '@/components/feedback/states';
 import { useERPStore } from '@/store';
-import { selectDashboard, selectInspector } from '@/store/selectors';
-import { formatQuantity } from '@/lib/formatters';
-import { t } from '@/locales/ur';
-import { workflowPreview } from '@/app/config/navigation';
+import { selectEnterpriseDashboard, selectNotifications } from '@/store/selectors/ui';
+import { formatDate, formatPKR, formatQuantity } from '@/lib/formatters';
+import { getRoute } from '@/routes/registry';
 
+type RecentTransaction = ReturnType<typeof selectEnterpriseDashboard>['recent'][number];
+const transactionColumns: TableColumn<RecentTransaction>[] = [
+  { id: 'number', label: 'دستاویز', value: (r) => r.number, technical: true },
+  { id: 'type', label: 'قسم', value: (r) => r.type },
+  { id: 'quantity', label: 'مقدار (میٹر)', value: (r) => r.quantity, technical: true, render: (r) => formatQuantity(r.quantity) },
+  { id: 'status', label: 'حالت', value: (r) => r.status, render: (r) => <StatusBadge status={r.status} /> },
+  { id: 'date', label: 'تاریخ', value: (r) => r.date, render: (r) => formatDate(r.date) },
+];
 export default function DashboardPage() {
-  const data = useERPStore((state) => state.data);
-  const summary = selectDashboard(data);
-  const inspection = selectInspector(data);
-  const distribution = [
-    { name: t('grey'), value: summary.grey, color: '#255947' },
-    { name: t('processed'), value: summary.processed, color: '#84ac92' },
-    { name: t('contractor'), value: summary.contractor, color: '#c9ab73' },
-    { name: t('loss'), value: summary.loss, color: '#d5dad5' },
-  ];
-  const stockCards = [
-    { title: t('grey'), value: summary.grey, detail: 'گودام میں دستیاب', icon: Layers3, tone: 'green' },
-    { title: t('processed'), value: summary.processed, detail: 'پروسیسنگ سے وصول شدہ', icon: PackageCheck, tone: 'sage' },
-    { title: t('contractor'), value: summary.contractor, detail: 'وصول ہونا باقی', icon: FlaskConical, tone: 'sand' },
-    { title: t('loss'), value: summary.loss, detail: 'واضح طور پر درج شدہ', icon: CircleCheck, tone: 'gray' },
-  ];
-
+  const data = useERPStore((s) => s.data);
+  const summary = selectEnterpriseDashboard(data); const notices = selectNotifications(data); const navigate = useNavigate();
+  const [period, setPeriod] = useState('all'); const [transaction, setTransaction] = useState<RecentTransaction | null>(null);
+  const years = [...new Set(summary.trend.map((row) => row.day.slice(0, 4)))];
+  const trend = summary.trend.filter((row) => period === 'all' || row.day.startsWith(period));
+  const unavailable = 'آئندہ مرحلے میں';
   return <>
-    <PageHeading title="کاروبار، ایک نظر میں" description="کپڑے کی ہر حرکت، ایک مربوط ریکارڈ کے ساتھ۔" eyebrow={summary.companyName} action={<Button asChild variant="outline"><Link to="/diagnostics">انوینٹری کی جانچ<ArrowUpLeft /></Link></Button>} />
-    <section className="overview-banner relative mb-7 overflow-hidden rounded-2xl border border-primary/15 bg-[#eaf0e8] px-6 py-5 dark:bg-[#183c30] sm:px-7" aria-label="ڈیمو کی معلومات">
-      <div className="relative z-10 flex flex-wrap items-center justify-between gap-5"><div><div className="mb-1 flex items-center gap-2"><span className="size-1.5 rounded-full bg-primary" /><span className="text-sm font-medium text-primary dark:text-emerald-200">آپ کا بنیادی نظام تیار ہے</span></div><h2 className="text-xl font-semibold sm:text-2xl">خریداری سے پروسیسنگ تک، مکمل ربط</h2><p className="mt-1 max-w-xl text-base leading-8 text-muted-foreground">یہ اعداد محفوظ ڈیمو ریکارڈ سے حاصل ہوتے ہیں۔ نئی آزمائشی کارروائیوں کے لیے انوینٹری جانچ کھولیں۔</p></div><Badge className="border-primary/20 bg-white/60 px-4 py-1 text-primary dark:bg-white/5 dark:text-emerald-200">{t('phaseOne')} · بنیادی ساخت</Badge></div>
+    <PageHeading title="کاروباری ڈیش بورڈ" description={summary.companyName + ' — کاروبار کی مجموعی صورتحال'} eyebrow="آپ کے کاروبار کا مرکز" action={<Button asChild variant="outline"><Link to={getRoute('diagnostics').path}>انوینٹری کی جانچ<ArrowLeft /></Link></Button>} />
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/15 bg-primary/5 px-5 py-3 text-sm"><span className="flex items-center gap-2"><span className="size-1.5 rounded-full bg-success" />مربوط مقامی ڈیمو · {summary.reconciled ? 'اسٹاک کی مصالحت درست ہے' : 'اسٹاک کی جانچ درکار ہے'}</span><span className="text-xs text-muted-foreground">تاریخی ریکارڈ؛ براہِ راست کاروباری سرگرمی نہیں</span></div>
+    <section aria-label="کپڑے کے موجودہ بیلنس" className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <StatCard title="کل خریداری" value={summary.purchaseValuePaisa === null ? unavailable : formatPKR(summary.purchaseValuePaisa)} icon={ReceiptText} subtitle="پوسٹ شدہ مال وصولی کی قدر؛ سپلائر انوائس نہیں" status={summary.purchaseValuePaisa === null ? 'upcoming' : 'available'} onClick={() => navigate(getRoute('purchases').path)} />
+      <StatCard title="کل فروخت" value={unavailable} icon={ShoppingBag} status="upcoming" subtitle="فروخت کے پوسٹ شدہ ریکارڈ ابھی دستیاب نہیں" onClick={() => navigate(getRoute('sales').path)} />
+      <StatCard title="کل منافع" value={unavailable} icon={TrendingUp} status="upcoming" subtitle="فروخت اور لاگت کے ماڈیول کے بعد" />
+      <StatCard title="زیرِ وصول رقم" value={unavailable} icon={Wallet} status="upcoming" subtitle="انوائس اور ادائیگی کے ریکارڈ کے بعد" onClick={() => navigate(getRoute('payments').path)} />
+      <StatCard title="کورے کپڑے کا اسٹاک" value={formatQuantity(summary.grey)} icon={Boxes} subtitle="گودام میں دستیاب · میٹر" onClick={() => navigate(getRoute('grey-inventory').path)} />
+      <StatCard title="پروسیس شدہ کپڑا" value={formatQuantity(summary.processed)} icon={Package} subtitle="اصل وصولی سے حاصل شدہ · میٹر" />
+      <StatCard title="زیرِ پروسیسنگ کپڑا" value={formatQuantity(summary.contractor)} icon={FlaskConical} subtitle="ٹھیکیدار کے پاس بقایا · میٹر" onClick={() => navigate(getRoute('processing').path)} />
+      <StatCard title="تیار سوٹ" value={formatQuantity(summary.finishedSuits)} icon={Factory} subtitle="نمونہ SKU کیٹلاگ ہے؛ تیار سوٹ کا اسٹاک صفر" onClick={() => navigate(getRoute('finished-inventory').path)} />
     </section>
-    <section className="mb-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="کپڑے کے موجودہ بیلنس">
-      {stockCards.map(({ title, value, detail, icon: Icon, tone }) => <Card key={title} className="p-5"><div className="mb-4 flex items-center justify-between"><span className="text-base text-muted-foreground">{title}</span><span className={`stat-icon stat-icon-${tone}`}><Icon className="size-5" strokeWidth={1.5} /></span></div><div className="flex items-baseline gap-2"><strong dir="ltr" className="number text-4xl font-semibold tracking-tight">{formatQuantity(value)}</strong><span className="text-sm text-muted-foreground">{t('meter')}</span></div><div className="mt-4 flex items-center gap-1.5 border-t border-border/70 pt-3 text-sm text-muted-foreground"><span className={`size-1.5 rounded-full ${tone === 'sand' ? 'bg-[#c9ab73]' : 'bg-primary/40'}`} />{detail}</div></Card>)}
-    </section>
-    <div className="mb-7 grid gap-5 xl:grid-cols-[1.45fr_1fr]">
-      <Card className="p-6"><div className="mb-6 flex items-center justify-between"><div><h2 className="text-xl font-semibold">کپڑے کا حساب</h2><p className="mt-1 text-sm text-muted-foreground">خریدی گئی مقدار کی موجودہ تقسیم</p></div><Badge className={inspection.reconciled ? 'border-primary/20 bg-primary/5 text-primary' : 'border-destructive/20 text-destructive'}>{inspection.reconciled ? <Check className="size-3.5" /> : null}{inspection.reconciled ? 'حساب درست ہے' : 'جانچ درکار ہے'}</Badge></div>
-        <div className="flex flex-col items-center gap-6 sm:flex-row"><div className="relative shrink-0" role="img" aria-label={`کل خرید ${formatQuantity(inspection.purchased)} میٹر؛ تقسیم نیچے درج ہے`}><PieChart width={172} height={172}><Pie data={distribution} dataKey="value" cx={81} cy={81} innerRadius={61} outerRadius={80} stroke="none" paddingAngle={2} isAnimationActive={false}>{distribution.map((entry) => <Cell key={entry.name} fill={entry.color} />)}</Pie></PieChart><div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"><span dir="ltr" className="number text-2xl font-semibold">{formatQuantity(inspection.purchased)}</span><span className="text-sm text-muted-foreground">کل خرید · میٹر</span></div></div><div className="w-full flex-1 space-y-3">{distribution.map((item) => <div className="flex items-center justify-between gap-3" key={item.name}><span className="flex items-center gap-2 text-base text-muted-foreground"><span className="size-2 rounded-sm" style={{ backgroundColor: item.color }} />{item.name}</span><span dir="ltr" className="number text-sm font-semibold">{formatQuantity(item.value)} <span className="font-normal text-muted-foreground">m</span></span></div>)}</div></div>
-        <div className="mt-5 border-t border-border pt-4 text-sm leading-7 text-muted-foreground">کورا + پروسیس شدہ + ٹھیکیدار کے پاس + منظور شدہ نقصان = کل خرید</div>
-      </Card>
-      <Card className="flex flex-col p-6"><div className="mb-5 flex items-center justify-between"><h2 className="text-xl font-semibold">مربوط کاروباری ریکارڈ</h2><Badge className="text-muted-foreground">گولڈن ڈیٹا</Badge></div><div className="grid grid-cols-2 gap-4"><div className="rounded-xl bg-muted/65 p-4"><Users className="mb-3 size-5 text-primary" strokeWidth={1.5} /><p dir="ltr" className="number text-start text-3xl font-semibold">{formatQuantity(summary.supplierCount)}</p><p className="mt-1 text-sm text-muted-foreground">رجسٹرڈ سپلائر</p></div><div className="rounded-xl bg-muted/65 p-4"><Layers3 className="mb-3 size-5 text-primary" strokeWidth={1.5} /><p dir="ltr" className="number text-start text-3xl font-semibold">{formatQuantity(summary.lotCount)}</p><p className="mt-1 text-sm text-muted-foreground">کپڑے کے لاٹس</p></div></div><p className="mb-4 mt-5 text-sm leading-7 text-muted-foreground">ایک کمپنی، متعلقہ دستاویزات اور مقدار کی مکمل جانچ۔ تیار سوٹ کا نمونہ، کپڑے کی وصولی سے الگ ہے۔</p><Link className="mt-auto flex items-center justify-between border-t border-border pt-4 text-base font-medium text-primary" to="/diagnostics">اصل ریکارڈ اور حرکات دیکھیں<ArrowLeft className="size-4" /></Link></Card>
-    </div>
-    <Card className="p-6"><div className="mb-6 flex flex-wrap items-center justify-between gap-2"><div><h2 className="text-xl font-semibold">کپڑے کا سفر</h2><p className="mt-1 text-sm text-muted-foreground">موجودہ بنیاد سے آنے والے کاروباری مراحل تک</p></div><Link to="/modules" className="flex items-center gap-2 text-sm text-primary">تمام ماڈیولز<ArrowLeft className="size-4" /></Link></div><ol className="grid gap-3 sm:grid-cols-5">{workflowPreview.map(({ label, icon: Icon, phase }, index) => <li key={label} className={`relative rounded-xl border p-4 ${phase === 1 ? 'border-primary/15 bg-primary/[0.035]' : 'border-dashed border-border bg-muted/25'}`}><div className="mb-4 flex items-center justify-between"><Icon className={`size-6 ${phase === 1 ? 'text-primary' : 'text-muted-foreground/60'}`} strokeWidth={1.4} /><span className="number text-xs text-muted-foreground/50" dir="ltr">0{index + 1}</span></div><p className="text-base font-medium">{label}</p><p className="mt-1 text-xs text-muted-foreground">{phase === 1 ? 'بنیادی ٹرانزیکشن فعال' : 'آئندہ مرحلے میں'}</p></li>)}</ol></Card>
+    <div className="mb-6 grid min-w-0 gap-5 xl:grid-cols-[1.45fr_1fr]"><div className="min-w-0"><div className="mb-2 flex justify-end"><label className="flex items-center gap-2 text-xs text-muted-foreground">مدت<select className="control w-28 text-xs" value={period} onChange={(e) => setPeriod(e.target.value)}><option value="all">تمام ریکارڈ</option><option value="recent">گزشتہ ۳۰ دن</option>{years.map((year) => <option key={year}>{year}</option>)}</select></label></div><BarChart title="خریداری اور فروخت کا رجحان" description="مال وصولی کی قدر؛ فروخت کی سیریز آئندہ مرحلے میں دستیاب ہو گی۔" data={period === 'recent' ? summary.trend.filter((r) => new Date(r.day).valueOf() >= Date.now() - 30 * 86400000) : trend} valueLabel="وصول شدہ خریداری کی قدر" money /></div><div className="min-w-0 xl:pt-[52px]"><DonutChart title="کپڑے کی انوینٹری کی تقسیم" description="ہر مقدار اصل پوسٹ شدہ حرکات سے حاصل ہوتی ہے۔" data={summary.distribution} valueLabel="میٹر" /></div></div>
+    <Card className="mb-6 p-5"><div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="text-lg font-semibold">مینوفیکچرنگ کا سفر</h2><p className="text-xs text-muted-foreground">تسلیم شدہ نقصان: <bdi className="number">{formatQuantity(summary.loss)}</bdi> میٹر</p></div><div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">{[
+      ['وصول شدہ کپڑا', formatQuantity(summary.purchased) + ' میٹر', 'goodsReceipt'],
+      ['کورا گودام', formatQuantity(summary.grey) + ' میٹر', 'grey'],
+      ['پروسیسنگ میں', formatQuantity(summary.contractor) + ' میٹر', 'contractor'],
+      ['پروسیس شدہ', formatQuantity(summary.processed) + ' میٹر', 'processed'],
+      ['پیداوار و پیکنگ', unavailable, 'future'],
+    ].map(([label, value, id], index) => <div key={id} className="rounded-xl border border-border bg-muted/35 p-4"><span className="number text-xs text-muted-foreground">0{index + 1}</span><p className="mt-3 text-sm font-medium">{label}</p><p className="mt-1 text-sm text-primary"><bdi>{value}</bdi></p></div>)}</div></Card>
+    <div className="mb-6 grid gap-5 xl:grid-cols-3"><Card className="p-5"><h2 className="mb-4 text-lg font-semibold">پروسیسنگ ملز کی صورتحال</h2>{summary.contractors.length ? <div className="space-y-4">{summary.contractors.map((contractor) => <div key={contractor.id} className="rounded-xl border border-border p-4"><p className="text-sm font-semibold">{contractor.name}</p><p className="my-2 text-sm text-muted-foreground">بقایا <bdi className="number text-warning-foreground">{formatQuantity(contractor.held)}</bdi> میٹر · جاری <bdi className="number">{formatQuantity(contractor.issued)}</bdi> میٹر</p><progress className="h-1.5 w-full accent-primary" value={contractor.settled} max={contractor.issued || 1} aria-label={contractor.name + ' مکمل شدہ مقدار'} /><Link className="mt-3 block text-xs text-primary" to={getRoute('processing').path}>چالان کا ماڈیول دیکھیں ←</Link></div>)}</div> : <EmptyState title="کوئی ٹھیکیدار نہیں" />}</Card><ActivityFeed activities={summary.activities} /><Card className="p-5"><h2 className="mb-4 text-lg font-semibold">زیرِ انتظار کارروائیاں اور اسٹاک انتباہات</h2>{notices.length ? <ul className="space-y-3">{notices.map((notice) => <li key={notice.id}><Link to={notice.path} className="block rounded-xl border border-border p-3 hover:bg-muted"><p className="text-sm font-medium">{notice.title}</p><p className="mt-1 text-xs leading-6 text-muted-foreground">{notice.description}</p></Link></li>)}</ul> : <EmptyState title="کوئی زیرِ انتظار کارروائی نہیں" />}<p className="mt-4 text-xs leading-6 text-muted-foreground">تاخیر کا انتباہ نہیں بنایا جاتا؛ موجودہ ماڈل میں متوقع وصولی کی تاریخ درج نہیں۔</p></Card></div>
+    <div className="mb-6"><QuickActions /></div><DataTable title="تازہ دستیاب لین دین" rows={summary.recent} columns={transactionColumns} rowId={(row) => row.id} onDetails={setTransaction} />
+    <DetailsDrawer open={Boolean(transaction)} onClose={() => setTransaction(null)} title="اصل لین دین کی تفصیل">{transaction && <dl className="space-y-4">{[['دستاویز', transaction.number], ['قسم', transaction.type], ['حوالہ', transaction.source], ['تاریخ', formatDate(transaction.date)], ['مقدار (میٹر)', formatQuantity(transaction.quantity)]].map(([label, value]) => <div key={label}><dt className="text-xs text-muted-foreground">{label}</dt><dd className="mt-1 text-base"><bdi>{value}</bdi></dd></div>)}<StatusBadge status={transaction.status} /></dl>}</DetailsDrawer>
   </>;
 }

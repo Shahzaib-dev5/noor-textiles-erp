@@ -1,0 +1,17 @@
+@page { size: A4; margin: 14mm; }
+.print-document { max-width: 210mm; margin-inline: auto; }
+@media print {
+  :root, .dark { --foreground: #111; --card: #fff; --background: #fff; --muted: #f4f4f4; --border: #777; }
+  body { background: white !important; color: black !important; }
+  .no-print, .app-sidebar, .app-header, .app-footer, .skip-link { display: none !important; }
+  .app-content { margin: 0 !important; }
+  main { padding: 0 !important; max-width: none !important; }
+  body:has(.print-document) main > :not(:has(.print-document)):not(.print-document) { display: none !important; }
+  body:has(.print-document) [role='tabpanel'] > :not(.print-document) { display: none !important; }
+  .print-document { width: 100%; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+  .print-document table { width: 100%; border-collapse: collapse; }
+  .print-document th, .print-document td { border: 1px solid #777; padding: 8px; }
+  .print-document tr, .print-document header, .print-document footer { break-inside: avoid; }
+  .print-document thead { display: table-header-group; }
+  .print-document * { color: black !important; }
+}

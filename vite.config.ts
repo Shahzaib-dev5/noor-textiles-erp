@@ -11,5 +11,8 @@ export default defineConfig({
     css: false,
     clearMocks: true,
     restoreMocks: true,
+    // Keep the full suite reliable on this Windows workstation without competing worker heaps.
+    maxWorkers: 1,
+    testTimeout: 15000,
   },
 });

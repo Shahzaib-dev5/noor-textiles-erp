@@ -2,6 +2,8 @@
 
 Frontend-only Urdu RTL textile ERP foundation. Phase 1 implements a connected local demo state, movement-based fabric inventory, three validated transactions and an operational architecture dashboard. It has no backend, real authentication or payment gateway.
 
+Phase 2 adds the enterprise Urdu RTL design system: collapsible grouped sidebar, keyboard search, real notifications, responsive dashboard, reusable tables/forms/charts/dialogs, persistent light/dark/system preferences, and `/design-system` with A4 print preview. See [design system](docs/DESIGN_SYSTEM.md), [component library](docs/COMPONENT_LIBRARY.md), [RTL guidelines](docs/RTL_GUIDELINES.md) and [Phase 2 acceptance](docs/PHASE_2_ACCEPTANCE.md).
+
 ## Run locally
 
 ```sh
@@ -17,10 +19,13 @@ Open the local URL printed by Vite. Use a current Node.js version compatible wit
 - `/diagnostics`: isolated resettable scenario for goods receipt, processing issue and partial receipt, with movement inspection and reconciliation.
 - `/modules`: route catalogue showing planned modules and phases.
 - `/settings`: explicit JSON export/import and reset of saved demo data.
+- `/design-system`: interactive components, a validated UI-only form, actual record tables, real-data charts and an existing purchase-order print showcase.
 
 Future module routes are labeled **زیرِ تعمیر** with their proposed phase number. A demo role switcher is available for context; it does not enforce authorization.
 
 The golden history receives 1,000 m, issues 400 m to processing, receives 380 m and recognizes 10 m loss. Balances are **600 m grey + 380 m processed + 10 m contractor-held + 10 m loss = 1,000 m**. The example finished SKU is a catalogue record with zero suits in stock.
+
+UI preferences use the separate key `noor-textiles-erp-ui-v1`; business JSON export/reset does not reset sidebar, theme, selected demo work profile or preferred table page size. Ctrl/Cmd+K opens global search. CSV exports are real local downloads with Urdu encoding. The showcase form is transient and cannot alter business inventory. Purchase dashboard amounts are receipt valuations, with sales/profit/receivable values honestly marked upcoming.
 
 ## Verification
 

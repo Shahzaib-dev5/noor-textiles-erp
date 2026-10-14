@@ -1,0 +1,2 @@
+import type { ReactNode } from 'react';
+export function Accordion({ items }: { items: readonly { id: string; title: string; content: ReactNode }[] }) { return <div className="divide-y divide-border rounded-xl border border-border bg-card">{items.map((item) => <details key={item.id} className="p-4"><summary className="cursor-pointer text-sm font-semibold">{item.title}</summary><div className="pt-3 text-sm leading-8 text-muted-foreground">{item.content}</div></details>)}</div>; }

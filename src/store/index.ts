@@ -5,8 +5,9 @@ import { issueProcessing, postGoodsReceipt, receiveProcessing } from '@/services
 import type { TransactionResult } from '@/services/transactions';
 import { decodeSnapshot, encodeSnapshot, getBrowserStorage, STORAGE_KEY } from '@/services/storage';
 import type { StorageAdapter } from '@/services/storage';
+import { useUIStore, resolveTheme, type UIRole } from '@/store/ui-preferences';
 
-export type DemoRole = 'owner' | 'warehouse' | 'accounts';
+export type DemoRole = UIRole;
 export type ScenarioAction = 'goodsReceipt' | 'processingIssue' | 'processingReceipt';
 export interface ActionResult { ok: boolean; message: string }
 export interface ERPStore {
@@ -121,3 +122,14 @@ export function createERPStore(storage: StorageAdapter | null = getBrowserStorag
 }
 
 export const useERPStore = createERPStore();
+
+// Preserve the Phase 1 factory's transient defaults; only the live app mirrors UI preferences.
+useERPStore.setState({
+  role: useUIStore.getState().preferences.selectedDemoRole,
+  theme: resolveTheme(useUIStore.getState().preferences.theme),
+  setRole: (selectedDemoRole) => useUIStore.getState().updatePreferences({ selectedDemoRole }),
+  setTheme: (theme) => useUIStore.getState().updatePreferences({ theme }),
+});
+useUIStore.subscribe(({ preferences }) => useERPStore.setState({
+  role: preferences.selectedDemoRole, theme: resolveTheme(preferences.theme),
+}));

@@ -2,7 +2,7 @@
 
 The typed registry is `src/routes/registry.ts`; Urdu labels come from `src/locales/ur/index.ts`. React Router renders routes inside the shared RTL application shell. `/` redirects to `/dashboard`; unknown paths render a meaningful not-found view. `:id` paths are reserved detail routes and remain placeholders until their phase.
 
-All routes are accessible in this frontend demonstration. The role switcher selects a demo context; there is no secure authorization, sign-in or route guard. The responsible roles below describe intended business use, not implemented security. Four Phase 1 routes are operational; all other routes display **زیرِ تعمیر** and the proposed phase. Future phase numbering is a proposed sequence because only Phase 1 was specified/authorized.
+All routes are accessible in this frontend demonstration. The role switcher selects a demo context; there is no secure authorization, sign-in or route guard. The responsible roles below describe intended business use, not implemented security. The four Phase 1 foundation routes remain operational and Phase 2 adds the design-system showcase. All operational business modules remain honest placeholders. There are 44 registered paths. The user supplied Phase 2 UI requirements; later phase numbers remain proposed. Existing supplier/fabric/contractor search results can show a read-only seeded master-record preview.
 
 | Path | Urdu title | Module owner | Intended roles | Phase / current state |
 | --- | --- | --- | --- | --- |
@@ -10,13 +10,14 @@ All routes are accessible in this frontend demonstration. The role switcher sele
 | `/diagnostics` | انوینٹری جانچ | diagnostics | Manager, warehouse | 1 — working isolated scenario |
 | `/modules` | تمام ماڈیولز | modules | All demo roles | 1 — working route/module catalogue |
 | `/settings` | ترتیبات | settings | Manager | 1 — working local export/import/reset |
-| `/company` | کمپنی | company | Manager | 2 — placeholder |
-| `/suppliers` | سپلائرز | suppliers | Procurement, manager | 2 — placeholder |
-| `/suppliers/:id` | سپلائرز | suppliers | Procurement, manager | 2 — placeholder |
-| `/fabrics` | کپڑے کی اقسام | fabrics | Procurement, warehouse | 2 — placeholder |
-| `/contractors` | پروسیسنگ ٹھیکیدار | contractors | Processing coordinator | 2 — placeholder |
-| `/customers` | گاہک | customers | Sales, accounts | 2 — placeholder |
-| `/staff` | عملہ | staff | Manager | 2 — placeholder |
+| `/design-system` | ڈیزائن سسٹم | design-system | All demo roles | 2 — working components/tables/charts/print |
+| `/company` | کمپنی | company | Manager | 4 — placeholder |
+| `/suppliers` | سپلائرز | suppliers | Procurement, manager | 4 — placeholder |
+| `/suppliers/:id` | سپلائرز | suppliers | Procurement, manager | 4 — placeholder |
+| `/fabrics` | کپڑے کی اقسام | fabrics | Procurement, warehouse | 4 — placeholder |
+| `/contractors` | پروسیسنگ ٹھیکیدار | contractors | Processing coordinator | 5 — placeholder |
+| `/customers` | گاہک | customers | Sales, accounts | 10 — placeholder |
+| `/staff` | عملہ | staff | Manager | 14 — placeholder |
 | `/purchases` | خریداری | purchasing | Procurement, manager | 4 — placeholder |
 | `/purchases/new` | خریداری | purchasing | Procurement | 4 — placeholder |
 | `/purchases/:id` | خریداری | purchasing | Procurement, warehouse | 4 — placeholder |
@@ -24,6 +25,7 @@ All routes are accessible in this frontend demonstration. The role switcher sele
 | `/inventory/grey/lots/:id` | کورا کپڑا | grey-inventory | Warehouse | 4 — placeholder |
 | `/processing/challans` | پروسیسنگ | processing | Processing coordinator, warehouse | 5 — placeholder |
 | `/processing/challans/:id` | پروسیسنگ | processing | Processing coordinator, warehouse | 5 — placeholder |
+| `/processing/jobs` | رنگائی اور پرنٹنگ | processing | Processing coordinator | 5 — placeholder |
 | `/designs` | ڈیزائنز | designs | Designer, manager | 6 — placeholder |
 | `/collections` | کلیکشنز | designs | Designer, manager | 6 — placeholder |
 | `/production` | پیداوار | production | Production planner | 7 — placeholder |

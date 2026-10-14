@@ -2,8 +2,8 @@
 
 The canonical phase-by-phase ledger is [docs/IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md). The acceptance checklist and executed command results are [docs/PHASE_1_ACCEPTANCE.md](docs/PHASE_1_ACCEPTANCE.md).
 
-Current scope: **Phase 1 — Project Architecture: complete and verified**. Later phases are proposed only and have not been started.
+Current scope: **Phase 2 — Complete Urdu RTL UI/UX & Design System: complete and verified**. Phase 1 remains complete; Phase 3 is the next proposed phase and has not started.
 
-Verification: dependency installation and development startup passed; strict TypeScript, ESLint, all 85 automated tests, production build and desktop/mobile Edge smoke checks passed. Golden inventory reconciles to 600 m grey + 380 m processed + 10 m contractor-held + 10 m explicit loss = 1,000 m. Finished suit stock remains zero.
+Verification: strict TypeScript, ESLint, all 112 automated tests, production build, preserved Phase 1 Edge browser smoke, and Phase 2 Edge checks at 375/768/1024/1440 px passed. Golden inventory remains 600 m grey + 380 m processed + 10 m contractor-held + 10 m explicit loss = 1,000 m. Finished suit stock remains zero.
 
-The proposed Phase 2 handoff covers validated master-record CRUD in the existing store; it requires the next phase's requirements. Preserve Phase 1 state, transactions and tests when extending the application.
+The Phase 3 handoff and full phase ledger are in [docs/IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md). Preserve Phase 1 business state, transactions and tests when extending the application.

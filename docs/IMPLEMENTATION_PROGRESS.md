@@ -1,15 +1,15 @@
 # Implementation progress
 
-Updated: 2026-10-13 (Asia/Karachi).
+Updated: 2026-10-14 (Asia/Karachi).
 
-Only **Phase 1: Project Architecture** is authorized by the current request. Phases 2–14 below are a proposed dependency-aware sequence to make route ownership and handoff concrete; the user did not supply their exact titles. They are not approval to begin future modules.
+Phase 1 architecture is complete and the user has authorized **Phase 2: Complete Urdu RTL UI/UX & Design System**. This replaces the provisional Phase 1 master-record Phase 2 proposal. Phase 3 and later scopes below remain proposed and are not authorization to begin their implementation.
 
 | Phase | Scope | Status | Implemented / next action |
 | --- | --- | --- | --- |
 | 1 | Project architecture | Complete — verified | React/Vite foundation, strict domain contracts, three transactions, central local state, Urdu RTL shell, diagnostics, all required docs; 85 tests, typecheck, lint, build and real browser smoke passed |
-| 2 | Company, people and master records | Not started | Proposed: company settings, staff/demo roles, suppliers/contacts, fabrics/specifications/roll metadata, contractors, customers; validated CRUD in existing store |
+| 2 | Complete Urdu RTL UI/UX & design system | Complete — verified | Enterprise dashboard, separate persistent UI preferences, seven sidebar groups, search, notifications, reusable tables/forms/dialogs/charts, design-system showcase and print foundation; 112 tests, strict typecheck, lint, production build and both Edge browser suites passed |
 | 3 | Connected demo-data expansion | Not started | Proposed: deterministic master-data scale-up; seed only valid supported transactions, stage future documents honestly |
-| 4 | Purchasing and grey inventory | Not started | Proposed: PO/GRN workflows, lot/roll views, transfers/adjustments, supplier invoice/return contracts |
+| 4 | Master records, purchasing and grey inventory | Not started | Proposed: company/supplier/fabric master CRUD, PO/GRN workflows, lot/roll views, transfers/adjustments, supplier invoice/return contracts |
 | 5 | Processing operations | Not started | Proposed: full challan/receipt screens, multiple lots/partial receipts, explicit losses and contractor reconciliation |
 | 6 | Collections, designs and BOMs | Not started | Proposed: seasonal collections, samples/approval, color variants, two-/three-piece component BOMs |
 | 7 | Production planning and cutting | Not started | Proposed: plans/work orders, protected material allocation, WIP, cutting outputs and loss |
@@ -45,7 +45,7 @@ Only **Phase 1: Project Architecture** is authorized by the current request. Pha
 
 ## Known boundaries and outstanding work
 
-- No known blocking Phase 1 issues remain. Phases 2–14 are not implemented.
+- No known blocking Phase 1 or Phase 2 issues remain. Phases 3–14 are not implemented.
 - localStorage is a local demonstration snapshot store with size, durability and concurrency limits; a changed-snapshot guard cannot eliminate simultaneous-tab races.
 - Demo roles are not secure authorization or authentication.
 - Future production, finished-goods, reservation, dispatch, invoice, payment and return transactions are typed contracts, not implemented workflows.
@@ -53,6 +53,19 @@ Only **Phase 1: Project Architecture** is authorized by the current request. Pha
 - Full seed volumes belong to a later authorized phase. Phase 1 uses the small fully connected golden scenario.
 - No backend, live APIs, real payment gateway, multi-company mode, tax submission or production accounting is included.
 
-## Phase 2 handoff
+## Phase 2 implementation ledger
 
-Obtain the Phase 2 requirements before coding its operational scope. Reuse the same centralized `DomainState`, versioned persistence, existing IDs/relationships, Urdu messages, route registry and shared controls. Add validated master-record CRUD with reference-safe deactivation/deletion and persistence failure handling. Keep existing posted movements immutable and preserve imported/user-created records; do not replace them with a new mock dataset. Extend schema/migrations deliberately if new collections are added, then add meaningful tests for critical relationships and run typecheck, lint, test and build again.
+- Branch `phase-02-urdu-ui` was already selected; the baseline 85 tests and strict TypeScript passed before edits.
+- Existing domain/entity models, seed, inventory reducers and version-1 business snapshot remain unchanged.
+- Added separate versioned UI preferences, pre-paint light/dark/system theme initialization and compatibility mirroring for the live store.
+- Implemented right desktop sidebar (272px/80px), seven collapsible groups, mobile native navigation drawer, company header, breadcrumbs, search, notifications and six demo work profiles reusing current staff/role metadata.
+- Dashboard uses real receipt valuations, movement-derived inventory, contractor custody, activity logs and document projections; sales/profit/receivables are explicitly upcoming.
+- Reusable table, form, status, feedback, native dialog/drawer, tab/accordion and five chart variants support future modules.
+- Added `/design-system` and reserved `/processing/jobs`; all 42 original paths remain, for 44 total routes. Operational CRUD remains deferred.
+- UI-only form save/discard/delete, local image preview, real CSV download, explicit settings reset confirmation and A4 existing-PO print are implemented.
+- Added UI unit/integration coverage and a four-viewport browser suite. All 112 automated tests passed. Strict typecheck, ESLint, production build, preserved Phase 1 browser workflows and Phase 2 browser checks across four widths passed; evidence and limits are in [Phase 2 acceptance](PHASE_2_ACCEPTANCE.md).
+- No dependency versions changed and no large-scale seed was generated. The transient form example is excluded from domain/pref exports.
+
+## Phase 3 handoff
+
+Begin only after receiving the Phase 3 requirements. The proposed next phase expands the deterministic connected demo dataset using existing factories, stable IDs, canonical units and tested transactions. Preserve user/imported data and original golden fixtures; do not silently reseed saved snapshots. Do not mark future production, sales or payment records posted before their transaction engines and persisted schemas are implemented. Reuse the Phase 2 table/form/chart/status/print components rather than inventing page-specific mocks. Extend schema/migrations deliberately and rerun strict TypeScript, lint, business/UI tests, production build and the browser suite.
