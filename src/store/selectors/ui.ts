@@ -2,18 +2,22 @@ import type { DomainState } from '@/domain/entities';
 import { routeRegistry, getRoute } from '@/routes/registry';
 import { t } from '@/locales/ur';
 import { selectDashboard, selectInspector } from '@/store/selectors';
-import { multiplyMoney } from '@/domain/value-objects/money';
 import { roundQuantity } from '@/domain/value-objects/quantity';
 import { formatDate } from '@/lib/formatters';
 import { selectBusinessAlerts } from './business';
+import { supplierProfile, fabricProfile, supplierBills, receiptLineValue } from './procurement';
+import { selectProcurementAlerts } from './procurement-alerts';
 
 export interface SearchResult { id: string; title: string; type: string; description: string; path: string }
 export const normalizeSearch = (value: string) => value.normalize('NFKC').toLocaleLowerCase().replace(/[\u064B-\u065F]/g, '').replace(/ك/g, 'ک').replace(/ي/g, 'ی').trim();
 export function selectGlobalSearch(data: DomainState, query: string): SearchResult[] {
   const results: SearchResult[] = [
     ...routeRegistry.filter((route) => !('detail' in route)).map((route) => ({ id: `route:${route.id}`, title: t(route.title), type: 'ماڈیول', description: route.module, path: route.path })),
-    ...Object.values(data.suppliers).map((record) => ({ id: record.id, title: record.name, type: 'سپلائر', description: `${record.city} · ${record.phone}`, path: getRoute('supplier-detail').path.replace(':id', encodeURIComponent(record.id)) })),
-    ...Object.values(data.fabrics).map((record) => ({ id: record.id, title: record.name, type: 'کپڑا', description: `${record.composition} · ${record.widthInches}″`, path: `${getRoute('fabrics').path}?record=${encodeURIComponent(record.id)}` })),
+    ...Object.values(data.suppliers).map((record) => ({ id: record.id, title: record.name, type: 'سپلائر', description: `${supplierProfile(data,record.id).code} · ${record.city} · ${record.phone}`, path: getRoute('supplier-detail').path.replace(':id', encodeURIComponent(record.id)) })),
+    ...Object.values(data.fabrics).map((record) => ({ id: record.id, title: record.name, type: 'کپڑا', description: `${fabricProfile(data,record.id).code} · ${record.composition} · ${record.widthInches}″`, path: getRoute('fabric-detail').path.replace(':id',encodeURIComponent(record.id)) })),
+    ...Object.values(data.purchaseOrders).map((record)=>({id:record.id,title:record.number,type:'خریداری آرڈر',description:data.suppliers[record.supplierId].name,path:getRoute('purchase-detail').path.replace(':id',encodeURIComponent(record.id))})),
+    ...Object.values(data.goodsReceipts).map((record)=>({id:record.id,title:record.number,type:'مال وصولی',description:data.purchaseOrders[record.purchaseOrderId].number,path:getRoute('receipt-detail').path.replace(':id',encodeURIComponent(record.id))})),
+    ...supplierBills(data).map((record)=>({id:record.id,title:record.number,type:'سپلائر بل',description:data.suppliers[record.supplierId].name,path:getRoute('supplier-bill-detail').path.replace(':id',encodeURIComponent(record.id))})),
     ...Object.values(data.contractors).map((record) => ({ id: record.id, title: record.name, type: 'ٹھیکیدار', description: record.city, path: `${getRoute('contractors').path}?record=${encodeURIComponent(record.id)}` })),
   ];
   const term = normalizeSearch(query);
@@ -27,8 +31,7 @@ export function selectEnterpriseDashboard(data: DomainState) {
   try {
     postedReceipts.forEach((receipt) => {
       const value = receipt.lineIds.reduce((sum, id) => {
-        const line = data.goodsReceiptLines[id]; const orderLine = data.purchaseOrderLines[line.purchaseOrderLineId];
-        const total = sum + multiplyMoney(orderLine.unitPricePaisaPerMeter, line.quantityMeters);
+        const total = sum + receiptLineValue(data,id);
         if (!Number.isSafeInteger(total)) throw new Error('Unsafe total');
         return total;
       }, 0);
@@ -57,13 +60,15 @@ export function selectEnterpriseDashboard(data: DomainState) {
   };
 }
 export interface DemoNotification { id: string; title: string; description: string; path: string; tone: 'warning' | 'info' }
-export function selectNotifications(data: DomainState): DemoNotification[] {
-  if (data.history) return selectBusinessAlerts(data);
+export function selectNotifications(data: DomainState, asOf?:string): DemoNotification[] {
+  const reportDate=asOf??Object.values(data.procurement?.audits??{}).reduce((max,r)=>r.createdAt.slice(0,10)>max?r.createdAt.slice(0,10):max,data.history?.asOf??'1970-01-01');
+  const purchasing=selectProcurementAlerts(data,reportDate);
+  if (data.history) return [...selectBusinessAlerts(data),...purchasing];
   const summary = selectEnterpriseDashboard(data);
   const notifications: DemoNotification[] = summary.contractors.filter((c) => c.held > 0).map((c) => ({ id: `custody:${c.id}`, title: 'پروسیسنگ کی وصولی باقی ہے', description: `${c.name} · ${c.held} میٹر باقی`, path: getRoute('processing').path, tone: 'info' }));
   // UI warning threshold, not a new inventory rule or a fabricated reorder document.
   for (const [label, value] of [[t('grey'), summary.grey], [t('processed'), summary.processed]] as const) {
     if (value <= 100) notifications.push({ id: `stock:${label}`, title: `${label}: کم اسٹاک`, description: `موجودہ مقدار ${value} میٹر؛ نمائشی انتباہی حد ۱۰۰ میٹر۔`, path: getRoute('diagnostics').path, tone: 'warning' });
   }
-  return notifications;
+  return [...notifications,...purchasing];
 }

@@ -39,8 +39,9 @@ try {
   await searchField.fill('فیبرک سپلائرز'); await searchField.press('Enter');
   await expect(page.getByRole('heading', { name: 'موجودہ ماسٹر ریکارڈ کا پیش منظر' })).toBeVisible();
   await page.goto(`${baseURL}/dashboard`); await dashboard(page);
-  await page.getByRole('link', { name: 'نئی خریداری منصوبہ بند مرحلہ 4' }).click();
-  await expect(page.getByRole('heading', { name: 'خریداری کا مکمل ماڈیول جلد آئے گا' })).toBeVisible();
+  await page.getByRole('link', { name: 'نئی خریداری دستیاب' }).click();
+  await expect(page.getByRole('heading', { name: 'نیا ریکارڈ — خریداری کے آرڈرز' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'محفوظ کریں', exact: true })).toBeVisible();
   await page.getByRole('navigation', { name: 'صفحے کا راستہ' }).getByRole('link', { name: 'ڈیش بورڈ' }).click();
   await dashboard(page);
   await page.getByRole('button', { name: 'اطلاعات (1)' }).click();

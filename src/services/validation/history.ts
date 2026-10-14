@@ -10,7 +10,7 @@ export function inspectHistory(state: DomainState): ValidationIssue[] {
   const ref = (value: unknown, recordId: string, name: string) => { if (!value) fail(recordId, 'Invalid reference: ' + name); return Boolean(value); };
   const eq = (a: number, b: number, recordId: string, name: string) => { if (!Number.isFinite(a) || Math.abs(a - b) > .00005) fail(recordId, name + ': ' + a + ' != ' + b); };
   const sum = <T>(list: T[], f: (r: T) => number) => list.reduce((n, r) => n + f(r), 0);
-  const ids = new Set(Object.entries(state).filter(([key]) => key !== 'history').flatMap(([, records]) => Object.keys(records)));
+  const ids = new Set(Object.entries(state).filter(([key]) => key !== 'history' && key !== 'procurement').flatMap(([, records]) => Object.keys(records)));
   const numbers = new Set([...Object.values(state.purchaseOrders), ...Object.values(state.goodsReceipts), ...Object.values(state.challans), ...Object.values(state.processingReceipts)].map((r) => r.number));
   ref(state.companies[h.companyId], h.companyId, 'company');
   for (const [collection, entries] of Object.entries(h)) {
@@ -52,7 +52,7 @@ export function inspectHistory(state: DomainState): ValidationIssue[] {
     eq(r.totalPaisa, multiplyMoney(r.ratePaisaPerMeter, r.meters), r.id, 'Processing charge');
   });
   const allocations = Object.values(h.materialAllocations);
-  Object.values(state.goodsReceipts).forEach((r) => { if (r.status === 'POSTED' && (r.receivedOn < state.purchaseOrders[r.purchaseOrderId].orderDate || r.receivedOn > h.asOf)) fail(r.id, 'Purchase chronology'); });
+  Object.values(state.goodsReceipts).forEach((r) => { if (r.origin === 'SEED' && r.status === 'POSTED' && (r.receivedOn < state.purchaseOrders[r.purchaseOrderId].orderDate || r.receivedOn > h.asOf)) fail(r.id, 'Purchase chronology'); });
   Object.values(h.batches).forEach((r) => {
     ref(state.designs[r.designId]?.bomId === r.bomId, r.id, 'design/bom');
     eq(r.targetSuits, r.completedSuits + r.rejectedSuits + r.inProgressSuits + r.plannedSuits, r.id, 'Production quantity');

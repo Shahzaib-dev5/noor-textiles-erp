@@ -2,14 +2,14 @@
 
 Updated: 2026-10-14 (Asia/Karachi).
 
-Phases 1, 2 and 3 are complete and verified. The user authorized **Phase 3: Realistic Connected Demo Data & Advanced Business Dashboard**; Phase 4 and later scopes remain proposed.
+Phases 1–4 are complete and verified. The user authorized **Phase 4: Suppliers, Fabric Master & Complete Purchasing Management**, which is now complete. Phase 5 has not started.
 
 | Phase | Scope | Status | Implemented / next action |
 | --- | --- | --- | --- |
 | 1 | Project architecture | Complete — verified | React/Vite foundation, strict domain contracts, three transactions, central local state, Urdu RTL shell, diagnostics, all required docs; 85 tests, typecheck, lint, build and real browser smoke passed |
 | 2 | Complete Urdu RTL UI/UX & design system | Complete — verified | Enterprise dashboard, separate persistent UI preferences, seven sidebar groups, search, notifications, reusable tables/forms/dialogs/charts, design-system showcase and print foundation; 112 tests, strict typecheck, lint, production build and both Edge browser suites passed |
 | 3 | Connected demo data and advanced business dashboard | Complete — verified | Deterministic opt-in purchasing/processing/production/wholesale history, safe replacement, strict validation, pure analytics, scoped filters, charts, alerts and reconciliation; 156 tests, TypeScript, lint, build and all three browser suites passed |
-| 4 | Master records, purchasing and grey inventory | Not started | Proposed: company/supplier/fabric master CRUD, PO/GRN workflows, lot/roll views, transfers/adjustments, supplier invoice/return contracts |
+| 4 | Suppliers, fabric master and purchasing | Complete — verified | Persistent masters, requests, PO/GRN, bills/payments/ledger/returns, dashboard/reports/print/search/alerts/audit; 190 tests, typecheck, lint, build and four production browser suites passed; company CRUD and warehouse enhancements excluded by the supplied brief |
 | 5 | Processing operations | Not started | Proposed: full challan/receipt screens, multiple lots/partial receipts, explicit losses and contractor reconciliation |
 | 6 | Collections, designs and BOMs | Not started | Proposed: seasonal collections, samples/approval, color variants, two-/three-piece component BOMs |
 | 7 | Production planning and cutting | Not started | Proposed: plans/work orders, protected material allocation, WIP, cutting outputs and loss |
@@ -76,6 +76,15 @@ Phases 1, 2 and 3 are complete and verified. The user authorized **Phase 3: Real
 - Added read-only shared-store directories/history previews. No future operational CRUD or backend was implemented.
 - All 156 tests, TypeScript, ESLint, production build and three browser suites passed; results and exact historical-workflow limits are tracked in [Phase 3 acceptance](PHASE_3_ACCEPTANCE.md).
 
-## Phase 4 handoff
+## Phase 4 implementation ledger
 
-Begin only after receiving Phase 4 requirements. Implement company/supplier/fabric master CRUD and purchasing/grey inventory workflows on existing normalized records. Preserve historical provenance and explicit replacement policy. Respect source statuses, meter/suit separation, imported snapshots and the independent golden fixture. Define approval/reversal behavior deliberately; do not repost imported completed history. Reuse the existing tables/forms/dialogs and rerun all business/UI/persistence/browser checks. Production, wholesale accounting and chained processing editors remain their later phase scopes.
+- Inspected the existing branch, domain, storage, seed, UI and documentation; baseline 156 tests passed before changes.
+- Added optional procurement version 4 to the existing schema-1 state, pure typed commands, strict source/state validation, and shared selectors; existing golden/expanded seeds and original reducers remain unchanged.
+- Implemented all 28 required purchasing/master routes plus dashboard alias, using existing reusable Urdu RTL forms, tables, dialogs, charts and one store commit per successful mutation.
+- Added measured partial/rejected receiving, full retained-GRN bills, allocated payments/advances, supplier ledger and compensating stock-limited returns. Preserved immutable historical provenance and separate UI preferences.
+- Extended live dashboards, CSV/A4 reports, global search, notifications and audit. Added critical transaction and selector tests plus Phase 4 browser scenarios A–E.
+- Final TypeScript, ESLint, all 190 tests in 11 files, production build and all four browser suites passed. Phase 4 browser verifies scenarios A–E, exported rupee amounts, A4, persistence, search and four viewport sizes in both themes. See [Phase 4 acceptance](PHASE_4_ACCEPTANCE.md).
+
+## Phase 5 handoff
+
+Processing operations and grey warehouse enhancements remain unimplemented. Reuse procurement source IDs and movement-derived availability; preserve historical snapshots, posting events and meter/suit separation. Add identified roll custody before offering individual-roll operations after aggregate historical processing. Supplier advance reallocation/refund, posted-payment reversal and controlled approved-PO amendments require explicit future transaction contracts. No backend or real authentication/payment processing was added.

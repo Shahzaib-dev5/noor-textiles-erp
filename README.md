@@ -21,11 +21,17 @@ Open the local URL printed by Vite. Use a current Node.js version compatible wit
 - `/settings`: explicit JSON export/import and reset of saved demo data.
 - `/design-system`: interactive components, a validated UI-only form, actual record tables, real-data charts and an existing purchase-order print showcase.
 
-Future module routes are labeled **زیرِ تعمیر** with their proposed phase number. A demo role switcher is available for context; it does not enforce authorization.
+Future module routes are labeled **زیرِ تعمیر** with their proposed phase number. A demo role switcher simulates purchasing command permissions; it is not secure authorization.
 
 The golden history receives 1,000 m, issues 400 m to processing, receives 380 m and recognizes 10 m loss. Balances are **600 m grey + 380 m processed + 10 m contractor-held + 10 m loss = 1,000 m**. The example finished SKU is a catalogue record with zero suits in stock.
 
-UI preferences use the separate key `noor-textiles-erp-ui-v1`; business JSON export/reset does not reset sidebar, theme, selected demo work profile or preferred table page size. Ctrl/Cmd+K opens global search. CSV exports are real local downloads with Urdu encoding. The showcase form is transient and cannot alter business inventory. Purchase dashboard amounts are receipt valuations, with sales/profit/receivable values honestly marked upcoming.
+UI preferences use the separate key `noor-textiles-erp-ui-v1`; business JSON export/reset does not reset sidebar, theme, selected demo work profile or preferred table page size. Ctrl/Cmd+K opens global search. CSV exports are real local downloads with Urdu encoding. The showcase form is transient and cannot alter business inventory. Purchasing views separate order commitments, receipt valuation, posted liabilities, cash allocations and advances.
+
+## Phase 4 purchasing
+
+Operational routes include `/suppliers`, `/fabrics`, `/purchases`, `/purchases/requests`, `/purchases/receipts`, `/purchases/bills`, `/purchases/payments`, `/purchases/returns` and `/purchases/reports`, with create/edit/detail paths and `/suppliers/:id/ledger`. Use the owner demo role to exercise the entire lifecycle. Supplier/fabric creation creates no stock; approve a PO, enter measured rolls in a draft GRN, then post it. Bills, payments and approved returns each require explicit posting.
+
+Meters are canonical, rates are per meter, money is integer paisa, receipt tolerance is zero and tax is explicitly zero. Existing historical records remain read-only and are never silently replaced or reposted. The additive procurement extension preserves the existing localStorage envelope and preferences. See [purchasing workflow](docs/PURCHASING_WORKFLOW.md), [supplier ledger](docs/SUPPLIER_LEDGER_RULES.md), [receiving rules](docs/GRN_AND_ROLL_RECEIVING.md), [route map](docs/ROUTE_MAP.md) and [Phase 4 acceptance](docs/PHASE_4_ACCEPTANCE.md) for actual verification and limits. Phase 5 processing/grey warehouse enhancements have not started.
 
 ## Verification
 
@@ -36,7 +42,7 @@ npm run test -- --run
 npm run build
 ```
 
-Actual executed results are tracked in [Phase 1 acceptance](docs/PHASE_1_ACCEPTANCE.md). Do not infer that a command passed merely because it is listed here.
+Actual executed results are tracked in the phase acceptance documents; the current purchasing evidence is in [Phase 4 acceptance](docs/PHASE_4_ACCEPTANCE.md). Do not infer that a command passed merely because it is listed here.
 
 An optional real-browser smoke script covers reload persistence, all three isolated transactions, export/import/reset, mobile navigation and corrupt-data protection. It launches installed Microsoft Edge headlessly through Playwright, uses fresh temporary browser contexts and writes screenshots/export evidence under `artifacts/`. Start the development server first, then run:
 

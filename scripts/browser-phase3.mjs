@@ -58,7 +58,7 @@ try {
   await writeFile(resolve(artifacts, 'kpi-evidence.txt'), headings, 'utf8');
   await writeFile(resolve(artifacts, 'expanded-snapshot.json'), expanded, 'utf8');
   await page.goto(baseURL + '/suppliers');
-  await expect(page.getByRole('heading', { name: 'مربوط نمونہ ڈائریکٹری — صرف مشاہدہ' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'سپلائرز کا رجسٹر' })).toBeVisible();
   await page.locator('tbody').getByRole('button', { name: 'تفصیل', exact: true }).first().click();
   await expect(page.getByRole('heading', { name: 'موجودہ تاریخی ریکارڈ کا پیش منظر' })).toBeVisible();
   assert.equal(await page.evaluate((key) => localStorage.getItem(key), key), expanded);

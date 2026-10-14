@@ -1,11 +1,11 @@
 import type { DomainState } from '@/domain/entities';
 import { roundQuantity } from '@/domain/value-objects/quantity';
-import { multiplyMoney } from '@/domain/value-objects/money';
 import { selectBatchCosts, selectInvoiceBalances, sum } from './business';
+import { supplierLedger, receiptLineValue } from './procurement';
 export function selectSupplierPurchases(data: DomainState) {
   return Object.values(data.suppliers).map((supplier) => {
     const receipts = Object.values(data.goodsReceipts).filter((r) => r.status === 'POSTED' && data.purchaseOrders[r.purchaseOrderId].supplierId === supplier.id);
-    return { supplierId: supplier.id, meters: roundQuantity(sum(receipts, (r) => sum(r.lineIds, (id) => data.goodsReceiptLines[id].quantityMeters))), postedValuePaisa: sum(receipts, (r) => sum(r.lineIds, (id) => { const line = data.goodsReceiptLines[id]; return multiplyMoney(data.purchaseOrderLines[line.purchaseOrderLineId].unitPricePaisaPerMeter, line.quantityMeters); })), payablePaisa: supplier.openingBalancePaisa + sum(Object.values(data.history?.supplierInvoices ?? {}).filter((i) => i.supplierId === supplier.id), (i) => i.totalPaisa) };
+    return { supplierId: supplier.id, meters: roundQuantity(sum(receipts, (r) => sum(r.lineIds, (id) => data.goodsReceiptLines[id].quantityMeters))), postedValuePaisa: sum(receipts, (r) => sum(r.lineIds, (id) => { return receiptLineValue(data,id); })), payablePaisa: supplierLedger(data,supplier.id).outstanding };
   });
 }
 export function selectContractorBalances(data: DomainState) {

@@ -2,7 +2,7 @@ import type { DocumentMeta, EntityID, EntityMeta, FabricLotID, InventoryLocation
 
 export interface FabricLot extends EntityMeta<'ACTIVE' | 'INACTIVE'> { code: string; fabricId: EntityID; supplierId: EntityID; sourceGoodsReceiptLineId: EntityID }
 export interface StockLocation extends EntityMeta<'ACTIVE' | 'INACTIVE'> { name: string; warehouseId?: EntityID; contractorId?: EntityID; category: InventoryLocationType }
-export type MovementSourceType = 'GOODS_RECEIPT' | 'PROCESSING_ISSUE' | 'PROCESSING_RECEIPT' | 'PROCESSING_LOSS';
+export type MovementSourceType = 'GOODS_RECEIPT' | 'PROCESSING_ISSUE' | 'PROCESSING_RECEIPT' | 'PROCESSING_LOSS' | 'PURCHASE_RETURN';
 export interface InventoryMovement extends EntityMeta<'POSTED'> {
   sourceType: MovementSourceType;
   sourceDocumentId: EntityID;

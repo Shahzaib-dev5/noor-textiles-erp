@@ -8,8 +8,10 @@ const DashboardPage = lazy(() => import('@/features/dashboard/DashboardPage'));
 const DiagnosticsPage = lazy(() => import('@/features/diagnostics/DiagnosticsPage'));
 const SettingsPage = lazy(() => import('@/features/settings/SettingsPage'));
 const DesignSystemPage = lazy(() => import('@/features/design-system/DesignSystemPage'));
+const ProcurementPage = lazy(() => import('@/features/purchasing/ProcurementPage'));
 
 function routeElement(route: ERPRoute) {
+  if (['suppliers','fabrics','purchasing','procurement'].includes(route.module)) return <ProcurementPage route={route} />;
   switch (route.id) {
     case 'dashboard': return <DashboardPage />;
     case 'diagnostics': return <DiagnosticsPage />;

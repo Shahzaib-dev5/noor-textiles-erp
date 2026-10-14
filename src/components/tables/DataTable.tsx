@@ -7,7 +7,7 @@ import { useToast } from '@/store/toasts';
 import { useUIStore } from '@/store/ui-preferences';
 import { buildCSV, downloadText } from '@/lib/csv';
 
-export interface TableColumn<T> { id: string; label: string; value: (row: T) => string | number; render?: (row: T) => ReactNode; sortable?: boolean; technical?: boolean }
+export interface TableColumn<T> { id: string; label: string; value: (row: T) => string | number; exportValue?: (row: T) => string | number; render?: (row: T) => ReactNode; sortable?: boolean; technical?: boolean }
 export interface TableFilter<T> { id: string; label: string; options: { value: string; label: string }[]; matches: (row: T, value: string) => boolean }
 export interface DataTableProps<T> { title: string; rows: readonly T[]; columns: readonly TableColumn<T>[]; rowId: (row: T) => string; filters?: readonly TableFilter<T>[]; loading?: boolean; error?: string; onDetails?: (row: T) => void; emptyDescription?: string; initialPageSize?: 5 | 10 | 25 | 50 }
 export function DataTableColumnHeader({ label, direction, onSort }: { label: string; direction?: 'asc' | 'desc'; onSort?: () => void }) { return onSort ? <button className="inline-flex items-center gap-2" onClick={onSort}>{label}{direction === 'asc' ? <ArrowUp className="size-3" /> : direction === 'desc' ? <ArrowDown className="size-3" /> : <ArrowUpDown className="size-3 text-muted-foreground" />}</button> : <span>{label}</span>; }
@@ -46,7 +46,7 @@ export function DataTable<T>({ title, rows, columns, rowId, filters = [], loadin
   function exportRows() {
     try {
       const exporting = selectedRows.length ? selectedRows : filtered;
-      downloadText(buildCSV(visibleColumns.map((c) => c.label), exporting.map((row) => visibleColumns.map((c) => c.value(row)))), 'noor-textiles-records.csv');
+      downloadText(buildCSV(visibleColumns.map((c) => c.label), exporting.map((row) => visibleColumns.map((c) => (c.exportValue ?? c.value)(row)))), 'noor-textiles-records.csv');
       useToast.getState().add(`${exporting.length} ریکارڈ کی CSV نقل تیار ہو گئی۔`);
     } catch { useToast.getState().add('CSV برآمد نہیں ہو سکی۔', 'error'); }
   }

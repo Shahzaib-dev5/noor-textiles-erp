@@ -6,5 +6,7 @@ export const statusPresentation = {
   OVERDUE: ['مقررہ تاریخ گزر چکی', 'error'], ACTIVE: ['فعال', 'success'], INACTIVE: ['غیر فعال', 'neutral'],
   PLANNED: ['منصوبہ بند', 'neutral'], CUTTING: ['کٹنگ', 'info'], PACKING: ['پیکنگ', 'info'],
   CONFIRMED: ['تصدیق شدہ', 'success'], PARTIALLY_DISPATCHED: ['جزوی ڈسپیچ', 'warning'], UNPAID: ['غیر ادا شدہ', 'warning'],
+  SUBMITTED: ['جمع شدہ', 'info'], CONVERTED: ['آرڈر میں تبدیل', 'success'], CLOSED: ['بند', 'neutral'],
+  ACCEPTED: ['منظور شدہ', 'success'], QUARANTINED: ['قرنطینہ', 'warning'], RETURNED_TO_SUPPLIER: ['سپلائر کو واپس', 'neutral'],
 } as const;
 export type DisplayStatus = keyof typeof statusPresentation;

@@ -104,8 +104,8 @@ try {
   await expect(mobilePage.locator('#erp-sidebar')).toBeHidden();
   await mobilePage.getByRole('button', { name: 'مینو کھولیں', exact: true }).click();
   await expect(mobilePage.getByRole('dialog', { name: 'مرکزی نیویگیشن' })).toBeVisible();
-  await mobilePage.getByRole('dialog', { name: 'مرکزی نیویگیشن' }).getByRole('link', { name: 'خریداری زیرِ تعمیر', exact: true }).click();
-  await expect(mobilePage.getByRole('heading', { name: 'خریداری کا مکمل ماڈیول جلد آئے گا' })).toBeVisible();
+  await mobilePage.getByRole('dialog', { name: 'مرکزی نیویگیشن' }).getByRole('link', { name: 'خریداری', exact: true }).click();
+  await expect(mobilePage.getByRole('heading', { name: 'خریداری کا ڈیش بورڈ' })).toBeVisible();
   await expect(mobilePage.locator('#erp-sidebar')).toBeHidden();
   await mobilePage.getByRole('button', { name: 'مینو کھولیں', exact: true }).click();
   await mobilePage.getByRole('dialog', { name: 'مرکزی نیویگیشن' }).getByRole('link', { name: 'ڈیش بورڈ', exact: true }).click();

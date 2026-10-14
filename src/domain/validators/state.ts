@@ -6,6 +6,8 @@ import { inspectInventoryInvariants } from '@/domain/invariants';
 import type { DomainError, EntityMeta } from '@/types/common';
 import { historySchema } from '@/domain/entities/history';
 import { inspectHistory } from '@/services/validation/history';
+import { procurementSchema } from '@/domain/entities/procurement';
+import { inspectProcurement } from '@/services/validation/procurement';
 
 const reservedKeys = new Set(Object.getOwnPropertyNames(Object.prototype));
 const id = z.string().min(1).max(160).regex(/^[A-Za-z0-9:_-]+$/).refine((value) => !reservedKeys.has(value), 'Reserved object key cannot be an entity ID');
@@ -28,6 +30,7 @@ const entityMap = <T extends z.ZodTypeAny>(schema: T) => z.record(id, schema);
 
 const rawStateSchema = z.object({
   history: historySchema.optional(),
+  procurement: procurementSchema.optional(),
   companies: entityMap(activeOnly.extend({ name: text, city: text, address: text, currency: z.literal('PKR'), locale: z.literal('ur-PK') }).strict()),
   employees: entityMap(active.extend({ companyId: id, name: text, roleId: id, departmentId: id.optional() }).strict()),
   roles: entityMap(active.extend({ name: text, permissionKeys: z.array(text) }).strict()),
@@ -39,7 +42,7 @@ const rawStateSchema = z.object({
   rolls: entityMap(active.extend({ lotId: id, label: text, packagingUnit: z.enum(['ROLL', 'THAAN']), actualLengthMeters: positiveQuantity, originalUnit: lengthUnit, originalLength: positiveQuantity }).strict()),
   purchaseOrders: entityMap(document.extend({ status: z.enum(['DRAFT', 'APPROVED', 'PARTIALLY_RECEIVED', 'COMPLETED', 'CANCELLED']), supplierId: id, lineIds: childIds, orderDate: date }).strict()),
   purchaseOrderLines: entityMap(activeOnly.extend({ purchaseOrderId: id, fabricId: id, quantityMeters: positiveQuantity, originalQuantity: positiveQuantity, originalUnit: z.enum(['METER', 'YARD', 'ROLL', 'THAAN', 'PIECE', 'SUIT', 'CARTON']), conversionMetersPerUnit: z.number().positive().finite(), unitPricePaisaPerMeter: money }).strict()),
-  goodsReceipts: entityMap(receiptDocument.extend({ purchaseOrderId: id, warehouseLocationId: id, lineIds: childIds, receivedOn: date }).strict()),
+  goodsReceipts: entityMap(receiptDocument.extend({ purchaseOrderId: id, warehouseLocationId: id, lineIds: z.array(id).refine((ids) => new Set(ids).size === ids.length), receivedOn: date }).strict()),
   goodsReceiptLines: entityMap(activeOnly.extend({ goodsReceiptId: id, purchaseOrderLineId: id, lotId: id, quantityMeters: positiveQuantity, originalQuantity: positiveQuantity, originalUnit: lengthUnit, conversionMetersPerUnit: z.number().positive().finite() }).strict()),
   contractors: entityMap(active.extend({ name: text, city: text, phone: text, services: z.array(z.enum(PROCESSING_SERVICE)).min(1) }).strict()),
   challans: entityMap(document.extend({ status: z.enum(['DRAFT', 'APPROVED', 'POSTED', 'PARTIALLY_RECEIVED', 'COMPLETED', 'CANCELLED']), contractorId: id, fromLocationId: id, contractorLocationId: id, serviceType: z.enum(PROCESSING_SERVICE), lineIds: childIds, jobId: id.optional() }).strict()),
@@ -47,7 +50,7 @@ const rawStateSchema = z.object({
   processingReceipts: entityMap(receiptDocument.extend({ challanId: id, destinationLocationId: id, lineIds: childIds }).strict()),
   processingReceiptLines: entityMap(activeOnly.extend({ processingReceiptId: id, challanLineId: id, outputMeters: quantity, lossMeters: quantity, lossReason: z.string().max(500), lossApprovedById: id.optional() }).strict()),
   processingLosses: entityMap(posted.extend({ receiptId: id, receiptLineId: id, challanId: id, challanLineId: id, lotId: id, quantityMeters: positiveQuantity, reason: text, approvedById: id }).strict()),
-  movements: entityMap(posted.extend({ sourceType: z.enum(['GOODS_RECEIPT', 'PROCESSING_ISSUE', 'PROCESSING_RECEIPT', 'PROCESSING_LOSS']), sourceDocumentId: id, sourceLineId: id, lotId: id, rollId: id.optional(), locationId: id, category, quantityMeters: z.number().refine((value) => value !== 0 && isQuantity(Math.abs(value), false)), occurredAt: dateTime, contractorId: id.optional() }).strict()),
+  movements: entityMap(posted.extend({ sourceType: z.enum(['GOODS_RECEIPT', 'PROCESSING_ISSUE', 'PROCESSING_RECEIPT', 'PROCESSING_LOSS', 'PURCHASE_RETURN']), sourceDocumentId: id, sourceLineId: id, lotId: id, rollId: id.optional(), locationId: id, category, quantityMeters: z.number().refine((value) => value !== 0 && isQuantity(Math.abs(value), false)), occurredAt: dateTime, contractorId: id.optional() }).strict()),
   reservations: entityMap(meta.extend({ status: z.enum(['ACTIVE', 'COMPLETED', 'CANCELLED']), lotId: id, locationId: id, category, quantityMeters: positiveQuantity, sourceDocumentId: id }).strict()),
   customers: entityMap(active.extend({ name: text, city: text, phone: text, openingBalancePaisa: money }).strict()),
   designs: entityMap(meta.extend({ status: z.enum(['DRAFT', 'APPROVED', 'INACTIVE']), code: text, name: text, pieceCount: z.union([z.literal(2), z.literal(3)]), imagePath: z.string().startsWith('/'), collectionId: id.optional(), bomId: id.optional() }).strict()),
@@ -66,7 +69,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   const allIds = new Set<string>();
   const numberIds = new Set<string>();
   for (const [collection, entries] of Object.entries(state)) {
-    if (collection === 'history') continue;
+    if (collection === 'history' || collection === 'procurement') continue;
     for (const [key, entity] of Object.entries(entries as Record<string, EntityMeta>)) {
       if (key !== entity.id || allIds.has(entity.id)) fail(`Duplicate or mismatched entity key: ${collection}/${key}`);
       allIds.add(entity.id);
@@ -126,6 +129,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
     else if (line.conversionMetersPerUnit !== (line.originalUnit === 'YARD' ? 0.9144 : 1) || roundQuantity(line.originalQuantity * line.conversionMetersPerUnit) !== line.quantityMeters) fail(`PO unit conversion mismatch: ${line.id}`);
   });
   Object.values(state.goodsReceipts).forEach((receipt) => {
+    if (!receipt.lineIds.length && !Object.values(state.procurement?.receiptProfiles ?? {}).some((p) => p.goodsReceiptId === receipt.id)) fail('Empty receipt requires operational inspection evidence');
     const order = state.purchaseOrders[receipt.purchaseOrderId];
     ref(order, receipt.id);
     ref(state.locations[receipt.warehouseLocationId]?.category === 'GREY', receipt.id);
@@ -199,6 +203,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
     if (!receipt || !line || receipt.status !== 'POSTED' || line.processingReceiptId !== receipt.id || receipt.challanId !== loss.challanId || line.challanLineId !== loss.challanLineId || challanLine?.lotId !== loss.lotId || loss.quantityMeters !== line.lossMeters || loss.approvedById !== line.lossApprovedById || loss.reason !== line.lossReason) fail(`Invalid processing loss relationship: ${loss.id}`);
   });
   const expectedKeys = new Map<string, number>();
+  Object.values(state.procurement?.returns ?? {}).filter((r) => r.status === 'POSTED').forEach((r) => expected.push({ sourceType: 'PURCHASE_RETURN', sourceDocumentId: r.id, sourceLineId: r.goodsReceiptLineId, lotId: r.lotId, locationId: r.locationId, category: 'GREY', quantityMeters: -r.quantityMeters }));
   expected.forEach((effect) => expectedKeys.set(effectKey(effect), (expectedKeys.get(effectKey(effect)) ?? 0) + 1));
   Object.values(state.movements).forEach((movement) => {
     ref(state.lots[movement.lotId], movement.id); ref(state.locations[movement.locationId]?.category === movement.category, movement.id);
@@ -220,9 +225,10 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   if (Object.keys(state.reservations).length) fail('Reservation posting is not implemented in Phase 1');
   Object.values(state.designs).forEach((design) => { if (!state.history && (design.collectionId || design.bomId)) fail('Collection and BOM require validated history'); });
   Object.values(state.finishedSKUs).forEach((sku) => { ref(state.designs[sku.designId]?.pieceCount === sku.pieceCount, sku.id); if (!state.history && (sku.colorVariantId || !sku.catalogueOnly)) fail('Finished production requires validated history'); });
-  Object.values(state.activityLogs).forEach((log) => { ref(state.employees[log.actorId], log.id); ref(documents.some((document) => document.id === log.documentId), log.id); });
+  Object.values(state.activityLogs).forEach((log) => { ref(state.employees[log.actorId], log.id); ref(documents.some((document) => document.id === log.documentId) || Boolean(state.suppliers[log.documentId] || state.fabrics[log.documentId]) || Object.values(state.procurement?.requests ?? {}).some((r) => r.id === log.documentId) || Object.values(state.procurement?.bills ?? {}).some((r) => r.id === log.documentId) || Object.values(state.procurement?.payments ?? {}).some((r) => r.id === log.documentId) || Object.values(state.procurement?.returns ?? {}).some((r) => r.id === log.documentId), log.id); });
   inspectInventoryInvariants(state).forEach(fail);
   inspectHistory(state).forEach((issue) => fail(issue.recordId + ': ' + issue.message));
+  inspectProcurement(state).forEach(fail);
 }
 
 export const domainStateSchema: z.ZodType<DomainState> = rawStateSchema.superRefine((state, context) => {

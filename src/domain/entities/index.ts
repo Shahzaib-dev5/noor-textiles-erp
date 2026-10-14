@@ -6,6 +6,7 @@ import type { Contractor, ProcessingChallan, ProcessingChallanLine, ProcessingLo
 import type { Design, FinishedProductSKU } from './production';
 import type { Customer } from './wholesale';
 import type { HistoricalDataset } from './history';
+import type { ProcurementState } from './procurement';
 
 export * from './company';
 export * from './purchasing';
@@ -17,6 +18,7 @@ export * from './wholesale';
 /** The shared meter foundation and optional validated Phase 3 historical extension. */
 export interface DomainState {
   history?: HistoricalDataset;
+  procurement?: ProcurementState;
   companies: EntityMap<Company>;
   employees: EntityMap<Employee>;
   roles: EntityMap<DemoRole>;

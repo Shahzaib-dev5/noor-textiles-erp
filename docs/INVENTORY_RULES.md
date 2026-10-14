@@ -89,3 +89,8 @@ No user can directly overwrite the authoritative balance through the Phase 1 UI.
 ## Limits
 
 These are deterministic local-demo safeguards. The store can detect a changed saved snapshot before writing and refuse a stale tab, but localStorage has no atomic compare-and-swap across tabs. A simultaneous read/check/write race is still possible. Data can also be manually modified outside the app. Production custody requires a transactional server and authorization, intentionally outside this project.
+# Phase 4 receiving and purchase returns
+
+Accepted USER GRNs use the existing goods-receipt posting architecture. Draft lots/rolls never contribute stock until posting. Rejected/quarantined inspection rolls contribute zero stock; zero accepted rolls may post inspection evidence only. Unit conversion, four-decimal rounding and zero receipt tolerance are described in [GRN and roll receiving](GRN_AND_ROLL_RECEIVING.md).
+
+`PURCHASE_RETURN` is a negative GREY movement linked to the original receipt line, lot, location and optional known roll. It cannot exceed movement-derived availability or eligible received/identified roll quantities. Imported states require exact posted-return stock effects and roll references. Original GRNs and measured roll lengths remain intact. Global conservation subtracts supplier-returned meters as a separate outflow; PO received quantity is not reopened by returns. No warehouse total is manually edited.

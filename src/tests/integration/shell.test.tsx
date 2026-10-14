@@ -30,9 +30,9 @@ describe('Urdu foundation application', () => {
     const balances = screen.getByRole('region', { name: 'کپڑے کے موجودہ بیلنس' });
     expect(within(balances).getByText('600')).toBeInTheDocument();
     expect(within(balances).getByText('380')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('link', { name: 'خریداری زیرِ تعمیر' }));
-    expect(screen.getByRole('heading', { name: 'خریداری کا مکمل ماڈیول جلد آئے گا' })).toBeInTheDocument();
-    expect(screen.getByText('زیرِ تعمیر · مرحلہ 4')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('link', { name: 'خریداری' }));
+    expect(await screen.findByRole('heading', { name: 'خریداری کا ڈیش بورڈ', level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'خریداری کے اشاریے' })).toBeInTheDocument();
   });
 
   it('executes the three isolated scenario transactions without changing the dashboard', async () => {

@@ -14,4 +14,7 @@
   .print-document tr, .print-document header, .print-document footer { break-inside: avoid; }
   .print-document thead { display: table-header-group; }
   .print-document * { color: black !important; }
+  dialog:has(.print-document) { position: static !important; max-width: none !important; max-height: none !important; width: 100% !important; margin: 0 !important; border: 0 !important; transform: none !important; overflow: visible !important; box-shadow: none !important; }
+  dialog:has(.print-document) > div:first-child { display: none !important; }
+  dialog:has(.print-document)::backdrop { display: none !important; }
 }

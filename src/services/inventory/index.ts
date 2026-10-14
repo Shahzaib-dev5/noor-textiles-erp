@@ -40,10 +40,11 @@ export function getInventorySummary(state: DomainState) {
 export function getReconciliation(state: DomainState) {
   const totals = getInventorySummary(state);
   const productionConsumed = getProductionConsumedMeters(state);
+  const returned = roundQuantity(-Object.values(state.movements).filter((m) => m.sourceType === 'PURCHASE_RETURN').reduce((n, m) => n + m.quantityMeters, 0));
   const purchased = roundQuantity(Object.values(state.movements).filter((movement) => movement.sourceType === 'GOODS_RECEIPT').reduce((sum, movement) => sum + movement.quantityMeters, 0));
   const issued = roundQuantity(Object.values(state.movements).filter((movement) => movement.sourceType === 'PROCESSING_ISSUE' && movement.category === 'PROCESSING_OUT').reduce((sum, movement) => sum + movement.quantityMeters, 0));
-  const difference = roundQuantity(purchased - totals.grey - totals.processed - totals.contractor - totals.loss - productionConsumed);
-  return { ...totals, ...(state.history ? { productionConsumed } : {}), purchased, issued, difference, balanced: difference === 0 };
+  const difference = roundQuantity(purchased - returned - totals.grey - totals.processed - totals.contractor - totals.loss - productionConsumed);
+  return { ...totals, ...(state.history ? { productionConsumed } : {}), ...(state.procurement ? { returned } : {}), purchased, issued, difference, balanced: difference === 0 };
 }
 export function getProductionConsumedMeters(state: DomainState) {
   return roundQuantity(Object.values(state.history?.materialAllocations ?? {}).reduce((n, r) => n + r.quantityMeters, 0));

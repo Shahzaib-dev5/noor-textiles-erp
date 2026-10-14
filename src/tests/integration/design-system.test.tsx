@@ -35,8 +35,8 @@ describe('Phase 2 shell and protected business state', () => {
   it('opens mobile navigation, navigates, and closes through the drawer', async () => {
     await openRoute(); fireEvent.click(screen.getByRole('button', { name: 'مینو کھولیں' }));
     const drawer = screen.getByRole('dialog', { name: 'مرکزی نیویگیشن' });
-    expect(drawer).toHaveAttribute('open'); fireEvent.click(within(drawer).getByRole('link', { name: 'خریداری زیرِ تعمیر' }));
-    expect(drawer).not.toHaveAttribute('open'); expect(screen.getByRole('heading', { name: 'خریداری کا مکمل ماڈیول جلد آئے گا' })).toBeInTheDocument();
+    expect(drawer).toHaveAttribute('open'); fireEvent.click(within(drawer).getByRole('link', { name: 'خریداری' }));
+    expect(drawer).not.toHaveAttribute('open'); expect(await screen.findByRole('heading', { name: 'خریداری کا ڈیش بورڈ', level: 1 })).toBeInTheDocument();
   });
   it('supports Ctrl+K keyboard search, empty results and record result navigation', async () => {
     await openRoute(); fireEvent.keyDown(document, { key: 'k', ctrlKey: true });
