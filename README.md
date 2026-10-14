@@ -31,9 +31,11 @@ UI preferences use the separate key `noor-textiles-erp-ui-v1`; business JSON exp
 
 Operational routes include `/suppliers`, `/fabrics`, `/purchases`, `/purchases/requests`, `/purchases/receipts`, `/purchases/bills`, `/purchases/payments`, `/purchases/returns` and `/purchases/reports`, with create/edit/detail paths and `/suppliers/:id/ledger`. Use the owner demo role to exercise the entire lifecycle. Supplier/fabric creation creates no stock; approve a PO, enter measured rolls in a draft GRN, then post it. Bills, payments and approved returns each require explicit posting.
 
-Meters are canonical, rates are per meter, money is integer paisa, receipt tolerance is zero and tax is explicitly zero. Existing historical records remain read-only and are never silently replaced or reposted. The additive procurement extension preserves the existing localStorage envelope and preferences. See [purchasing workflow](docs/PURCHASING_WORKFLOW.md), [supplier ledger](docs/SUPPLIER_LEDGER_RULES.md), [receiving rules](docs/GRN_AND_ROLL_RECEIVING.md), [route map](docs/ROUTE_MAP.md) and [Phase 4 acceptance](docs/PHASE_4_ACCEPTANCE.md) for actual verification and limits. Phase 5 processing/grey warehouse enhancements have not started.
+Meters are canonical, rates are per meter, money is integer paisa, receipt tolerance is zero and tax is explicitly zero. Existing historical records remain read-only and are never silently replaced or reposted. The additive procurement extension preserves the existing localStorage envelope and preferences. See [purchasing workflow](docs/PURCHASING_WORKFLOW.md), [supplier ledger](docs/SUPPLIER_LEDGER_RULES.md), [receiving rules](docs/GRN_AND_ROLL_RECEIVING.md), [route map](docs/ROUTE_MAP.md) and [Phase 4 acceptance](docs/PHASE_4_ACCEPTANCE.md) for actual verification and limits. Phase 5 now extends grey warehouse control; full processing editors remain Phase 6.
 
 ## Verification
+
+Phase 5 adds `/inventory/grey` and warehouse routes for lots, rolls, locations, putaway, transfers, reservations, stocktakes, adjustments, quality holds, contractor custody, movements and reports. Use the owner demo role for approval workflows. Create a staging/bin hierarchy (or explicitly create the empty sample layout), receive through Phase 4, and put accepted measured rolls away. Stock moves only through posted events; reservations and saved counts do not create stock. Historical roll custody is honestly marked unknown where source history has no identities. See [Phase 5 acceptance](docs/PHASE_5_ACCEPTANCE.md), [warehouse workflow](docs/GREY_WAREHOUSE_WORKFLOW.md) and [roll model](docs/ROLL_TRACKING_MODEL.md). Full processing management remains Phase 6.
 
 ```sh
 npm run typecheck
@@ -77,7 +79,7 @@ src/
 docs/            architecture, business workflows and acceptance evidence
 ```
 
-The project creates meaningful Phase 1 files, rather than empty stubs for every future module. See [architecture](docs/ARCHITECTURE.md), [data model](docs/DATA_MODEL.md), [workflow catalogue](docs/BUSINESS_WORKFLOWS.md), [inventory rules](docs/INVENTORY_RULES.md), [route map](docs/ROUTE_MAP.md), and [demo data strategy](docs/DEMO_DATA_STRATEGY.md). The [implementation ledger](docs/IMPLEMENTATION_PROGRESS.md) lists all 14 phases and the Phase 4 handoff.
+The project creates meaningful Phase 1 files, rather than empty stubs for every future module. See [architecture](docs/ARCHITECTURE.md), [data model](docs/DATA_MODEL.md), [workflow catalogue](docs/BUSINESS_WORKFLOWS.md), [inventory rules](docs/INVENTORY_RULES.md), [route map](docs/ROUTE_MAP.md), and [demo data strategy](docs/DEMO_DATA_STRATEGY.md). The [implementation ledger](docs/IMPLEMENTATION_PROGRESS.md) lists all 14 phases and the Phase 6 handoff.
 
 localStorage is a demonstration mechanism with browser quota, durability and concurrent-tab limits. Invalid saved data is surfaced without silently replacing it; explicit import/reset performs recovery. Keep an exported JSON copy if the demo data matters. Follow the permanent instructions in `AGENTS.md` for every subsequent phase.
 

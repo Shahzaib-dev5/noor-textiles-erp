@@ -4,7 +4,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [react()],
-  build: { rollupOptions: { output: { manualChunks: (id) => id.includes('/node_modules/zod/') ? 'validation-vendor' : undefined } } },
+  build: { rollupOptions: { output: { manualChunks: (id) => id.includes('/node_modules/zod/') ? 'validation-vendor' : ['/node_modules/react/','/node_modules/react-dom/','/node_modules/scheduler/','/node_modules/react-router/','/node_modules/react-router-dom/'].some((path)=>id.includes(path)) ? 'react-vendor' : undefined } } },
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   test: {
     environment: 'jsdom',

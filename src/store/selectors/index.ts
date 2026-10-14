@@ -51,7 +51,7 @@ export function selectInspector(data: DomainState) {
     ...Object.values(data.finishedSKUs).map((r) => ({ label: 'تیار مال کا کیٹلاگ — اسٹاک نہیں', value: r.code })),
   ];
   const accounted = balances.grey + balances.processed + balances.contractor + balances.loss + getProductionConsumedMeters(data) + (getReconciliation(data).returned ?? 0);
-  return { balances, movements, records, purchased, issued, reconciled: Math.abs(purchased - accounted) < 0.00005 };
+  return { balances, movements, records, purchased, issued, reconciled: Math.abs(purchased + (getReconciliation(data).adjustmentNet??0) - accounted) < 0.00005 };
 }
 
 export function selectScenarioStep(data: DomainState): 0 | 1 | 2 | 3 {

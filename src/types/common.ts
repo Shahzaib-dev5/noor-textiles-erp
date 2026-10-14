@@ -9,7 +9,7 @@ export type DateString = string;
 export type DocumentNumber = string;
 export type TransactionStatus = 'DRAFT' | 'APPROVED' | 'POSTED' | 'PARTIALLY_RECEIVED' | 'COMPLETED' | 'CANCELLED' | 'REVERSED';
 export type EntityStatus = TransactionStatus | 'ACTIVE' | 'INACTIVE';
-export type InventoryLocationType = 'GREY' | 'PROCESSING_OUT' | 'PROCESSED' | 'PRODUCTION_WIP' | 'CUT_COMPONENT' | 'FINISHED_GOODS' | 'REJECTED' | 'DAMAGED';
+export type InventoryLocationType = 'GREY' | 'INSPECTION_HOLD' | 'QUARANTINED' | 'PROCESSING_OUT' | 'PROCESSED' | 'PRODUCTION_WIP' | 'CUT_COMPONENT' | 'FINISHED_GOODS' | 'REJECTED' | 'DAMAGED';
 export type FabricUnit = 'METER' | 'YARD' | 'ROLL' | 'THAAN' | 'PIECE' | 'SUIT' | 'CARTON';
 export interface EntityMeta<S extends EntityStatus = EntityStatus> {
   id: EntityID;

@@ -94,3 +94,13 @@ These are deterministic local-demo safeguards. The store can detect a changed sa
 Accepted USER GRNs use the existing goods-receipt posting architecture. Draft lots/rolls never contribute stock until posting. Rejected/quarantined inspection rolls contribute zero stock; zero accepted rolls may post inspection evidence only. Unit conversion, four-decimal rounding and zero receipt tolerance are described in [GRN and roll receiving](GRN_AND_ROLL_RECEIVING.md).
 
 `PURCHASE_RETURN` is a negative GREY movement linked to the original receipt line, lot, location and optional known roll. It cannot exceed movement-derived availability or eligible received/identified roll quantities. Imported states require exact posted-return stock effects and roll references. Original GRNs and measured roll lengths remain intact. Global conservation subtracts supplier-returned meters as a separate outflow; PO received quantity is not reopened by returns. No warehouse total is manually edited.
+
+## Phase 5 warehouse rules
+
+Inspection hold and quarantine are now explicit meter categories. Physical grey warehouse ownership includes GREY plus owned hold/quarantine/rejected/damaged material; only active-location eligible GREY, less active reservations, is available. Processed and contractor-held material remain separate. Supplier-owned rejected GRN evidence remains unowned inspection data, not company inventory.
+
+Putaway and internal GREY transfers post balanced source/destination pairs once. Quality classification/release uses paired movements and cannot recreate written-off material. Known lots require identified roll portions; unknown historical lots permit exact aggregate operations without fabricated assignments. Inactive occupied locations, wrong category/endpoints, excess reservations, capacity overruns, incompatible fabric, insufficient source stock and repeat posting are blocked.
+
+Approved stocktake/manual adjustment net is added to global purchased-input conservation, with positive gains and negative warehouse shortages/write-offs visible separately. Stale scope fingerprints block count posting. Individual known-roll conservation includes identified contractor/processed quantities and recognized losses/returns; unknown legacy custody is explicitly excluded from individual claims while lot reconciliation remains exact.
+
+Lot valuation rounds source goods cost by scaled meter weights at lot totals, preserving value through internal bin transfers; it excludes invented charges and selling prices. Unsupported unsafe aggregate monetary estimates fail validation. See [movement equations](WAREHOUSE_MOVEMENT_RULES.md), [workflow](GREY_WAREHOUSE_WORKFLOW.md) and [stocktaking](STOCKTAKING_AND_ADJUSTMENTS.md).

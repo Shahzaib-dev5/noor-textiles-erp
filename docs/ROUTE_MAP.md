@@ -2,7 +2,27 @@
 
 The typed registry is `src/routes/registry.ts`; Urdu labels come from `src/locales/ur/index.ts`. React Router renders routes inside the shared RTL application shell. `/` redirects to `/dashboard`; unknown paths render a meaningful not-found view. Purchasing/master detail paths are operational; future module details remain placeholders.
 
-All routes are accessible in this frontend demonstration. The role switcher simulates purchasing command permissions; there is no secure authorization, sign-in or route guard. There are 67 registered paths, including 34 implemented purchasing/foundation paths. The table below records earlier phases; the Phase 4 matrix supersedes its supplier/fabric/purchase placeholder entries. Contractor and downstream modules retain historical read-only previews and future operational notices.
+All routes are accessible in this frontend demonstration. The role switcher simulates purchasing/warehouse command permissions; there is no secure authorization, sign-in or route guard. There are 93 registered paths, including 62 implemented purchasing/warehouse/foundation paths. The matrices below supersede earlier placeholder descriptions. Contractor and downstream modules retain historical read-only previews and future operational notices.
+
+## Phase 5 operational paths
+
+| Paths | Function |
+| --- | --- |
+| `/inventory/grey` | Physical/eligible/reserved/quality/custody dashboard and valuation |
+| `/inventory/grey/lots`, `/inventory/grey/lots/:id` | Lot register, source receipt/supplier/rolls/movement detail |
+| `/inventory/grey/rolls`, `/inventory/grey/rolls/:id` | Original measurements/current portions, search/quality filters, detail and roll label |
+| `/inventory/locations`, `/inventory/locations/new`, `/inventory/locations/:id`, `/inventory/locations/:id/edit` | Hierarchy/capacity/compatibility and protected deactivation |
+| `/inventory/putaway`, `/inventory/putaway/new` | Multi-roll staging-to-storage; detail/draft edit via `?record=<id>` / `&edit=1` |
+| `/inventory/transfers`, `/inventory/transfers/new`, `/inventory/transfers/:id` | Draft/submit/approve/post/cancel; draft edit via `?record=<id>&edit=1` |
+| `/inventory/reservations`, `/inventory/reservations/new`, `/inventory/reservations/:id` | Reservation creation, partial release/cancel/existing-challan consumption |
+| `/inventory/stocktakes`, `/inventory/stocktakes/new`, `/inventory/stocktakes/:id` | Snapshot, counts/notes, variance, review/approval/posting |
+| `/inventory/adjustments`, `/inventory/adjustments/new`, `/inventory/adjustments/:id` | Provenance-backed signed corrections and hold-linked write-offs |
+| `/inventory/quality-holds`, `/inventory/quality-holds/new` | Owned hold/quarantine/rejection/damage; detail/release via `?record=<id>` |
+| `/inventory/contractor-custody` | Existing source custody overview and `?record=<challan-line-id>` drill-down |
+| `/inventory/movements` | Unified signed fabric ledger, exact event filters, drawer, CSV/A4 |
+| `/inventory/reports` | Fourteen stock/ageing/low-stock/variance/custody reports and reconciliation |
+
+Full processing screens remain deferred to Phase 6; the existing diagnostic reducers and historical read-only source links remain available.
 
 ## Phase 4 operational paths
 
@@ -38,11 +58,11 @@ Owner can perform all purchasing actions. Purchase demo role manages masters/req
 | `/purchases` | خریداری | purchasing | Procurement, manager | 4 — operational |
 | `/purchases/new` | خریداری | purchasing | Procurement | 4 — operational |
 | `/purchases/:id` | خریداری | purchasing | Procurement, warehouse | 4 — operational |
-| `/inventory/grey` | کورا کپڑا | grey-inventory | Warehouse | 4 — placeholder |
-| `/inventory/grey/lots/:id` | کورا کپڑا | grey-inventory | Warehouse | 4 — placeholder |
-| `/processing/challans` | پروسیسنگ | processing | Processing coordinator, warehouse | 5 — placeholder |
-| `/processing/challans/:id` | پروسیسنگ | processing | Processing coordinator, warehouse | 5 — placeholder |
-| `/processing/jobs` | رنگائی اور پرنٹنگ | processing | Processing coordinator | 5 — placeholder |
+| `/inventory/grey` | کورا کپڑا | grey-inventory | Warehouse | 5 — operational |
+| `/inventory/grey/lots/:id` | کورا کپڑا | grey-inventory | Warehouse | 5 — operational |
+| `/processing/challans` | پروسیسنگ | processing | Processing coordinator, warehouse | 6 — placeholder |
+| `/processing/challans/:id` | پروسیسنگ | processing | Processing coordinator, warehouse | 6 — placeholder |
+| `/processing/jobs` | رنگائی اور پرنٹنگ | processing | Processing coordinator | 6 — placeholder |
 | `/designs` | ڈیزائنز | designs | Designer, manager | 6 — placeholder |
 | `/collections` | کلیکشنز | designs | Designer, manager | 6 — placeholder |
 | `/production` | پیداوار | production | Production planner | 7 — placeholder |

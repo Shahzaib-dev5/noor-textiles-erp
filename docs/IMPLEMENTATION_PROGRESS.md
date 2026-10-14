@@ -2,7 +2,7 @@
 
 Updated: 2026-10-14 (Asia/Karachi).
 
-Phases 1–4 are complete and verified. The user authorized **Phase 4: Suppliers, Fabric Master & Complete Purchasing Management**, which is now complete. Phase 5 has not started.
+Phases 1–5 are complete and verified. The user-authorized **Phase 5: Grey Fabric Warehouse & Advanced Inventory Control** is complete. Full processing management is deferred to Phase 6 under the supplied brief.
 
 | Phase | Scope | Status | Implemented / next action |
 | --- | --- | --- | --- |
@@ -10,8 +10,8 @@ Phases 1–4 are complete and verified. The user authorized **Phase 4: Suppliers
 | 2 | Complete Urdu RTL UI/UX & design system | Complete — verified | Enterprise dashboard, separate persistent UI preferences, seven sidebar groups, search, notifications, reusable tables/forms/dialogs/charts, design-system showcase and print foundation; 112 tests, strict typecheck, lint, production build and both Edge browser suites passed |
 | 3 | Connected demo data and advanced business dashboard | Complete — verified | Deterministic opt-in purchasing/processing/production/wholesale history, safe replacement, strict validation, pure analytics, scoped filters, charts, alerts and reconciliation; 156 tests, TypeScript, lint, build and all three browser suites passed |
 | 4 | Suppliers, fabric master and purchasing | Complete — verified | Persistent masters, requests, PO/GRN, bills/payments/ledger/returns, dashboard/reports/print/search/alerts/audit; 190 tests, typecheck, lint, build and four production browser suites passed; company CRUD and warehouse enhancements excluded by the supplied brief |
-| 5 | Processing operations | Not started | Proposed: full challan/receipt screens, multiple lots/partial receipts, explicit losses and contractor reconciliation |
-| 6 | Collections, designs and BOMs | Not started | Proposed: seasonal collections, samples/approval, color variants, two-/three-piece component BOMs |
+| 5 | Grey warehouse and inventory control | Complete — verified | Location hierarchy, roll portions, putaway/transfers, reservations, stocktakes/adjustments, quality holds/write-offs, custody, movement/report/search/print; 220 tests, TypeScript, lint, build and five production browser suites passed |
+| 6 | Full processing operations | Not started | User brief defers full challan/job/partial receipt editors here; earlier design/collection numbering is provisional and awaits the next brief |
 | 7 | Production planning and cutting | Not started | Proposed: plans/work orders, protected material allocation, WIP, cutting outputs and loss |
 | 8 | Embroidery, quality and suit assembly | Not started | Proposed: optional embroidery custody, inspections/defects, component matching |
 | 9 | Packaging and finished inventory | Not started | Proposed: inspected packaging completion, unit-safe finished-stock movements and SKU availability |
@@ -45,7 +45,7 @@ Phases 1–4 are complete and verified. The user authorized **Phase 4: Suppliers
 
 ## Known boundaries and outstanding work
 
-- No known blocking Phase 1–3 issues remain within their documented scopes. Phases 4–14 are not implemented.
+- No known blocking Phase 1–5 issues remain within their documented scopes. Full Phase 6 and later operations remain proposed.
 - localStorage is a local demonstration snapshot store with size, durability and concurrency limits; a changed-snapshot guard cannot eliminate simultaneous-tab races.
 - Demo roles are not secure authorization or authentication.
 - Future production, finished-goods, reservation, dispatch, invoice, payment and return transactions are typed contracts, not implemented workflows.
@@ -85,6 +85,16 @@ Phases 1–4 are complete and verified. The user authorized **Phase 4: Suppliers
 - Extended live dashboards, CSV/A4 reports, global search, notifications and audit. Added critical transaction and selector tests plus Phase 4 browser scenarios A–E.
 - Final TypeScript, ESLint, all 190 tests in 11 files, production build and all four browser suites passed. Phase 4 browser verifies scenarios A–E, exported rupee amounts, A4, persistence, search and four viewport sizes in both themes. See [Phase 4 acceptance](PHASE_4_ACCEPTANCE.md).
 
-## Phase 5 handoff
+## Phase 5 implementation ledger
 
-Processing operations and grey warehouse enhancements remain unimplemented. Reuse procurement source IDs and movement-derived availability; preserve historical snapshots, posting events and meter/suit separation. Add identified roll custody before offering individual-roll operations after aggregate historical processing. Supplier advance reallocation/refund, posted-payment reversal and controlled approved-PO amendments require explicit future transaction contracts. No backend or real authentication/payment processing was added.
+- Verified clean `phase-05-grey-warehouse` baseline at `3c9220b`; original 190 tests, TypeScript, lint and build passed.
+- Added optional warehouse version 5, strict normalized source documents and existing-ledger effects. Original golden/expanded seed definitions and independent UI preferences remain unchanged.
+- Added location hierarchy/capacity/compatibility and explicit empty sample layout; legacy bins/individual custody are not fabricated.
+- Added known-roll portions, balanced putaway/transfers, exclusive reservations and source-linked consumption, stale-safe stocktakes, approved adjustments, quality hold/quarantine/rejection/damage and hold-linked write-offs/release.
+- Reused Phase 4 supplier returns with current-location support; extended original processing reducers only with optional identified roll references and metadata for future integration.
+- Added warehouse dashboards, 800-roll pagination/indexed projections, fourteen reports, date/fabric/lot/location/warehouse/quality filters, source movement drawer, filtered CSV/A4, search, alerts, ageing and independent lot/roll reconciliation.
+- Final TypeScript, lint, 220 tests in 12 files, production build and all five production browser suites passed. A–F workflows, accurate posted-only custody, numeric CSV, A4, refresh/preferences and four widths in both themes are verified; see [Phase 5 acceptance](PHASE_5_ACCEPTANCE.md).
+
+## Phase 6 handoff
+
+Implement full processing editors only after the next authorized brief. Use existing typed warehouse issue/reservation-consumption commands and optional challan-line roll references for exact source portions. Partial receipts must retain roll custody identities and recognized loss evidence. Preserve old unassigned historical events, purchasing/warehouse sources, reservations, money/meter/suit separation, import/export and all regression fixtures. Supplier advance reallocation/refund and posted-payment reversal remain outside this phase. No backend or real authentication/payment processing was added.

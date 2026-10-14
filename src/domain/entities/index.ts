@@ -7,6 +7,7 @@ import type { Design, FinishedProductSKU } from './production';
 import type { Customer } from './wholesale';
 import type { HistoricalDataset } from './history';
 import type { ProcurementState } from './procurement';
+import type { WarehouseState } from './warehouse';
 
 export * from './company';
 export * from './purchasing';
@@ -19,6 +20,7 @@ export * from './wholesale';
 export interface DomainState {
   history?: HistoricalDataset;
   procurement?: ProcurementState;
+  warehouse?: WarehouseState;
   companies: EntityMap<Company>;
   employees: EntityMap<Employee>;
   roles: EntityMap<DemoRole>;

@@ -8,5 +8,7 @@ export const statusPresentation = {
   CONFIRMED: ['تصدیق شدہ', 'success'], PARTIALLY_DISPATCHED: ['جزوی ڈسپیچ', 'warning'], UNPAID: ['غیر ادا شدہ', 'warning'],
   SUBMITTED: ['جمع شدہ', 'info'], CONVERTED: ['آرڈر میں تبدیل', 'success'], CLOSED: ['بند', 'neutral'],
   ACCEPTED: ['منظور شدہ', 'success'], QUARANTINED: ['قرنطینہ', 'warning'], RETURNED_TO_SUPPLIER: ['سپلائر کو واپس', 'neutral'],
+  INSPECTION_HOLD:['معائنہ ہولڈ','warning'],DAMAGED:['خراب','error'],LEGACY:['تاریخی / غیر مختص','neutral'],MIXED:['مختلف حصے','info'],REVIEWED:['جانچ شدہ','info'],PARTIALLY_CONSUMED:['جزوی استعمال','warning'],CONSUMED:['استعمال شدہ','success'],RELEASED:['رہا شدہ','neutral'],
+  EMPTY:['خالی / ختم','neutral'],
 } as const;
 export type DisplayStatus = keyof typeof statusPresentation;

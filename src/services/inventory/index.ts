@@ -23,7 +23,7 @@ export function getInventoryBalances(state: DomainState): InventoryBalance[] {
     const balance = obtain(reservation.lotId, reservation.locationId, reservation.category);
     balance.reservedMeters = roundQuantity(balance.reservedMeters + reservation.quantityMeters);
   });
-  return [...balances.values()].map((balance) => ({ ...balance, availableMeters: roundQuantity(balance.onHandMeters - balance.reservedMeters) }));
+  return [...balances.values()].map((balance) => ({ ...balance, availableMeters: state.locations[balance.locationId]?.status!=='ACTIVE'||['INSPECTION_HOLD','QUARANTINED','REJECTED','DAMAGED'].includes(balance.category) ? 0 : roundQuantity(balance.onHandMeters - balance.reservedMeters) }));
 }
 export function getAvailableMeters(state: DomainState, lotId: string, locationId: string, category: InventoryLocationType): number {
   return getInventoryBalances(state).find((balance) => balanceKey(balance.lotId, balance.locationId, balance.category) === balanceKey(lotId, locationId, category))?.availableMeters ?? 0;
@@ -32,7 +32,7 @@ export function getInventorySummary(state: DomainState) {
   const balances = getInventoryBalances(state);
   const sum = (category: InventoryLocationType) => roundQuantity(balances.filter((balance) => balance.category === category).reduce((total, balance) => total + balance.onHandMeters, 0));
   return {
-    grey: sum('GREY'), processed: sum('PROCESSED'), contractor: sum('PROCESSING_OUT'),
+    grey: roundQuantity(sum('GREY')+sum('INSPECTION_HOLD')+sum('QUARANTINED')+sum('REJECTED')+sum('DAMAGED')), processed: sum('PROCESSED'), contractor: sum('PROCESSING_OUT'),
     loss: roundQuantity(Object.values(state.processingLosses).reduce((total, loss) => total + loss.quantityMeters, 0)),
     finished: Object.values(state.history?.finishedMovements ?? {}).reduce((n, r) => n + r.quantitySuits, 0),
   };
@@ -43,8 +43,11 @@ export function getReconciliation(state: DomainState) {
   const returned = roundQuantity(-Object.values(state.movements).filter((m) => m.sourceType === 'PURCHASE_RETURN').reduce((n, m) => n + m.quantityMeters, 0));
   const purchased = roundQuantity(Object.values(state.movements).filter((movement) => movement.sourceType === 'GOODS_RECEIPT').reduce((sum, movement) => sum + movement.quantityMeters, 0));
   const issued = roundQuantity(Object.values(state.movements).filter((movement) => movement.sourceType === 'PROCESSING_ISSUE' && movement.category === 'PROCESSING_OUT').reduce((sum, movement) => sum + movement.quantityMeters, 0));
-  const difference = roundQuantity(purchased - returned - totals.grey - totals.processed - totals.contractor - totals.loss - productionConsumed);
-  return { ...totals, ...(state.history ? { productionConsumed } : {}), ...(state.procurement ? { returned } : {}), purchased, issued, difference, balanced: difference === 0 };
+  const adjustmentNet = roundQuantity(Object.values(state.movements).filter((m)=>m.sourceType==='WAREHOUSE_ADJUSTMENT').reduce((n,m)=>n+m.quantityMeters,0));
+  const warehouseGains=roundQuantity(Object.values(state.movements).filter((m)=>m.sourceType==='WAREHOUSE_ADJUSTMENT'&&m.quantityMeters>0).reduce((n,m)=>n+m.quantityMeters,0));
+  const warehouseLoss=roundQuantity(-Object.values(state.movements).filter((m)=>m.sourceType==='WAREHOUSE_ADJUSTMENT'&&m.quantityMeters<0).reduce((n,m)=>n+m.quantityMeters,0));
+  const difference = roundQuantity(purchased + adjustmentNet - returned - totals.grey - totals.processed - totals.contractor - totals.loss - productionConsumed);
+  return { ...totals, ...(state.history ? { productionConsumed } : {}), ...(state.procurement ? { returned } : {}), ...(state.warehouse ? {adjustmentNet,warehouseGains,warehouseLoss} : {}), purchased, issued, difference, balanced: difference === 0 };
 }
 export function getProductionConsumedMeters(state: DomainState) {
   return roundQuantity(Object.values(state.history?.materialAllocations ?? {}).reduce((n, r) => n + r.quantityMeters, 0));

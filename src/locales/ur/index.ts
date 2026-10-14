@@ -1,4 +1,5 @@
 export const ur = {
+  warehouseLots:'کپڑے کی لاٹیں',warehouseRolls:'کپڑے کے تھان',warehouseLocations:'گودام کے مقامات',warehousePutaway:'مال کی جگہ بندی',warehouseTransfers:'اسٹاک کی منتقلی',warehouseReservations:'کپڑے کی رزرویشن',warehouseStocktakes:'اسٹاک کی جسمانی گنتی',warehouseAdjustments:'اسٹاک کی ایڈجسٹمنٹ',warehouseQuality:'معیار ہولڈ اور قرنطینہ',warehouseCustody:'ملز کے پاس موجود کپڑا',warehouseMovements:'اسٹاک کی نقل و حرکت',warehouseReports:'گودام کی رپورٹس',
   appName: 'نور ٹیکسٹائل ERP',
   companyName: 'نور ٹیکسٹائلز لاہور',
   location: 'اعظم کلاتھ مارکیٹ، لاہور',

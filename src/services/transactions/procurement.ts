@@ -7,6 +7,7 @@ import type { TransactionContext, TransactionResult } from '@/services/transacti
 import { roundQuantity, toMeters } from '@/domain/value-objects/quantity';
 import { receivedMeters, supplierBills, supplierProfile, fabricProfile, receiptLineValue, purchaseSum, proportionPaisa, returnCredit } from '@/store/selectors/procurement';
 import { getAvailableMeters } from '@/services/inventory';
+import { availableRollMeters,hasKnownRollCustody } from '@/services/inventory/warehouse';
 import { nextDocumentNumber } from '@/services/document-numbering';
 const text = z.string().min(1).max(500).refine((v)=>Boolean(v.trim())), notes = z.string().max(1000), optionalId = id.optional();
 export const orderInputLine = z.object({ fabricId: id, quantity: qty.refine((v) => v > 0), unit: purchaseUnit, measuredLengths: z.array(qty.refine((v) => v > 0)), ratePaisaPerMeter: money, discountPaisa: money, specification: notes }).strict();
@@ -30,7 +31,7 @@ export const procurementCommandSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('createPayment'), supplierId: id, date: day, amountPaisa: money.refine((v) => v > 0), method: z.enum(['CASH', 'BANK', 'CHEQUE']), reference: text, notes, allocations: z.array(z.object({ billId: id, amountPaisa: money.refine((v) => v > 0) }).strict()) }).strict(),
   z.object({ kind: z.literal('postPayment'), id }).strict(),
   z.object({ kind: z.literal('cancelPayment'), id }).strict(),
-  z.object({ kind: z.literal('createReturn'), goodsReceiptLineId: id, rollId: optionalId, quantityMeters: qty.refine((v) => v > 0), date: day, reason: text, condition: text, billId: optionalId }).strict(),
+  z.object({ kind: z.literal('createReturn'), goodsReceiptLineId: id, rollId: optionalId, locationId:optionalId, quantityMeters: qty.refine((v) => v > 0), date: day, reason: text, condition: text, billId: optionalId }).strict(),
   z.object({ kind: z.literal('returnAction'), id, action: z.enum(['APPROVE', 'POST', 'CANCEL']) }).strict(),
 ]);
 export type ProcurementCommand = z.infer<typeof procurementCommandSchema>;
@@ -239,10 +240,14 @@ function applyProcurement(input: DomainState, raw: ProcurementCommand, context: 
     }
     case 'createReturn': {
       ensureDate(command.date); const line = state.goodsReceiptLines[command.goodsReceiptLineId], grn = line && state.goodsReceipts[line.goodsReceiptId]; requireRule(grn?.status === 'POSTED', 'پوسٹ شدہ اصل وصولی منتخب کریں۔');
-      requireRule(command.quantityMeters <= getAvailableMeters(state, line.lotId, grn.warehouseLocationId, 'GREY'), 'واپسی کے لیے دستیاب کورا کپڑا ناکافی ہے۔');
+      const locationId=command.locationId??grn.warehouseLocationId;
+      if(state.warehouse&&hasKnownRollCustody(state,line.lotId))requireRule(command.rollId,'معلوم تحویل والی لاٹ کے لیے واپسی کا تھان منتخب کریں۔');
+      requireRule(state.locations[locationId]?.status==='ACTIVE'&&state.locations[locationId].category==='GREY','فعال کورا مقام منتخب کریں۔');
+      requireRule(command.quantityMeters <= getAvailableMeters(state, line.lotId, locationId, 'GREY'), 'واپسی کے لیے دستیاب کورا کپڑا ناکافی ہے۔');
+      if(state.warehouse&&command.rollId)requireRule(command.quantityMeters<=availableRollMeters(state,command.rollId,locationId),'اس مقام پر رول کی دستیاب مقدار ناکافی ہے۔');
       const num = number('PRET', command.date), id = 'purchase-return:user:' + num, supplierId = state.purchaseOrders[grn.purchaseOrderId].supplierId;
       const bill = command.billId ?? supplierBills(state).find((b) => b.status === 'POSTED' && b.receiptIds.includes(grn.id))?.id;
-      p.returns[id] = { ...meta(id, 'DRAFT'), number: num, date: command.date, supplierId, goodsReceiptLineId: line.id, lotId: line.lotId, locationId: grn.warehouseLocationId, quantityMeters: command.quantityMeters, reason: command.reason, condition: command.condition, ...(command.rollId ? { rollId: command.rollId } : {}), ...(bill ? { billId: bill } : {}), creditPaisa: bill ? returnCredit(state, line.id, bill, command.quantityMeters, id) : 0 };
+      p.returns[id] = { ...meta(id, 'DRAFT'), number: num, date: command.date, supplierId, goodsReceiptLineId: line.id, lotId: line.lotId, locationId, quantityMeters: command.quantityMeters, reason: command.reason, condition: command.condition, ...(command.rollId ? { rollId: command.rollId } : {}), ...(bill ? { billId: bill } : {}), creditPaisa: bill ? returnCredit(state, line.id, bill, command.quantityMeters, id) : 0 };
       actedId = id; newStatus = 'DRAFT'; break;
     }
     case 'returnAction': {
@@ -250,11 +255,14 @@ function applyProcurement(input: DomainState, raw: ProcurementCommand, context: 
       if (command.action === 'APPROVE') { requireRule(r.status === 'DRAFT', 'صرف مسودہ واپسی منظور ہوتی ہے۔'); r.status = 'APPROVED'; }
       if (command.action === 'CANCEL') { requireRule(['DRAFT', 'APPROVED'].includes(r.status), 'پوسٹ شدہ واپسی منسوخ نہیں ہو سکتی۔'); r.status = 'CANCELLED'; }
       if (command.action === 'POST') {
+        if(state.warehouse&&hasKnownRollCustody(state,r.lotId))requireRule(r.rollId,'معلوم تحویل کی واپسی میں تھان ضروری ہے؛ پرانا مجموعی مسودہ منسوخ کر کے شناخت شدہ واپسی بنائیں۔');
+        if(state.warehouse&&r.rollId)requireRule(r.quantityMeters<=availableRollMeters(state,r.rollId,r.locationId),'اس مقام پر رول کی دستیاب مقدار ناکافی ہے۔');
         requireRule(r.status === 'APPROVED', 'صرف منظور شدہ واپسی پوسٹ ہوتی ہے۔'); requireRule(r.quantityMeters <= getAvailableMeters(state, r.lotId, r.locationId, 'GREY'), 'دستیاب کورا اسٹاک ناکافی ہے۔');
         requireRule(context.at >= Object.values(state.movements).reduce((max, m) => m.occurredAt > max ? m.occurredAt : max, ''), 'پوسٹنگ پچھلے لین دین سے پہلے نہیں ہو سکتی۔');
         r.creditPaisa = r.billId ? returnCredit(state, r.goodsReceiptLineId, r.billId, r.quantityMeters, r.id) : 0; r.status = 'POSTED';
         const mid = 'movement:PURCHASE_RETURN:' + r.id;
         state.movements[mid] = { ...baseMeta(mid, 'POSTED'), sourceType: 'PURCHASE_RETURN', sourceDocumentId: r.id, sourceLineId: r.goodsReceiptLineId, lotId: r.lotId, locationId: r.locationId, category: 'GREY', quantityMeters: -r.quantityMeters, occurredAt: context.at, ...(r.rollId ? { rollId: r.rollId } : {}) };
+          if(state.warehouse)Object.assign(state.movements[mid],{companyId:state.warehouse.companyId,fabricId:state.lots[r.lotId].fabricId,fromLocationId:r.locationId,toLocationId:'supplier:'+r.supplierId,role:context.role,reason:r.reason});
       }
       touch(r); actedId = r.id; newStatus = r.status; break;
     }

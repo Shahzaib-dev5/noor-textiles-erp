@@ -204,3 +204,15 @@ Design collectionId/bomId and SKU colorVariantId/non-catalogue status are now al
 Profiles store master contact/specification/rate defaults; order terms preserve original unit/count/measured lengths and discounts alongside canonical core lines. Inspection separates accepted roll stock from rejected/quarantined evidence. Bills reference eligible posted receipt quantities; payment allocations reference same-supplier posted bills. Returns reference original GRN line/lot/location and optional known roll; posted returns own compensating movements and derived bill credit. Audits record actor, demo role, timestamp, command, source ID and status transition.
 
 History supplier invoices remain validated snapshots joined in read-only financial selectors. Posted documents are immutable; available historical lots permit only source-valid stock-limited new returns. See [ledger rules](SUPPLIER_LEDGER_RULES.md) and [receiving](GRN_AND_ROLL_RECEIVING.md) for exact financial and stock semantics.
+
+## Phase 5 warehouse model
+
+`DomainState.warehouse` is optional version 5, preserving envelope schema 1 and existing history/procurement extensions. Normalized maps: locationProfiles, transfers, reservationProfiles, stocktakes, stocktakeLines, adjustments, qualityHolds and audits. Hierarchy is optional zone/rack/shelf/bin metadata on the existing location; each profile has warehouse code, purpose, capacity and fabric compatibility. The explicit sample-layout command creates empty location records only.
+
+Transfers hold one or many lot/roll quantity portions. The original roll ID remains stable; current portions derive from identified signed movements. Inspection hold and quarantine join the category enum alongside existing rejected/damaged categories. Quality documents retain original quantity and adjusted/released remainder; hold-linked approved write-offs/gains reconcile with source adjustment events.
+
+Reservations retain the existing base map. When ACTIVE, base quantity is remaining reserved meters; completed/cancelled base records retain a positive original quantity for schema compatibility and are excluded from availability. Profiles retain original/released/consumed meters and exact consuming challan references; UI status distinguishes partial consumption, release, cancellation and completion.
+
+Stocktakes store system snapshots, counted quantities, notes and a scope fingerprint, not replacement balances. Posted variances produce source-linked adjustment documents/movements. Adjustment provenance, source snapshot, approver and optional count/quality-hold references are explicit. New movements include company/fabric/role/reason/endpoints; legacy movements remain unchanged and receive source-derived presentation metadata.
+
+Processing challan lines optionally identify a roll for future integration; old lines remain unassigned. Supplier returns optionally choose the current GREY location after transfer, with unchanged Phase 4 billing/credit rules. No new lots appear without a GRN source. [Movement rules](WAREHOUSE_MOVEMENT_RULES.md) define stock, availability, custody, roll conservation and cost rounding.

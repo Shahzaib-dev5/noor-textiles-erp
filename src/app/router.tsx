@@ -9,8 +9,10 @@ const DiagnosticsPage = lazy(() => import('@/features/diagnostics/DiagnosticsPag
 const SettingsPage = lazy(() => import('@/features/settings/SettingsPage'));
 const DesignSystemPage = lazy(() => import('@/features/design-system/DesignSystemPage'));
 const ProcurementPage = lazy(() => import('@/features/purchasing/ProcurementPage'));
+const WarehousePage = lazy(() => import('@/features/warehouse/WarehousePage'));
 
 function routeElement(route: ERPRoute) {
+  if (route.module==='grey-inventory'||route.module==='warehouse') return <WarehousePage route={route}/>;
   if (['suppliers','fabrics','purchasing','procurement'].includes(route.module)) return <ProcurementPage route={route} />;
   switch (route.id) {
     case 'dashboard': return <DashboardPage />;

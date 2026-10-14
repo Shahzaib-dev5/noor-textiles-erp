@@ -17,10 +17,12 @@ import { selectEnterpriseDashboard, selectNotifications } from '@/store/selector
 import { formatDate, formatPKR, formatQuantity } from '@/lib/formatters';
 import { getRoute } from '@/routes/registry';
 import BusinessDashboard from './BusinessDashboard';
+import { WarehouseDashboard } from '@/features/warehouse/WarehouseDashboard';
 
 export default function DashboardPage() {
   const expanded = useERPStore((s) => Boolean(s.data.history));
-  return expanded ? <BusinessDashboard /> : <FoundationDashboard />;
+  const data=useERPStore((s)=>s.data);
+  return <>{expanded ? <BusinessDashboard /> : <FoundationDashboard />}<WarehouseDashboard data={data} compact/></>;
 }
 
 type RecentTransaction = ReturnType<typeof selectEnterpriseDashboard>['recent'][number];

@@ -4,6 +4,7 @@ import type { EntityMeta, TransactionStatus } from '@/types/common';
 import { roundQuantity } from '@/domain/value-objects/quantity';
 import { validateDomainState } from '@/domain/validators/state';
 import { getAvailableMeters } from '@/services/inventory';
+import { movementEndpoints,hasKnownRollCustody } from '@/services/inventory/warehouse';
 import type { TransactionContext, TransactionResult } from './contracts';
 
 export type { TransactionContext, TransactionResult, FutureTransactionCommands } from './contracts';
@@ -27,6 +28,7 @@ function changeStatus<T extends EntityMeta<TransactionStatus>>(document: T, stat
 function addMovement(state: DomainState, suffix: string, effect: Omit<InventoryMovement, keyof EntityMeta | 'occurredAt'>, context: TransactionContext): void {
   const id = `movement:${effect.sourceType}:${effect.sourceDocumentId}:${effect.sourceLineId}:${suffix}`;
   state.movements[id] = { ...metadata(id, 'POSTED', context), ...effect, occurredAt: context.at };
+  if(state.warehouse){const m=state.movements[id],endpoints=movementEndpoints(state,m);Object.assign(m,{companyId:state.warehouse.companyId,fabricId:state.lots[m.lotId].fabricId,fromLocationId:endpoints.from,toLocationId:endpoints.to,role:(context as TransactionContext & {role?:string}).role??'owner',reason:'اصل دستاویز سے مربوط اسٹاک کارروائی'});}
 }
 function addLog(state: DomainState, documentId: string, action: string, detail: string, context: TransactionContext): void {
   const id = `activity:${action}:${documentId}`;
@@ -83,13 +85,14 @@ function issueProcessingOperation(input: DomainState, challanId: string, context
   const proposedByLot = new Map<string, number>();
   for (const lineId of challan.lineIds) {
     const line = state.challanLines[lineId];
+    if(state.warehouse&&hasKnownRollCustody(state,line.lotId)&&!line.rollId)return failure('ROLL_REQUIRED','معلوم تحویل والی لاٹ سے مخصوص تھان کا اجرا ضروری ہے۔');
     if (state.lots[line.lotId].status !== 'ACTIVE') return failure('INACTIVE_ENTITY', 'لاٹ فعال ہونا ضروری ہے۔');
     proposedByLot.set(line.lotId, roundQuantity((proposedByLot.get(line.lotId) ?? 0) + line.quantityMeters));
   }
   for (const [lotId, quantity] of proposedByLot) if (quantity > getAvailableMeters(state, lotId, challan.fromLocationId, 'GREY')) return failure('INSUFFICIENT_STOCK', 'جاری کرنے کے لیے کورے کپڑے کا دستیاب اسٹاک ناکافی ہے۔');
   for (const lineId of challan.lineIds) {
     const line = state.challanLines[lineId];
-    const effect = { sourceType: 'PROCESSING_ISSUE' as const, sourceDocumentId: challan.id, sourceLineId: line.id, lotId: line.lotId, contractorId: challan.contractorId };
+    const effect = { sourceType: 'PROCESSING_ISSUE' as const, sourceDocumentId: challan.id, sourceLineId: line.id, lotId: line.lotId, contractorId: challan.contractorId, ...(line.rollId ? { rollId:line.rollId } : {}) };
     addMovement(state, 'grey-out', { ...effect, locationId: challan.fromLocationId, category: 'GREY', quantityMeters: -line.quantityMeters }, context);
     addMovement(state, 'contractor-in', { ...effect, locationId: challan.contractorLocationId, category: 'PROCESSING_OUT', quantityMeters: line.quantityMeters }, context);
   }
@@ -127,7 +130,7 @@ function receiveProcessingOperation(input: DomainState, receiptId: string, conte
   for (const lineId of receipt.lineIds) {
     const line = state.processingReceiptLines[lineId];
     const issuedLine = state.challanLines[line.challanLineId];
-    const effect = { sourceDocumentId: receipt.id, sourceLineId: line.id, lotId: issuedLine.lotId, contractorId: challan.contractorId };
+    const effect = { sourceDocumentId: receipt.id, sourceLineId: line.id, lotId: issuedLine.lotId, contractorId: challan.contractorId, ...(issuedLine.rollId ? {rollId:issuedLine.rollId} : {}) };
     if (line.outputMeters > 0) {
       addMovement(state, 'contractor-out', { ...effect, sourceType: 'PROCESSING_RECEIPT', locationId: challan.contractorLocationId, category: 'PROCESSING_OUT', quantityMeters: -line.outputMeters }, context);
       addMovement(state, 'processed-in', { ...effect, sourceType: 'PROCESSING_RECEIPT', locationId: receipt.destinationLocationId, category: 'PROCESSED', quantityMeters: line.outputMeters }, context);

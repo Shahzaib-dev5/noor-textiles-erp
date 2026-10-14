@@ -6,7 +6,7 @@ export function inspectProcurement(state: DomainState): string[] {
   const p = state.procurement; if (!p) return [];
   const problems: string[] = [], fail = (id: string, message: string) => problems.push(id + ': ' + message);
   const ref = (exists: unknown, id: string) => { if (!exists) fail(id, 'متعلقہ ریکارڈ درست نہیں۔'); };
-  const allIds = new Set(Object.entries(state).filter(([k]) => !['history', 'procurement'].includes(k)).flatMap(([, rows]) => Object.keys(rows)));
+  const allIds = new Set(Object.entries(state).filter(([k]) => !['history', 'procurement','warehouse'].includes(k)).flatMap(([, rows]) => Object.keys(rows)));
   const numbers = new Set([...Object.values(state.purchaseOrders), ...Object.values(state.goodsReceipts), ...Object.values(state.challans), ...Object.values(state.processingReceipts)].map((r) => r.number));
   for (const rows of Object.values(state.history ?? {})) if (typeof rows === 'object') for (const r of Object.values(rows) as { id: string; number?: string }[]) { allIds.add(r.id); if (r.number) numbers.add(r.number); }
   ref(state.companies[p.companyId], p.companyId);
@@ -110,9 +110,9 @@ export function inspectProcurement(state: DomainState): string[] {
   Object.values(p.returns).forEach((r) => {
     if (r.status === 'POSTED' && Object.values(state.movements).some((m) => m.sourceType === 'PURCHASE_RETURN' && m.sourceDocumentId === r.id && m.rollId !== r.rollId)) fail(r.id, 'واپسی کی حرکت کا رول حوالہ اصل دستاویز سے مختلف ہے۔');
     const line = state.goodsReceiptLines[r.goodsReceiptLineId], grn = line && state.goodsReceipts[line.goodsReceiptId];
-    ref(line?.lotId === r.lotId && grn?.status === 'POSTED' && state.purchaseOrders[grn.purchaseOrderId].supplierId === r.supplierId && grn.warehouseLocationId === r.locationId, r.id);
+    ref(line?.lotId === r.lotId && grn?.status === 'POSTED' && state.purchaseOrders[grn.purchaseOrderId].supplierId === r.supplierId && state.locations[r.locationId]?.category==='GREY', r.id);
     if (grn && r.date < grn.receivedOn) fail(r.id, 'واپسی وصولی سے پہلے ہے۔');
-    if (r.rollId) { const roll = state.rolls[r.rollId]; ref(roll?.lotId === r.lotId, r.id); if (Object.values(state.movements).some((m) => m.lotId === r.lotId && m.sourceType === 'PROCESSING_ISSUE' && m.quantityMeters < 0) || Object.values(p.returns).some((a) => a.id !== r.id && a.lotId === r.lotId && a.status === 'POSTED' && !a.rollId)) fail(r.id, 'بغیر رول حوالہ تاریخی اجرا / واپسی کے بعد مخصوص رول کی واپسی ناممکن ہے۔'); if (roll && purchaseSum(Object.values(p.returns).filter((a) => a.status === 'POSTED' && a.rollId === r.rollId), (a) => a.quantityMeters) > roll.actualLengthMeters) fail(r.id, 'رول سے زیادہ واپسی۔'); }
+    if (r.rollId) { const roll = state.rolls[r.rollId]; ref(roll?.lotId === r.lotId, r.id); if (Object.values(state.movements).some((m) => m.lotId === r.lotId && m.sourceType === 'PROCESSING_ISSUE' && m.quantityMeters < 0 && !m.rollId) || Object.values(p.returns).some((a) => a.id !== r.id && a.lotId === r.lotId && a.status === 'POSTED' && !a.rollId)) fail(r.id, 'بغیر رول حوالہ تاریخی اجرا / واپسی کے بعد مخصوص رول کی واپسی ناممکن ہے۔'); if (roll && purchaseSum(Object.values(p.returns).filter((a) => a.status === 'POSTED' && a.rollId === r.rollId), (a) => a.quantityMeters) > roll.actualLengthMeters) fail(r.id, 'رول سے زیادہ واپسی۔'); }
     if (line && purchaseSum(Object.values(p.returns).filter((a) => a.status === 'POSTED' && a.goodsReceiptLineId === line.id), (a) => a.quantityMeters) > line.quantityMeters) fail(r.id, 'وصولی سے زیادہ واپسی۔');
     if (r.billId) { const bill = bills.find((b) => b.id === r.billId); ref(bill?.supplierId === r.supplierId && bill.status === 'POSTED' && bill.receiptIds.includes(grn?.id ?? ''), r.id); if (bill && r.date < bill.date) fail(r.id, 'کریڈٹ بل سے پہلے ہے۔'); }
     else if (r.creditPaisa !== 0) fail(r.id, 'بغیر بل کے واجبات کا کریڈٹ نہیں۔');

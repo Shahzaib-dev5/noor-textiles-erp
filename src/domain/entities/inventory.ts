@@ -2,7 +2,7 @@ import type { DocumentMeta, EntityID, EntityMeta, FabricLotID, InventoryLocation
 
 export interface FabricLot extends EntityMeta<'ACTIVE' | 'INACTIVE'> { code: string; fabricId: EntityID; supplierId: EntityID; sourceGoodsReceiptLineId: EntityID }
 export interface StockLocation extends EntityMeta<'ACTIVE' | 'INACTIVE'> { name: string; warehouseId?: EntityID; contractorId?: EntityID; category: InventoryLocationType }
-export type MovementSourceType = 'GOODS_RECEIPT' | 'PROCESSING_ISSUE' | 'PROCESSING_RECEIPT' | 'PROCESSING_LOSS' | 'PURCHASE_RETURN';
+export type MovementSourceType = 'GOODS_RECEIPT' | 'PROCESSING_ISSUE' | 'PROCESSING_RECEIPT' | 'PROCESSING_LOSS' | 'PURCHASE_RETURN' | 'WAREHOUSE_TRANSFER' | 'WAREHOUSE_ADJUSTMENT' | 'QUALITY_CHANGE';
 export interface InventoryMovement extends EntityMeta<'POSTED'> {
   sourceType: MovementSourceType;
   sourceDocumentId: EntityID;
@@ -14,6 +14,12 @@ export interface InventoryMovement extends EntityMeta<'POSTED'> {
   quantityMeters: Quantity;
   occurredAt: string;
   contractorId?: EntityID;
+  companyId?: EntityID;
+  fabricId?: EntityID;
+  fromLocationId?: EntityID;
+  toLocationId?: EntityID;
+  role?: 'owner' | 'purchase' | 'warehouse' | 'production' | 'sales' | 'accounts';
+  reason?: string;
 }
 /** Derived projection, never the authoritative mutable stock record. */
 export interface InventoryBalance { lotId: FabricLotID; locationId: EntityID; category: InventoryLocationType; onHandMeters: Quantity; reservedMeters: Quantity; availableMeters: Quantity }

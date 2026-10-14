@@ -1,7 +1,7 @@
 /** Quote every cell, protect spreadsheet formulas and include BOM for Urdu in Excel. */
 export function csvCell(value: string | number): string {
   let text = String(value);
-  if (/^[\s]*[=+\-@]/.test(text) || /^[\t\r]/.test(text)) text = `'${text}`;
+  if (typeof value !== 'number' && (/^[\s]*[=+\-@]/.test(text) || /^[\t\r]/.test(text))) text = `'${text}`;
   return `"${text.replaceAll('"', '""')}"`;
 }
 export function buildCSV(headers: readonly string[], rows: readonly (readonly (string | number)[])[]): string {
