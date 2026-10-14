@@ -1,0 +1,43 @@
+import type { EntityMap } from '@/types/common';
+import type { ActivityLog, Company, DemoRole, Employee, Warehouse } from './company';
+import type { FabricMaster, FabricRoll, GoodsReceipt, GoodsReceiptLine, PurchaseOrder, PurchaseOrderLine, Supplier } from './purchasing';
+import type { FabricLot, InventoryMovement, InventoryReservation, StockLocation } from './inventory';
+import type { Contractor, ProcessingChallan, ProcessingChallanLine, ProcessingLoss, ProcessingReceipt, ProcessingReceiptLine } from './processing';
+import type { Design, FinishedProductSKU } from './production';
+import type { Customer } from './wholesale';
+
+export * from './company';
+export * from './purchasing';
+export * from './inventory';
+export * from './processing';
+export * from './production';
+export * from './wholesale';
+
+/** Only implemented Phase 1 collections are persisted; future catalogue types stay explicit contracts. */
+export interface DomainState {
+  companies: EntityMap<Company>;
+  employees: EntityMap<Employee>;
+  roles: EntityMap<DemoRole>;
+  warehouses: EntityMap<Warehouse>;
+  locations: EntityMap<StockLocation>;
+  suppliers: EntityMap<Supplier>;
+  fabrics: EntityMap<FabricMaster>;
+  lots: EntityMap<FabricLot>;
+  rolls: EntityMap<FabricRoll>;
+  purchaseOrders: EntityMap<PurchaseOrder>;
+  purchaseOrderLines: EntityMap<PurchaseOrderLine>;
+  goodsReceipts: EntityMap<GoodsReceipt>;
+  goodsReceiptLines: EntityMap<GoodsReceiptLine>;
+  contractors: EntityMap<Contractor>;
+  challans: EntityMap<ProcessingChallan>;
+  challanLines: EntityMap<ProcessingChallanLine>;
+  processingReceipts: EntityMap<ProcessingReceipt>;
+  processingReceiptLines: EntityMap<ProcessingReceiptLine>;
+  processingLosses: EntityMap<ProcessingLoss>;
+  movements: EntityMap<InventoryMovement>;
+  reservations: EntityMap<InventoryReservation>;
+  customers: EntityMap<Customer>;
+  designs: EntityMap<Design>;
+  finishedSKUs: EntityMap<FinishedProductSKU>;
+  activityLogs: EntityMap<ActivityLog>;
+}

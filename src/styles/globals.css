@@ -1,0 +1,85 @@
+@import 'tailwindcss';
+@config '../../tailwind.config.js';
+
+:root {
+  font-family: 'Noto Naskh Arabic', Tahoma, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --background: 45 22% 96%;
+  --foreground: 151 17% 19%;
+  --card: 0 0% 100%;
+  --card-foreground: 151 17% 19%;
+  --primary: 153 39% 25%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 141 15% 92%;
+  --secondary-foreground: 153 39% 25%;
+  --muted: 48 15% 95%;
+  --muted-foreground: 150 6% 47%;
+  --accent: 141 21% 93%;
+  --accent-foreground: 153 39% 25%;
+  --destructive: 1 60% 43%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 55 12% 89%;
+  --input: 55 12% 85%;
+  --ring: 153 39% 25%;
+  --radius: 0.75rem;
+  color-scheme: light;
+}
+
+.dark {
+  --background: 157 17% 10%;
+  --foreground: 45 15% 91%;
+  --card: 157 16% 13%;
+  --card-foreground: 45 15% 91%;
+  --primary: 147 34% 65%;
+  --primary-foreground: 156 36% 12%;
+  --secondary: 155 17% 20%;
+  --secondary-foreground: 142 25% 85%;
+  --muted: 155 13% 17%;
+  --muted-foreground: 145 9% 65%;
+  --accent: 155 17% 20%;
+  --accent-foreground: 142 25% 85%;
+  --destructive: 1 70% 70%;
+  --border: 155 10% 23%;
+  --input: 155 10% 28%;
+  --ring: 147 34% 65%;
+  color-scheme: dark;
+}
+
+* { border-color: hsl(var(--border)); }
+body { margin: 0; min-width: 320px; background: hsl(var(--background)); }
+button, input, textarea, select { font: inherit; }
+button:not(:disabled), select { cursor: pointer; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 4px; }
+input[type='checkbox'] { flex-shrink: 0; }
+option { color: hsl(var(--foreground)); background: hsl(var(--card)); }
+::selection { color: hsl(var(--primary-foreground)); background: hsl(var(--primary)); }
+.number { font-family: 'Segoe UI', Tahoma, sans-serif; font-variant-numeric: tabular-nums; }
+.app-sidebar { background: #15392e; }
+.sidebar-scroll { scrollbar-width: thin; scrollbar-color: #315447 transparent; }
+.sidebar-link-active { box-shadow: 0 2px 4px rgb(0 0 0 / 3%); }
+.skip-link { position: fixed; top: -90px; right: 16px; z-index: 100; border-radius: 8px; padding: 10px 18px; background: hsl(var(--card)); color: hsl(var(--foreground)); }
+.skip-link:focus { top: 12px; }
+.brand-mark { display: grid; grid-template-columns: repeat(2, 11px); gap: 3px; transform: rotate(45deg); margin-inline: 4px 7px; }
+.brand-mark span { width: 11px; height: 19px; border: 1px solid #d9d5af; border-radius: 2px; }
+.brand-mark span:nth-child(2), .brand-mark span:nth-child(3) { background: #d9d5af; opacity: .85; }
+.overview-banner::after { content: ''; position: absolute; width: 240px; height: 240px; inset-inline-end: -55px; top: -100px; border: 22px double rgb(76 116 90 / 5%); border-radius: 60px; transform: rotate(35deg); }
+.stat-icon { display: flex; width: 40px; height: 40px; align-items: center; justify-content: center; border-radius: 12px; }
+.stat-icon-green { background: #eaf0e8; color: #36634c; }
+.stat-icon-sage { background: #f0f3eb; color: #788768; }
+.stat-icon-sand { background: #f6f0e2; color: #ac8b51; }
+.stat-icon-gray { background: #f1f2ef; color: #7f8c7a; }
+.dark .stat-icon { background: hsl(var(--muted)); }
+.dark .stat-icon-green { color: #92b59a; }
+.erp-table { width: 100%; border-collapse: collapse; white-space: nowrap; text-align: start; }
+.erp-table th { background: hsl(var(--muted) / .7); color: hsl(var(--muted-foreground)); font-weight: 500; font-size: 14px; text-align: start; }
+.erp-table th, .erp-table td { padding: 13px 18px; border-bottom: 1px solid hsl(var(--border)); }
+.erp-table td { font-size: 15px; }
+.erp-table tbody tr:last-child td { border-bottom: 0; }
+.erp-table tbody tr:hover { background: hsl(var(--muted) / .35); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}

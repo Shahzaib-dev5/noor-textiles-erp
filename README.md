@@ -1,0 +1,71 @@
+# نور ٹیکسٹائلز لاہور — Noor Textiles ERP
+
+Frontend-only Urdu RTL textile ERP foundation. Phase 1 implements a connected local demo state, movement-based fabric inventory, three validated transactions and an operational architecture dashboard. It has no backend, real authentication or payment gateway.
+
+## Run locally
+
+```sh
+npm install
+npm run dev
+```
+
+Open the local URL printed by Vite. Use a current Node.js version compatible with the locked Vite/Vitest dependencies; this workspace uses Node 24. The interface is Urdu and RTL; technical document codes retain LTR direction. Demo data is saved in the browser under `noor-textiles-erp-demo-v1`.
+
+## Working foundation pages
+
+- `/dashboard`: company identity, live store-derived stock totals and golden traceability.
+- `/diagnostics`: isolated resettable scenario for goods receipt, processing issue and partial receipt, with movement inspection and reconciliation.
+- `/modules`: route catalogue showing planned modules and phases.
+- `/settings`: explicit JSON export/import and reset of saved demo data.
+
+Future module routes are labeled **زیرِ تعمیر** with their proposed phase number. A demo role switcher is available for context; it does not enforce authorization.
+
+The golden history receives 1,000 m, issues 400 m to processing, receives 380 m and recognizes 10 m loss. Balances are **600 m grey + 380 m processed + 10 m contractor-held + 10 m loss = 1,000 m**. The example finished SKU is a catalogue record with zero suits in stock.
+
+## Verification
+
+```sh
+npm run typecheck
+npm run lint
+npm run test -- --run
+npm run build
+```
+
+Actual executed results are tracked in [Phase 1 acceptance](docs/PHASE_1_ACCEPTANCE.md). Do not infer that a command passed merely because it is listed here.
+
+An optional real-browser smoke script covers reload persistence, all three isolated transactions, export/import/reset, mobile navigation and corrupt-data protection. It launches installed Microsoft Edge headlessly through Playwright, uses fresh temporary browser contexts and writes screenshots/export evidence under `artifacts/`. Start the development server first, then run:
+
+```sh
+npm run test:browser
+```
+
+The default target is `http://127.0.0.1:5173`. If Vite is running on a different port, set `NOOR_BASE_URL` to that URL. For example, in PowerShell:
+
+```powershell
+$env:NOOR_BASE_URL = 'http://127.0.0.1:5174'
+npm run test:browser
+```
+
+## Project organization
+
+```text
+src/
+  app/           application, router and providers
+  components/    shared RTL layout, forms, feedback, shadcn/ui
+  features/      working foundation pages; future feature boundaries
+  domain/        entity contracts, enums, calculators and invariants
+  services/      transactions, inventory, numbering and local persistence
+  store/         central Zustand state and selectors
+  data/          deterministic seed and scenario factory
+  locales/ur/    shared Urdu labels
+  lib/           shared formatting/utilities
+  routes/        typed route registry
+  styles/        theme and RTL styles
+  tests/         unit and integration coverage
+  types/         common aliases and metadata
+docs/            architecture, business workflows and acceptance evidence
+```
+
+The project creates meaningful Phase 1 files, rather than empty stubs for every future module. See [architecture](docs/ARCHITECTURE.md), [data model](docs/DATA_MODEL.md), [workflow catalogue](docs/BUSINESS_WORKFLOWS.md), [inventory rules](docs/INVENTORY_RULES.md), [route map](docs/ROUTE_MAP.md), and [demo data strategy](docs/DEMO_DATA_STRATEGY.md). The [implementation ledger](docs/IMPLEMENTATION_PROGRESS.md) lists all 14 proposed phases and the Phase 2 handoff.
+
+localStorage is a demonstration mechanism with browser quota, durability and concurrent-tab limits. Invalid saved data is surfaced without silently replacing it; explicit import/reset performs recovery. Keep an exported JSON copy if the demo data matters. Follow the permanent instructions in `AGENTS.md` for every subsequent phase.
