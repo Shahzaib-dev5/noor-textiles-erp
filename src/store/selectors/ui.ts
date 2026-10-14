@@ -5,6 +5,7 @@ import { selectDashboard, selectInspector } from '@/store/selectors';
 import { multiplyMoney } from '@/domain/value-objects/money';
 import { roundQuantity } from '@/domain/value-objects/quantity';
 import { formatDate } from '@/lib/formatters';
+import { selectBusinessAlerts } from './business';
 
 export interface SearchResult { id: string; title: string; type: string; description: string; path: string }
 export const normalizeSearch = (value: string) => value.normalize('NFKC').toLocaleLowerCase().replace(/[\u064B-\u065F]/g, '').replace(/ك/g, 'ک').replace(/ي/g, 'ی').trim();
@@ -57,6 +58,7 @@ export function selectEnterpriseDashboard(data: DomainState) {
 }
 export interface DemoNotification { id: string; title: string; description: string; path: string; tone: 'warning' | 'info' }
 export function selectNotifications(data: DomainState): DemoNotification[] {
+  if (data.history) return selectBusinessAlerts(data);
   const summary = selectEnterpriseDashboard(data);
   const notifications: DemoNotification[] = summary.contractors.filter((c) => c.held > 0).map((c) => ({ id: `custody:${c.id}`, title: 'پروسیسنگ کی وصولی باقی ہے', description: `${c.name} · ${c.held} میٹر باقی`, path: getRoute('processing').path, tone: 'info' }));
   // UI warning threshold, not a new inventory rule or a fabricated reorder document.

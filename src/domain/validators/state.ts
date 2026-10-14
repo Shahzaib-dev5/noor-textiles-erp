@@ -4,6 +4,8 @@ import { PROCESSING_SERVICE } from '@/domain/enums';
 import { isQuantity, roundQuantity, toMeters } from '@/domain/value-objects/quantity';
 import { inspectInventoryInvariants } from '@/domain/invariants';
 import type { DomainError, EntityMeta } from '@/types/common';
+import { historySchema } from '@/domain/entities/history';
+import { inspectHistory } from '@/services/validation/history';
 
 const reservedKeys = new Set(Object.getOwnPropertyNames(Object.prototype));
 const id = z.string().min(1).max(160).regex(/^[A-Za-z0-9:_-]+$/).refine((value) => !reservedKeys.has(value), 'Reserved object key cannot be an entity ID');
@@ -25,6 +27,7 @@ const lengthUnit = z.enum(['METER', 'YARD']);
 const entityMap = <T extends z.ZodTypeAny>(schema: T) => z.record(id, schema);
 
 const rawStateSchema = z.object({
+  history: historySchema.optional(),
   companies: entityMap(activeOnly.extend({ name: text, city: text, address: text, currency: z.literal('PKR'), locale: z.literal('ur-PK') }).strict()),
   employees: entityMap(active.extend({ companyId: id, name: text, roleId: id, departmentId: id.optional() }).strict()),
   roles: entityMap(active.extend({ name: text, permissionKeys: z.array(text) }).strict()),
@@ -48,7 +51,7 @@ const rawStateSchema = z.object({
   reservations: entityMap(meta.extend({ status: z.enum(['ACTIVE', 'COMPLETED', 'CANCELLED']), lotId: id, locationId: id, category, quantityMeters: positiveQuantity, sourceDocumentId: id }).strict()),
   customers: entityMap(active.extend({ name: text, city: text, phone: text, openingBalancePaisa: money }).strict()),
   designs: entityMap(meta.extend({ status: z.enum(['DRAFT', 'APPROVED', 'INACTIVE']), code: text, name: text, pieceCount: z.union([z.literal(2), z.literal(3)]), imagePath: z.string().startsWith('/'), collectionId: id.optional(), bomId: id.optional() }).strict()),
-  finishedSKUs: entityMap(active.extend({ code: text, designId: id, name: text, pieceCount: z.union([z.literal(2), z.literal(3)]), unit: z.literal('SUIT'), colorVariantId: id.optional(), catalogueOnly: z.literal(true) }).strict()),
+  finishedSKUs: entityMap(active.extend({ code: text, designId: id, name: text, pieceCount: z.union([z.literal(2), z.literal(3)]), unit: z.literal('SUIT'), colorVariantId: id.optional(), catalogueOnly: z.boolean() }).strict()),
   activityLogs: entityMap(activeOnly.extend({ actorId: id, action: text, documentId: id, detail: text }).strict()),
 }).strict();
 
@@ -63,6 +66,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   const allIds = new Set<string>();
   const numberIds = new Set<string>();
   for (const [collection, entries] of Object.entries(state)) {
+    if (collection === 'history') continue;
     for (const [key, entity] of Object.entries(entries as Record<string, EntityMeta>)) {
       if (key !== entity.id || allIds.has(entity.id)) fail(`Duplicate or mismatched entity key: ${collection}/${key}`);
       allIds.add(entity.id);
@@ -214,10 +218,11 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   });
   // Reservation command contracts are defined for later phases; accepting imported reservations now would claim an unimplemented workflow.
   if (Object.keys(state.reservations).length) fail('Reservation posting is not implemented in Phase 1');
-  Object.values(state.designs).forEach((design) => { if (design.collectionId || design.bomId) fail('Collection and BOM persistence starts in a future phase'); });
-  Object.values(state.finishedSKUs).forEach((sku) => { ref(state.designs[sku.designId]?.pieceCount === sku.pieceCount, sku.id); if (sku.colorVariantId) fail('Color variant persistence starts in a future phase'); });
+  Object.values(state.designs).forEach((design) => { if (!state.history && (design.collectionId || design.bomId)) fail('Collection and BOM require validated history'); });
+  Object.values(state.finishedSKUs).forEach((sku) => { ref(state.designs[sku.designId]?.pieceCount === sku.pieceCount, sku.id); if (!state.history && (sku.colorVariantId || !sku.catalogueOnly)) fail('Finished production requires validated history'); });
   Object.values(state.activityLogs).forEach((log) => { ref(state.employees[log.actorId], log.id); ref(documents.some((document) => document.id === log.documentId), log.id); });
   inspectInventoryInvariants(state).forEach(fail);
+  inspectHistory(state).forEach((issue) => fail(issue.recordId + ': ' + issue.message));
 }
 
 export const domainStateSchema: z.ZodType<DomainState> = rawStateSchema.superRefine((state, context) => {

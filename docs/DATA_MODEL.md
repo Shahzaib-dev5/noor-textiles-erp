@@ -191,3 +191,9 @@ erDiagram
 ```
 
 The diagram describes intended relationships, not a remote database schema. Phase 1 validates and persists only the active foundation collections. Future types are contracts, not seeded fake transactions. Deletion of referenced records and cancellation of posted records must be resolved through explicit validated operations; a generic destructive CRUD shortcut is not part of the architecture.
+
+## Phase 3 persisted historical contracts
+
+The 25 base maps above remain the original meter/catalogue foundation. DomainState additionally supports optional history, whose strict schema is in src/domain/entities/history.ts. It owns normalized maps for profiles, collections, variants, BOMs/lines, processing schedules/charges, production batches, material allocations/component outputs, packaging, finished suit movements, sales orders/lines/reservations, dispatches/lines, invoices/lines, payments/allocations, supplier invoices and expenses. Each extension entity has stable metadata and the same companyId; uniqueness and foreign keys are checked across both base and extension collections.
+
+Design collectionId/bomId and SKU colorVariantId/non-catalogue status are now allowed only with matching validated extension records. Meter-ledger reservations remain unsupported; suit reservations use the separate historical count contract. Finished suit counts never become meter movements. Historical contracts are reporting evidence, not full executable work-order/QC/accounting workflows. The base envelope version remains 1 and the optional extension is independently versioned. Source relationships, actual counts and limitations are documented in EXPANDED_DEMO_DATA.md.

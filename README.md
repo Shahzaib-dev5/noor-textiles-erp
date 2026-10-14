@@ -71,6 +71,12 @@ src/
 docs/            architecture, business workflows and acceptance evidence
 ```
 
-The project creates meaningful Phase 1 files, rather than empty stubs for every future module. See [architecture](docs/ARCHITECTURE.md), [data model](docs/DATA_MODEL.md), [workflow catalogue](docs/BUSINESS_WORKFLOWS.md), [inventory rules](docs/INVENTORY_RULES.md), [route map](docs/ROUTE_MAP.md), and [demo data strategy](docs/DEMO_DATA_STRATEGY.md). The [implementation ledger](docs/IMPLEMENTATION_PROGRESS.md) lists all 14 proposed phases and the Phase 2 handoff.
+The project creates meaningful Phase 1 files, rather than empty stubs for every future module. See [architecture](docs/ARCHITECTURE.md), [data model](docs/DATA_MODEL.md), [workflow catalogue](docs/BUSINESS_WORKFLOWS.md), [inventory rules](docs/INVENTORY_RULES.md), [route map](docs/ROUTE_MAP.md), and [demo data strategy](docs/DEMO_DATA_STRATEGY.md). The [implementation ledger](docs/IMPLEMENTATION_PROGRESS.md) lists all 14 phases and the Phase 4 handoff.
 
 localStorage is a demonstration mechanism with browser quota, durability and concurrent-tab limits. Invalid saved data is surfaced without silently replacing it; explicit import/reset performs recovery. Keep an exported JSON copy if the demo data matters. Follow the permanent instructions in `AGENTS.md` for every subsequent phase.
+
+## Phase 3 expanded business demonstration
+
+Open Settings and choose **مکمل نمونہ ڈیٹا لوڈ کریں**. Export your current JSON if needed, then confirm replacement. The deterministic historical dataset includes 12 suppliers/fabrics, 8 contractors, 20 customers, 800 rolls, connected purchasing/processing/production/wholesale records, and linked invoices/payments. Existing saved data stays unchanged until confirmation; refresh restores the loaded snapshot and UI preferences remain intact.
+
+The expanded dashboard offers real invoice/cash/receivable/inventory KPIs, eleven charts, scoped filters, source alerts and reconciliation. The original golden dashboard remains the default and can be restored explicitly. Future operational modules retain honest notices and read-only history previews. See [Phase 3 acceptance](docs/PHASE_3_ACCEPTANCE.md), [data and limits](docs/EXPANDED_DEMO_DATA.md), [analytics definitions](docs/DASHBOARD_ANALYTICS.md) and [reconciliation](docs/SEED_RECONCILIATION.md).

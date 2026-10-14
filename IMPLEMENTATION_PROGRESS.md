@@ -2,8 +2,8 @@
 
 The canonical phase-by-phase ledger is [docs/IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md). The acceptance checklist and executed command results are [docs/PHASE_1_ACCEPTANCE.md](docs/PHASE_1_ACCEPTANCE.md).
 
-Current scope: **Phase 2 — Complete Urdu RTL UI/UX & Design System: complete and verified**. Phase 1 remains complete; Phase 3 is the next proposed phase and has not started.
+Current scope: **Phase 3 — Realistic Connected Demo Data & Advanced Business Dashboard: complete and verified**. Phases 1 and 2 remain complete; Phase 4 has not started.
 
-Verification: strict TypeScript, ESLint, all 112 automated tests, production build, preserved Phase 1 Edge browser smoke, and Phase 2 Edge checks at 375/768/1024/1440 px passed. Golden inventory remains 600 m grey + 380 m processed + 10 m contractor-held + 10 m explicit loss = 1,000 m. Finished suit stock remains zero.
+Verification: strict TypeScript, ESLint, all 156 automated tests, production build and all three Edge browser suites passed, including 375/768/1024/1440 px checks. The separate golden fixture remains 600 m grey + 380 m processed + 10 m contractor-held + 10 m loss = 1,000 m, with zero suits. Expanded opt-in history reconciles 52,920 purchased meters and 900 packaged suits; 712 suits are physically held in the saleable category, 70 reserved and 642 available.
 
-The Phase 3 handoff and full phase ledger are in [docs/IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md). Preserve Phase 1 business state, transactions and tests when extending the application.
+The expanded-data definitions, test evidence and limits are in [docs/PHASE_3_ACCEPTANCE.md](docs/PHASE_3_ACCEPTANCE.md). The Phase 4 handoff is in the canonical progress ledger. Preserve Phase 1 business state, transactions and tests when extending the application.

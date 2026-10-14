@@ -5,6 +5,7 @@ import type { FabricLot, InventoryMovement, InventoryReservation, StockLocation 
 import type { Contractor, ProcessingChallan, ProcessingChallanLine, ProcessingLoss, ProcessingReceipt, ProcessingReceiptLine } from './processing';
 import type { Design, FinishedProductSKU } from './production';
 import type { Customer } from './wholesale';
+import type { HistoricalDataset } from './history';
 
 export * from './company';
 export * from './purchasing';
@@ -13,8 +14,9 @@ export * from './processing';
 export * from './production';
 export * from './wholesale';
 
-/** Only implemented Phase 1 collections are persisted; future catalogue types stay explicit contracts. */
+/** The shared meter foundation and optional validated Phase 3 historical extension. */
 export interface DomainState {
+  history?: HistoricalDataset;
   companies: EntityMap<Company>;
   employees: EntityMap<Employee>;
   roles: EntityMap<DemoRole>;

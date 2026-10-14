@@ -16,6 +16,12 @@ import { useERPStore } from '@/store';
 import { selectEnterpriseDashboard, selectNotifications } from '@/store/selectors/ui';
 import { formatDate, formatPKR, formatQuantity } from '@/lib/formatters';
 import { getRoute } from '@/routes/registry';
+import BusinessDashboard from './BusinessDashboard';
+
+export default function DashboardPage() {
+  const expanded = useERPStore((s) => Boolean(s.data.history));
+  return expanded ? <BusinessDashboard /> : <FoundationDashboard />;
+}
 
 type RecentTransaction = ReturnType<typeof selectEnterpriseDashboard>['recent'][number];
 const transactionColumns: TableColumn<RecentTransaction>[] = [
@@ -25,7 +31,7 @@ const transactionColumns: TableColumn<RecentTransaction>[] = [
   { id: 'status', label: 'حالت', value: (r) => r.status, render: (r) => <StatusBadge status={r.status} /> },
   { id: 'date', label: 'تاریخ', value: (r) => r.date, render: (r) => formatDate(r.date) },
 ];
-export default function DashboardPage() {
+function FoundationDashboard() {
   const data = useERPStore((s) => s.data);
   const summary = selectEnterpriseDashboard(data); const notices = selectNotifications(data); const navigate = useNavigate();
   const [period, setPeriod] = useState('all'); const [transaction, setTransaction] = useState<RecentTransaction | null>(null);

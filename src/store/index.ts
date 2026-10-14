@@ -19,6 +19,7 @@ export interface ERPStore {
   runScenario: (action: ScenarioAction) => ActionResult;
   resetScenario: () => void;
   resetDemo: () => ActionResult;
+  loadExpandedDemo: () => Promise<ActionResult>;
   importDemo: (json: string) => ActionResult;
   exportDemo: () => string;
   setRole: (role: DemoRole) => void;
@@ -98,6 +99,10 @@ export function createERPStore(storage: StorageAdapter | null = getBrowserStorag
       },
       resetScenario: () => set({ scenario: createScenarioState() }),
       resetDemo: () => persist(createSeedState(), true),
+      loadExpandedDemo: async () => {
+        try { const { createExpandedSeed } = await import('@/data/seed/expanded-seed'); return persist(createExpandedSeed(), true); }
+        catch { return { ok: false, message: 'مکمل نمونہ ڈیٹا کی جانچ یا محفوظ کرنا ناکام ہوا؛ موجودہ ریکارڈ برقرار ہیں۔' }; }
+      },
       importDemo: (json) => {
         const imported = decodeSnapshot(json);
         return imported.ok ? persist(imported.value.data, true) : imported;

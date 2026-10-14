@@ -1,5 +1,5 @@
 import type { DomainState } from '@/domain/entities';
-import { getInventorySummary } from '@/services/inventory';
+import { getInventorySummary, getProductionConsumedMeters } from '@/services/inventory';
 
 export function selectDashboard(data: DomainState) {
   const balances = getInventorySummary(data);
@@ -50,7 +50,7 @@ export function selectInspector(data: DomainState) {
     ...Object.values(data.designs).map((r) => ({ label: 'ڈیزائن', value: r.name })),
     ...Object.values(data.finishedSKUs).map((r) => ({ label: 'تیار مال کا کیٹلاگ — اسٹاک نہیں', value: r.code })),
   ];
-  const accounted = balances.grey + balances.processed + balances.contractor + balances.loss;
+  const accounted = balances.grey + balances.processed + balances.contractor + balances.loss + getProductionConsumedMeters(data);
   return { balances, movements, records, purchased, issued, reconciled: Math.abs(purchased - accounted) < 0.00005 };
 }
 

@@ -2,13 +2,13 @@
 
 Updated: 2026-10-14 (Asia/Karachi).
 
-Phase 1 architecture is complete and the user has authorized **Phase 2: Complete Urdu RTL UI/UX & Design System**. This replaces the provisional Phase 1 master-record Phase 2 proposal. Phase 3 and later scopes below remain proposed and are not authorization to begin their implementation.
+Phases 1, 2 and 3 are complete and verified. The user authorized **Phase 3: Realistic Connected Demo Data & Advanced Business Dashboard**; Phase 4 and later scopes remain proposed.
 
 | Phase | Scope | Status | Implemented / next action |
 | --- | --- | --- | --- |
 | 1 | Project architecture | Complete — verified | React/Vite foundation, strict domain contracts, three transactions, central local state, Urdu RTL shell, diagnostics, all required docs; 85 tests, typecheck, lint, build and real browser smoke passed |
 | 2 | Complete Urdu RTL UI/UX & design system | Complete — verified | Enterprise dashboard, separate persistent UI preferences, seven sidebar groups, search, notifications, reusable tables/forms/dialogs/charts, design-system showcase and print foundation; 112 tests, strict typecheck, lint, production build and both Edge browser suites passed |
-| 3 | Connected demo-data expansion | Not started | Proposed: deterministic master-data scale-up; seed only valid supported transactions, stage future documents honestly |
+| 3 | Connected demo data and advanced business dashboard | Complete — verified | Deterministic opt-in purchasing/processing/production/wholesale history, safe replacement, strict validation, pure analytics, scoped filters, charts, alerts and reconciliation; 156 tests, TypeScript, lint, build and all three browser suites passed |
 | 4 | Master records, purchasing and grey inventory | Not started | Proposed: company/supplier/fabric master CRUD, PO/GRN workflows, lot/roll views, transfers/adjustments, supplier invoice/return contracts |
 | 5 | Processing operations | Not started | Proposed: full challan/receipt screens, multiple lots/partial receipts, explicit losses and contractor reconciliation |
 | 6 | Collections, designs and BOMs | Not started | Proposed: seasonal collections, samples/approval, color variants, two-/three-piece component BOMs |
@@ -45,12 +45,12 @@ Phase 1 architecture is complete and the user has authorized **Phase 2: Complete
 
 ## Known boundaries and outstanding work
 
-- No known blocking Phase 1 or Phase 2 issues remain. Phases 3–14 are not implemented.
+- No known blocking Phase 1–3 issues remain within their documented scopes. Phases 4–14 are not implemented.
 - localStorage is a local demonstration snapshot store with size, durability and concurrency limits; a changed-snapshot guard cannot eliminate simultaneous-tab races.
 - Demo roles are not secure authorization or authentication.
 - Future production, finished-goods, reservation, dispatch, invoice, payment and return transactions are typed contracts, not implemented workflows.
 - Future fabric quality inspection and finished/component count movements have separate typed contracts; their persistence and posting operations remain deferred. The meter ledger must never be reused as if suit counts were meters.
-- Full seed volumes belong to a later authorized phase. Phase 1 uses the small fully connected golden scenario.
+- Phase 3 provides the expanded deterministic dataset only through explicit Settings replacement. Phase 1 still supplies the independently reproducible golden scenario.
 - No backend, live APIs, real payment gateway, multi-company mode, tax submission or production accounting is included.
 
 ## Phase 2 implementation ledger
@@ -66,6 +66,16 @@ Phase 1 architecture is complete and the user has authorized **Phase 2: Complete
 - Added UI unit/integration coverage and a four-viewport browser suite. All 112 automated tests passed. Strict typecheck, ESLint, production build, preserved Phase 1 browser workflows and Phase 2 browser checks across four widths passed; evidence and limits are in [Phase 2 acceptance](PHASE_2_ACCEPTANCE.md).
 - No dependency versions changed and no large-scale seed was generated. The transient form example is excluded from domain/pref exports.
 
-## Phase 3 handoff
+## Phase 3 implementation ledger
 
-Begin only after receiving the Phase 3 requirements. The proposed next phase expands the deterministic connected demo dataset using existing factories, stable IDs, canonical units and tested transactions. Preserve user/imported data and original golden fixtures; do not silently reseed saved snapshots. Do not mark future production, sales or payment records posted before their transaction engines and persisted schemas are implemented. Reuse the Phase 2 table/form/chart/status/print components rather than inventing page-specific mocks. Extend schema/migrations deliberately and rerun strict TypeScript, lint, business/UI tests, production build and the browser suite.
+- Baseline 112 tests passed before changes; no existing assertion was weakened or removed.
+- Added a separate deterministic expanded builder while preserving the golden seed and the three original posting reducers.
+- Added an optional versioned historical schema, cross-record validation, source-checked production/finished/sales/payment history and structured validation/reconciliation reports.
+- Added pure cached dashboard/report selectors, eleven real-source charts, dimension-scoped filters, operational alerts and ordered business activity.
+- Settings loads with export/cancel/confirm and one validated commit; defaults and existing data remain unchanged. Reload, import/export/reset and separate UI preference behavior are covered.
+- Added read-only shared-store directories/history previews. No future operational CRUD or backend was implemented.
+- All 156 tests, TypeScript, ESLint, production build and three browser suites passed; results and exact historical-workflow limits are tracked in [Phase 3 acceptance](PHASE_3_ACCEPTANCE.md).
+
+## Phase 4 handoff
+
+Begin only after receiving Phase 4 requirements. Implement company/supplier/fabric master CRUD and purchasing/grey inventory workflows on existing normalized records. Preserve historical provenance and explicit replacement policy. Respect source statuses, meter/suit separation, imported snapshots and the independent golden fixture. Define approval/reversal behavior deliberately; do not repost imported completed history. Reuse the existing tables/forms/dialogs and rerun all business/UI/persistence/browser checks. Production, wholesale accounting and chained processing editors remain their later phase scopes.

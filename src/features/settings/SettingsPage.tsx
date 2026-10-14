@@ -8,7 +8,7 @@ import { ResultNotice } from '@/components/feedback/ResultNotice';
 import { useERPStore, type ActionResult } from '@/store';
 import { t } from '@/locales/ur';
 import { MAX_IMPORT_BYTES } from '@/services/storage';
-import { ConfirmationDialog } from '@/components/dialogs/Dialog';
+import { ConfirmationDialog, FormDialog } from '@/components/dialogs/Dialog';
 import { useToast } from '@/store/toasts';
 import { useUIStore } from '@/store/ui-preferences';
 
@@ -18,6 +18,9 @@ export default function SettingsPage() {
   const [result, setResult] = useState<ActionResult | null>(null);
   const [resetConfirmed, setResetConfirmed] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
+  const [expandedOpen, setExpandedOpen] = useState(false);
+  const [expandedLoading, setExpandedLoading] = useState(false);
+  const loadExpandedDemo = useERPStore((state) => state.loadExpandedDemo);
   const themePreference = useUIStore((s) => s.preferences.theme);
   const updatePreferences = useUIStore((s) => s.updatePreferences);
   const exportDemo = useERPStore((state) => state.exportDemo);
@@ -45,6 +48,8 @@ export default function SettingsPage() {
   return <>
     <PageHeading title={t('settings')} description="مقامی ڈیمو کی نقل محفوظ کریں، بحال کریں اور ظاہری تھیم بدلیں۔" eyebrow="بنیادی نظام" />
     <div className="mb-6"><ResultNotice result={result} /></div>
+    <Card className="mb-6 p-6"><h2 className="text-xl font-semibold">مکمل تاریخی نمونہ</h2><p className="my-4 text-sm leading-7 text-muted-foreground">ایک کمپنی کے مربوط خریداری، پیداوار اور ہول سیل ریکارڈ۔ موجودہ کاروباری نقل تبدیل ہو گی؛ پہلے JSON برآمد کریں۔ ظاہری ترجیحات برقرار رہیں گی۔</p><Button disabled={expandedLoading} onClick={() => setExpandedOpen(true)}>{expandedLoading ? 'نمونہ تیار ہو رہا ہے…' : 'مکمل نمونہ ڈیٹا لوڈ کریں'}</Button></Card>
+    <FormDialog open={expandedOpen} onClose={() => setExpandedOpen(false)} title="مکمل نمونہ لوڈ کریں؟" description="آپ کے موجودہ کاروباری ریکارڈ تاریخی نمونے سے تبدیل ہوں گے۔ یہ عمل صرف تصدیق کے بعد ہو گا۔"><div className="flex flex-wrap gap-3"><Button variant="outline" onClick={downloadSnapshot}>پہلے JSON نقل برآمد کریں</Button><Button variant="outline" onClick={() => setExpandedOpen(false)}>منسوخ کریں</Button><Button disabled={expandedLoading} onClick={() => { setExpandedOpen(false); setExpandedLoading(true); void loadExpandedDemo().then((outcome) => { setResult(outcome); setExpandedLoading(false); useToast.getState().add(outcome.message, outcome.ok ? 'success' : 'error'); }); }}>تصدیق کر کے نمونہ لوڈ کریں</Button></div></FormDialog>
     <div className="grid items-start gap-6 xl:grid-cols-[1.4fr_1fr]">
       <div className="space-y-6"><Card className="p-6"><div className="mb-3 flex items-center gap-3"><Upload className="size-5 text-primary" /><h2 className="text-xl font-semibold">ڈیمو ڈیٹا درآمد کریں</h2></div><p className="mb-5 text-base leading-8 text-muted-foreground">اسی ایپ سے برآمد کی گئی JSON نقل منتخب کریں یا اس کا متن درج کریں۔ درست فائل کی تصدیق کے بعد موجودہ محفوظ ڈیٹا تبدیل ہو گا۔</p>
         <form onSubmit={handleSubmit((values) => { const outcome = importDemo(values.json); setResult(outcome); useToast.getState().add(outcome.message, outcome.ok ? 'success' : 'error'); if (outcome.ok) reset(); })} className="space-y-4" noValidate>

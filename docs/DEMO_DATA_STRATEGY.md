@@ -59,9 +59,9 @@ Schema version is independent of the storage-key spelling. The migration boundar
 
 `revision` helps identify updates but is not a server lock. A stale snapshot guard detects sequential changes by another tab; simultaneous tab writes can still race between comparison and `setItem`. localStorage also has quota, browser-policy, device-loss and durability limits. This remains demonstration-only persistence.
 
-## Planned Phase 3 expansion
+## Phase 3 target volumes (original planning)
 
-The following is a target volume, **not the Phase 1 seed**:
+The following was the Phase 3 target volume, **not the Phase 1 seed**. The completed opt-in dataset and actual counts are documented in EXPANDED_DEMO_DATA.md:
 
 | Entity group | Planned count |
 | --- | ---: |
@@ -83,6 +83,12 @@ The following is a target volume, **not the Phase 1 seed**:
 | Invoices | 20 |
 | Payments | 30 |
 
-Generate master records first, then dependent documents with stable IDs and deterministic dates. Replay supported transactions in dependency order. Later production/sales/payment history must not be marked posted until corresponding tested transaction engines exist; the Phase 3 expansion may stage future documents as drafts or add those historical scenarios only when their module phase is implemented. Do not bypass business invariants merely to hit a count.
+Generate master records first, then dependent documents with stable IDs and deterministic dates. Replay supported transactions in dependency order. Phase 3 now persists strictly validated production/sales/payment historical snapshots. Their later operational posting engines must preserve those sources and must not repost this imported history. Do not bypass business invariants merely to hit a count.
 
 Every seed revision must test: no orphan foreign keys; bidirectional line/header consistency; approved receipt quantities within orders; contractor custody reconciliation; distinct inventory categories; no negative availability; valid production input/output/loss relationships when supported; invoice/payment allocation and ledger consistency when supported; and reproducible totals after reset. The absence of future invoices/payments in Phase 1 is deliberate, not a missing financial balance that should be guessed.
+
+## Implemented Phase 3 opt-in expansion
+
+The prior target table is now satisfied by createExpandedSeed(), independently of the preserved golden fixture. The default remains the original golden state. Users explicitly load the expanded snapshot in Settings after a dialog offering export/cancel/confirm. No app startup, dashboard navigation or refresh appends or replaces records. Failed generation/validation/storage writes retain existing data.
+
+The storage envelope still has schemaVersion 1. Optional history carries version 3 and seedVersion noor-expanded-2026-v1; this additive schema extension requires no destructive envelope migration. Old snapshots round-trip without adding history. Unsupported versions remain protected. New historical records are strictly validated against their physical/financial sources; they do not pretend that future operational editors or engines exist. UI preferences remain separate. [Expanded dataset](EXPANDED_DEMO_DATA.md) records actual counts, chronology, assumptions and supported limits.
