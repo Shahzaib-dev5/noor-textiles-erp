@@ -4,7 +4,7 @@ import { warehouseMovementEffects, warehouseSum, greyCategories, hasKnownRollCus
 import { roundQuantity } from '@/domain/value-objects/quantity';
 export function inspectWarehouse(data:DomainState):string[]{
  const w=data.warehouse;if(!w)return[];const errors:string[]=[],fail=(id:string,why:string)=>errors.push(id+': '+why),ref=(yes:unknown,id:string)=>{if(!yes)fail(id,'متعلقہ ریکارڈ درست نہیں۔');};
- const ids=new Set(Object.entries(data).filter(([key])=>!['warehouse','history','procurement','processing'].includes(key)).flatMap(([,rows])=>Object.keys(rows)));
+ const ids=new Set(Object.entries(data).filter(([key])=>!['warehouse','history','procurement','processing','studio'].includes(key)).flatMap(([,rows])=>Object.keys(rows)));
  const numbers=new Set([...Object.values(data.purchaseOrders),...Object.values(data.goodsReceipts),...Object.values(data.challans),...Object.values(data.processingReceipts)].map((r)=>r.number));
  for(const ext of [data.history,data.procurement])for(const rows of Object.values(ext??{}))if(typeof rows==='object')for(const r of Object.values(rows) as {id:string;number?:string}[]){ids.add(r.id);if(r.number)numbers.add(r.number);}
  ref(data.companies[w.companyId],w.companyId);

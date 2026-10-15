@@ -13,7 +13,10 @@ const WarehousePage = lazy(() => import('@/features/warehouse/WarehousePage'));
 
 const ProcessingPage = lazy(() => import('@/features/processing/ProcessingPage'));
 
+const DesignStudioPage = lazy(() => import('@/features/designs/DesignStudioPage'));
+
 function routeElement(route: ERPRoute) {
+  if(route.module==='designs')return <DesignStudioPage key={route.id} route={route}/>;
   if (['contractors','processing','processing-operations'].includes(route.module)) return <ProcessingPage key={route.id} route={route}/>;
   if (route.module==='grey-inventory'||route.module==='warehouse') return <WarehousePage route={route}/>;
   if (['suppliers','fabrics','purchasing','procurement'].includes(route.module)) return <ProcurementPage route={route} />;

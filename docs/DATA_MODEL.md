@@ -220,3 +220,11 @@ Processing challan lines optionally identify a roll for future integration; old 
 ## Phase 6 entities
 
 The additive processing extension contains contractor profiles, unit-aware rates, operational jobs, issue/receipt profiles, colors, dye batches/shade approvals, processed outputs, QC decisions, contractor bills and payments. Output metadata links a new core lot to parent/root lots, original GRN, job, receipt line, service stage, color/design and destination quality. Core receipt `outputMeters` is the entire physical returned quantity, including accepted, held and rejected output; it is not accepted quantity alone. New output lots share the original GRN lineage and have explicit processing provenance. The original purchase lot is never overwritten. See [processing rules](PROCESSING_RECEIPTS_AND_LOSSES.md).
+
+## Phase 7 studio entities
+
+Optional `studio.version: 7` contains operational collections, design profiles, color variants, BOM revisions with structured lines, prototype samples, eight-check reviews, per-BOM cost assumptions, immutable approval snapshots and activity events. The core `designs` map remains authoritative for design identity/code/name/piece count; operational profiles share that design ID. Their extended workflow status maps to compatible core DRAFT/APPROVED/INACTIVE values.
+
+Historical collections/variants/BOMs remain in `history`, unmodified and read-only. Operational collections can also be referenced by processing jobs. New operational BOM IDs do not overwrite historical core `bomId` references. Variant BOMs carry version/effective date/reason/previous revision and explicit approval identity. Samples reference the exact revision. Production readiness records no work order or stock movement.
+
+Absent studio data requires no migration or write. The unchanged envelope schema 1 accepts this validated optional extension on import/reload. Invalid references, code duplication, BOM approval-content changes and unsupported states fail validation before persistence. See [revision rules](BOM_AND_REVISION_RULES.md) and [assessment](DESIGN_CONTRACT_ASSESSMENT.md).

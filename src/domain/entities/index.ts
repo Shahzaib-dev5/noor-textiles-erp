@@ -9,6 +9,7 @@ import type { HistoricalDataset } from './history';
 import type { ProcurementState } from './procurement';
 import type { WarehouseState } from './warehouse';
 import type { ProcessingOperations } from './processing-operations';
+import type { DesignOperations } from './design-operations';
 
 export * from './company';
 export * from './purchasing';
@@ -19,6 +20,7 @@ export * from './wholesale';
 
 /** The shared meter foundation and optional validated Phase 3 historical extension. */
 export interface DomainState {
+  studio?: DesignOperations;
   processing?: ProcessingOperations;
   history?: HistoricalDataset;
   procurement?: ProcurementState;

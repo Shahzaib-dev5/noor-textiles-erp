@@ -1,0 +1,1 @@
+export const checkLabels:Record<string,string>={color:'رنگ کی درستگی',print:'پرنٹ معیار',fabric:'کپڑے کی موزونیت',matching:'اجزاء کی مطابقت',embroidery:'کڑھائی کی موزونیت',completeness:'ڈیزائن کی تکمیل',market:'مارکیٹ کی موزونیت',feasibility:'پیداوار کی عملی جانچ'};

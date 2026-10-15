@@ -1,3 +1,4 @@
+import { StudioMetrics } from '@/features/designs/StudioMetrics';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Boxes, Factory, FlaskConical, Package, ReceiptText, ShoppingBag, TrendingUp, Wallet } from 'lucide-react';
@@ -22,7 +23,7 @@ import { WarehouseDashboard } from '@/features/warehouse/WarehouseDashboard';
 export default function DashboardPage() {
   const expanded = useERPStore((s) => Boolean(s.data.history));
   const data=useERPStore((s)=>s.data);
-  return <>{expanded ? <BusinessDashboard /> : <FoundationDashboard />}<WarehouseDashboard data={data} compact/></>;
+  return <>{expanded ? <BusinessDashboard /> : <FoundationDashboard />}<WarehouseDashboard data={data} compact/><StudioMetrics/></>;
 }
 
 type RecentTransaction = ReturnType<typeof selectEnterpriseDashboard>['recent'][number];

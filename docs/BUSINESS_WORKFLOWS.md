@@ -265,3 +265,9 @@ This document defines the whole business chain. **Only goods receipt posting, pr
 ## Phase 6 outsourced processing
 
 Maintain contractor and valid service rate, create a multi-input job with agreed rate snapshot, approve, issue eligible warehouse fabric, receive partial physical outputs/QC categories, approve explicit loss, and reconcile custody. Accepted output can feed a later processing stage while preserving original GRN lineage. Settle a completed job with an explicit contractor bill and allocated payment. See [workflow](PROCESSING_WORKFLOW.md), [color batches](DYEING_AND_COLOR_BATCHES.md), [custody and ledger](CONTRACTOR_CUSTODY_AND_LEDGER.md), [costing](PROCESSING_COSTING.md) and [actual acceptance evidence](PHASE_6_ACCEPTANCE.md).
+
+## Phase 7 product definition and design planning
+
+Create a seasonal collection and core design, approve color variants, draft/submit/approve a component BOM per variant, request a prototype, review its eight checks, revise/resubmit as needed, enter cost assumptions, inspect matching processed material, approve the design and explicitly mark it ready. Owners and production demo profiles execute validated commands. All changes pass the existing full-state and storage boundary.
+
+Each approved revision is immutable; later revisions retain history and require new revision-specific sample approval. Design duplication creates new IDs/codes and draft BOMs without copied approvals or production. Availability reads current eligible inventory with independent component wastage and non-reused preview capacity. Costs and margins are estimates. Every action in this phase is stock-neutral and creates no actual financial posting. Historical design/production records remain unchanged. See [workflow diagram](DESIGN_STUDIO_WORKFLOW.md), [sampling](DESIGN_SAMPLING_AND_APPROVAL.md) and [costing/availability](DESIGN_COSTING_AND_AVAILABILITY.md).

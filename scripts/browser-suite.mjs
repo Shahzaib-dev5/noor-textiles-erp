@@ -4,3 +4,5 @@ await import('./browser-phase3.mjs');
 await import('./browser-phase4.mjs');
 await import('./browser-phase5.mjs');
 await import('./browser-phase6.mjs');
+
+await import('./browser-phase7.mjs');

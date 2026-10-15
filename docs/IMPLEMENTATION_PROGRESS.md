@@ -2,9 +2,11 @@
 
 Updated: 2026-10-15 (Asia/Karachi).
 
-Documentation follow-up: added [one consolidated module guide through Phase 5](MODULE_GUIDE_THROUGH_PHASE_5.md), covering each working module's purpose, usage, relationships, workflow diagrams and future-module boundaries. The guide records the completed Phase 5 scope; current Phase 6 work is tracked below.
+Documentation follow-up: added [one consolidated module guide through Phase 5](MODULE_GUIDE_THROUGH_PHASE_5.md), covering each working module's purpose, usage, relationships, workflow diagrams and future-module boundaries. That guide preserves Phase 5 scope; later work is tracked below.
 
 Phases 1–6 are complete and verified. **Phase 6: Complete Textile Processing, Challans & Contractor Management** is implemented on `phase-06-processing`. See [acceptance evidence](PHASE_6_ACCEPTANCE.md).
+
+Current scope: **Phase 7 Design Studio — complete and verified**, on `phase-07-design-studio` from `7453214`. See [Phase 7 acceptance](PHASE_7_ACCEPTANCE.md).
 
 | Phase | Scope | Status | Implemented / next action |
 | --- | --- | --- | --- |
@@ -14,8 +16,8 @@ Phases 1–6 are complete and verified. **Phase 6: Complete Textile Processing, 
 | 4 | Suppliers, fabric master and purchasing | Complete — verified | Persistent masters, requests, PO/GRN, bills/payments/ledger/returns, dashboard/reports/print/search/alerts/audit; 190 tests, typecheck, lint, build and four production browser suites passed; company CRUD and warehouse enhancements excluded by the supplied brief |
 | 5 | Grey warehouse and inventory control | Complete — verified | Location hierarchy, roll portions, putaway/transfers, reservations, stocktakes/adjustments, quality holds/write-offs, custody, movement/report/search/print; 220 tests, TypeScript, lint, build and five production browser suites passed |
 | 6 | Full processing operations | Complete — verified | Contractor/rate/job/challan/receipt/QC/color/cost/finance workflows, shared-ledger multi-stage lineage, dashboard/reports/search/alerts; 255 tests, TypeScript, lint, production build and six browser suites passed |
-| 7 | Design studio | Not started | Await the supplied Phase 7 brief; production planning/cutting shifts to the later roadmap |
-| 8 | Embroidery, quality and suit assembly | Not started | Proposed: optional embroidery custody, inspections/defects, component matching |
+| 7 | Design studio | Complete — verified | Collections, core designs, colors, immutable BOM revisions, samples/reviews, costing, availability, readiness, catalog/reports/search/alerts/CSV/A4; 293 tests, TypeScript, lint, build and seven browser suites passed |
+| 8 | Production planning and execution | Not started | Await Phase 8 brief; plans/work orders must reference immutable approved BOMs and explicit inventory transactions |
 | 9 | Packaging and finished inventory | Not started | Proposed: inspected packaging completion, unit-safe finished-stock movements and SKU availability |
 | 10 | Pricing, quotations and wholesale orders | Not started | Proposed: price lists, quotations, credit-aware orders and exclusive reservations |
 | 11 | Dispatch and invoicing | Not started | Proposed: order-limited dispatch, reservation consumption, separate billing and receivable records |
@@ -49,7 +51,7 @@ Phases 8–14 retain provisional planning labels. Reconcile their numbering agai
 
 ## Known boundaries and outstanding work
 
-- No known blocking Phase 1–6 issues remain within their documented scopes. Later operations remain proposed; Phase 6 limitations are recorded in its acceptance document.
+- No known blocking Phase 1–7 issues remain within their documented scopes. Phase 8 and later operations remain proposed; Phase 7 limitations are recorded in its acceptance document.
 - localStorage is a local demonstration snapshot store with size, durability and concurrency limits; a changed-snapshot guard cannot eliminate simultaneous-tab races.
 - Demo roles are not secure authorization or authentication.
 - Future production, finished-goods, reservation, dispatch, invoice, payment and return transactions are typed contracts, not implemented workflows.
@@ -103,6 +105,16 @@ Phases 8–14 retain provisional planning labels. Reconcile their numbering agai
 
 Implement full processing editors only after the next authorized brief. Use existing typed warehouse issue/reservation-consumption commands and optional challan-line roll references for exact source portions. Partial receipts must retain roll custody identities and recognized loss evidence. Preserve old unassigned historical events, purchasing/warehouse sources, reservations, money/meter/suit separation, import/export and all regression fixtures. Supplier advance reallocation/refund and posted-payment reversal remain outside this phase. No backend or real authentication/payment processing was added.
 
-## Phase 6 implementation follow-up (2026-10-15)
+## Phase 6 implementation follow-up (historical, 2026-10-15)
 
 Completed on `phase-06-processing`: operational schemas, pure transactions and validation, contractor/rate/job/challan/receipt/QC/color/billing/payment screens, shared ledger integration, output lineage/costing, reports/search/alerts and Phase 6 tests/browser scenarios. All 255 tests passed, including the original 220 and 35 processing tests. TypeScript, lint, production build and all six browser suites passed. Final Phase 6 browser coverage includes QC hold/release, output inspection history and warehouse movement links, scoped A4 printing, refresh persistence and four widths in both themes. See [Phase 6 acceptance](PHASE_6_ACCEPTANCE.md) for evidence and deliberate limits. Next: Phase 7 design studio, awaiting its brief; no later-phase implementation has started.
+
+## Phase 7 implementation ledger (2026-10-15)
+
+- Verified clean expected branch/baseline `phase-07-design-studio` / `7453214`; all 255 baseline tests passed.
+- Added optional validated studio version 7 while retaining core design identity and unchanged historical collections, variants, BOMs, production references, stock and preference persistence.
+- Implemented collection/design management and duplication, approved colors, two/three-piece BOM validation, immutable revision approvals, prototype/sample review history, structured cost assumptions and explicit production readiness.
+- Integrated actual Phase 6 color/shade/output lineage and source costs with shared availability. Preview allocation prevents repeated lines reusing stock; inactive designs contribute no current demand. Planning creates no stock, reservation or accounting actuals.
+- Added twenty routes, catalog cards/table, dashboard metrics/charts, nine reports, real search/alerts, numeric CSV and six A4 sheets. Material catalog distinguishes source grade/cost from unknown or estimated values.
+- All **293 tests** passed (255 preserved + 34 domain + 4 UI); final focused 38 tests passed. Strict TypeScript, ESLint and production build passed. All seven browser suites and the later Phase 7 guard/deep-link rerun passed; final quality-grade display verification passed. See [acceptance evidence](PHASE_7_ACCEPTANCE.md).
+- Next: Phase 8 production planning/execution, awaiting its brief. Bind future work orders to immutable approved BOM IDs and use explicit inventory transactions; preserve all completed phases.

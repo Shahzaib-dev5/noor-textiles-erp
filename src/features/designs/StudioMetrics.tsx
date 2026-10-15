@@ -1,0 +1,6 @@
+import { Link } from 'react-router-dom';
+import { useERPStore } from '@/store';
+import { designSummary } from '@/store/selectors/designs';
+import { Card } from '@/components/ui/card';
+const stats:Record<string,string>={total:'کل ڈیزائن',draft:'مسودے',review:'زیر جائزہ',approved:'منظور شدہ',collections:'فعال کلیکشنز',variants:'رنگوں کی اقسام',samples:'سیمپل درخواستیں',rejected:'مسترد سیمپل',ready:'پیداوار کے لیے تیار',shortages:'مواد کی کمی والے ڈیزائن',demand:'منصوبہ شدہ کپڑا (میٹر)'};
+export function StudioMetrics(){const d=useERPStore(s=>s.data),summary=designSummary(d);return <section aria-label="ڈیزائن منصوبہ بندی" className="my-6"><div className="mb-3 flex items-center justify-between"><h2 className="text-xl font-bold">ڈیزائن منصوبہ بندی</h2><Link className="text-primary underline" to="/designs">اسٹوڈیو کھولیں</Link></div><p className="mb-3 text-sm text-muted-foreground">منصوبہ بندی کے اعداد؛ حقیقی پیداوار یا ریزرو نہیں۔</p><div className="grid grid-cols-2 gap-3 md:grid-cols-4">{Object.entries(summary).map(([key,value])=><Card key={key} className="min-w-0 p-4"><p className="text-sm text-muted-foreground">{stats[key]}</p><p className="mt-2 break-words text-2xl font-bold" dir="ltr">{Number(value.toFixed(4))}</p></Card>)}</div></section>;}

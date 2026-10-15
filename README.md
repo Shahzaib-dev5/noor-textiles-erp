@@ -94,3 +94,9 @@ The expanded dashboard offers real invoice/cash/receivable/inventory KPIs, eleve
 ## Phase 6 processing
 
 Phase 6 is complete and verified. Contractor management, service rates, jobs, issue challans, partial receipts, returned-output QC, color batches, multi-stage output lineage and contractor finances use the existing shared store and movement ledger. All 255 automated tests, TypeScript, lint, production build and six browser suites pass. Start at `/processing/dashboard` or `/contractors`. See [processing workflow](docs/PROCESSING_WORKFLOW.md), [costing](docs/PROCESSING_COSTING.md) and [acceptance evidence](docs/PHASE_6_ACCEPTANCE.md).
+
+## Phase 7 Design Studio
+
+Phase 7 is complete and verified: 293 tests, strict TypeScript, lint, production build and all seven browser suites passed. Open `/designs` and `/collections` for seasonal collections, two/three-piece product definitions, approved color variants, immutable BOM revisions, prototype sampling/reviews, editable estimated costs and live processed-fabric availability. Catalog cards, nine reports, CSV and six Urdu A4 sheets reuse the existing interface and store. Design planning never creates or reserves stock. Historical designs remain read-only and can be duplicated into controlled drafts.
+
+See [workflow and diagram](docs/DESIGN_STUDIO_WORKFLOW.md), [BOM revision rules](docs/BOM_AND_REVISION_RULES.md), [costing and availability](docs/DESIGN_COSTING_AND_AVAILABILITY.md) and [actual Phase 7 verification](docs/PHASE_7_ACCEPTANCE.md). Phase 8 production execution is not included.

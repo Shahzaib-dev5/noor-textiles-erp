@@ -98,3 +98,9 @@ No initialization migration rewrites movements or resets storage. Known roll ope
 ## Phase 6 processing extension
 
 `DomainState.processing` is an optional version-6 document extension. Schemas live in `domain/entities/processing-operations.ts`; pure commands in `services/transactions/processing.ts`; independent expected effects and projections in `services/inventory/processing.ts`; imported-state checks in `services/validation/processing.ts`. Shared core challans, receipt lines, losses and inventory movements remain authoritative. `features/processing` reuses the existing RTL shell, tables, dialogs, charts and store commit boundary. No envelope replacement or automatic migration is needed for absent processing metadata.
+
+## Phase 7 design studio extension
+
+`DomainState.studio` is optional version 7, with strict Zod contracts, pure commands, import/reload validation and one existing Zustand persistence commit. Core `designs` remains the single design catalogue; studio profiles extend new operational designs while preserving historical BOM/production references. Unified collection/variant selectors include historical records without duplicating them. Approval snapshots preserve approved BOM contents; samples reference exact revisions.
+
+`services/designs/planning.ts` reads shared inventory and processing provenance, computes stock-neutral requirements with non-reused preview capacity, distinguishes cost evidence from estimates and validates readiness. `features/designs` supplies lazy operational screens and shared forms, charts, CSV/A4; the company dashboard imports only compact metrics. No new inventory ledger, envelope migration, automatic seed replacement, authentication or Phase 8 work order is introduced. See [contract assessment](DESIGN_CONTRACT_ASSESSMENT.md) and [workflow](DESIGN_STUDIO_WORKFLOW.md).

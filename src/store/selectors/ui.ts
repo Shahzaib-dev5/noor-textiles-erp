@@ -1,3 +1,4 @@
+import { designSearch,designAlerts } from './designs';
 import { processingRows, processingAlerts, processPath } from './processing';
 import type { DomainState } from '@/domain/entities';
 import { routeRegistry, getRoute } from '@/routes/registry';
@@ -16,6 +17,7 @@ export interface SearchResult { id: string; title: string; type: string; descrip
 export const normalizeSearch = (value: string) => value.normalize('NFKC').toLocaleLowerCase().replace(/[\u064B-\u065F]/g, '').replace(/ك/g, 'ک').replace(/ي/g, 'ی').trim();
 export function selectGlobalSearch(data: DomainState, query: string): SearchResult[] {
   const results: SearchResult[] = [
+    ...designSearch(data),
     ...routeRegistry.filter((route) => !('detail' in route)).map((route) => ({ id: `route:${route.id}`, title: t(route.title), type: 'ماڈیول', description: route.module, path: route.path })),
     ...Object.values(data.suppliers).map((record) => ({ id: record.id, title: record.name, type: 'سپلائر', description: `${supplierProfile(data,record.id).code} · ${record.city} · ${record.phone}`, path: getRoute('supplier-detail').path.replace(':id', encodeURIComponent(record.id)) })),
     ...Object.values(data.fabrics).map((record) => ({ id: record.id, title: record.name, type: 'کپڑا', description: `${fabricProfile(data,record.id).code} · ${record.composition} · ${record.widthInches}″`, path: getRoute('fabric-detail').path.replace(':id',encodeURIComponent(record.id)) })),
@@ -71,7 +73,7 @@ export function selectEnterpriseDashboard(data: DomainState) {
 export interface DemoNotification { id: string; title: string; description: string; path: string; tone: 'warning' | 'info' }
 export function selectNotifications(data: DomainState, asOf?:string): DemoNotification[] {
   const reportDate=asOf??Object.values(data.procurement?.audits??{}).reduce((max,r)=>r.createdAt.slice(0,10)>max?r.createdAt.slice(0,10):max,data.history?.asOf??'1970-01-01');
-  const purchasing=[...processingAlerts(data,asOf??new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Karachi'}).format(new Date())),...selectProcurementAlerts(data,reportDate),...selectWarehouseAlerts(data,reportDate)];
+  const purchasing=[...designAlerts(data,asOf??new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Karachi'}).format(new Date())),...processingAlerts(data,asOf??new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Karachi'}).format(new Date())),...selectProcurementAlerts(data,reportDate),...selectWarehouseAlerts(data,reportDate)];
   if (data.history) return [...selectBusinessAlerts(data),...purchasing];
   const summary = selectEnterpriseDashboard(data);
   const notifications: DemoNotification[] = summary.contractors.filter((c) => c.held > 0).map((c) => ({ id: `custody:${c.id}`, title: 'پروسیسنگ کی وصولی باقی ہے', description: `${c.name} · ${c.held} میٹر باقی`, path: getRoute('processing').path, tone: 'info' }));

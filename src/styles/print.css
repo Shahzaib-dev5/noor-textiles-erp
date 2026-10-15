@@ -22,3 +22,10 @@
   .processing-screen .print-document table { table-layout: fixed; white-space: normal; }
   .processing-screen .print-document th, .processing-screen .print-document td { padding: 4px; font-size: 9pt; white-space: normal; overflow-wrap: anywhere; }
 }
+
+@media print {
+ :where(.studio-screen, .studio-screen *):has(.print-document) > :not(.print-document):not(:has(.print-document)) { display: none !important; }
+ :where(.studio-screen, .studio-screen *):has(.print-document) { padding: 0 !important; border: 0 !important; box-shadow: none !important; }
+ .studio-screen .print-document table { table-layout: fixed; white-space: normal; }
+ .studio-screen .print-document td, .studio-screen .print-document th { overflow-wrap: anywhere; font-size: 9pt; padding: 4px; }
+}

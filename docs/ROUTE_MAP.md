@@ -63,8 +63,8 @@ Owner can perform all purchasing actions. Purchase demo role manages masters/req
 | `/processing/challans` | پروسیسنگ | processing | Processing coordinator, warehouse | 6 — placeholder |
 | `/processing/challans/:id` | پروسیسنگ | processing | Processing coordinator, warehouse | 6 — placeholder |
 | `/processing/jobs` | رنگائی اور پرنٹنگ | processing | Processing coordinator | 6 — placeholder |
-| `/designs` | ڈیزائنز | designs | Designer, manager | 6 — placeholder |
-| `/collections` | کلیکشنز | designs | Designer, manager | 6 — placeholder |
+| `/designs` | ڈیزائن اسٹوڈیو | designs | All read; owner/production writes | 7 — implemented |
+| `/collections` | کلیکشنز | designs | All read; owner/production writes | 7 — implemented |
 | `/production` | پیداوار | production | Production planner | 7 — placeholder |
 | `/production/orders/:id` | پیداوار | production | Production planner, warehouse | 7 — placeholder |
 | `/cutting` | کٹنگ | cutting | Cutting supervisor | 7 — placeholder |
@@ -93,3 +93,9 @@ Phase 3 expands deterministic demonstration data and has no dedicated operationa
 ## Phase 6 routes
 
 Contractors: `/contractors`, `/contractors/new`, `/contractors/:id`, `/contractors/:id/edit`, `/contractors/:id/ledger`. Processing: `/processing`, `/processing/dashboard`, `/processing/services`, `/processing/rates`, `/processing/jobs`, `/processing/jobs/new`, `/processing/jobs/:id`, `/processing/jobs/:id/edit`, `/processing/challans`, `/processing/challans/new`, `/processing/challans/:id`, `/processing/receipts`, `/processing/receipts/new`, `/processing/receipts/:id`, `/processing/dyeing`, `/processing/printing`, `/processing/bleaching`, `/processing/calendering`, `/processing/finishing`, `/processing/color-batches`, `/processing/quality-control`, `/processing/losses`, `/processing/custody`, `/processing/bills`, `/processing/bills/new`, `/processing/bills/:id`, `/processing/payments`, `/processing/payments/new`, `/processing/reports`, `/processing/outputs`. Additional detail views use `?record=<id>`; rates and controlled colors edit/create through the shared forms. Existing historical challan URLs remain readable.
+
+## Phase 7 routes
+
+`/designs` now opens the Design Studio. Implemented detail paths are `/designs/new`, `/designs/:id`, `/designs/:id/edit`, `/designs/:id/duplicate`, `/designs/:id/colors`, `/designs/:id/bom`, `/designs/:id/samples`, `/designs/:id/costing`, `/designs/:id/availability` and `/designs/:id/activity`. Existing `?record=<id>` previews remain readable; BOM deep links additionally accept `?bom=<revisionId>`.
+
+Collections: `/collections`, `/collections/new`, `/collections/:id`, `/collections/:id/edit`. Cross-design pages: `/designs/samples`, `/designs/samples/new`, `/designs/approvals`, `/designs/material-planning`, `/designs/reports`. Static routes retain precedence over `:id`. All twenty paths are implemented, with Urdu RTL screens and state-derived actions. Earlier table phase labels are historical; these design routes now belong to Phase 7. Future production routes remain deferred.

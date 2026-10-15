@@ -10,7 +10,7 @@ export function inspectHistory(state: DomainState): ValidationIssue[] {
   const ref = (value: unknown, recordId: string, name: string) => { if (!value) fail(recordId, 'Invalid reference: ' + name); return Boolean(value); };
   const eq = (a: number, b: number, recordId: string, name: string) => { if (!Number.isFinite(a) || Math.abs(a - b) > .00005) fail(recordId, name + ': ' + a + ' != ' + b); };
   const sum = <T>(list: T[], f: (r: T) => number) => list.reduce((n, r) => n + f(r), 0);
-  const ids = new Set(Object.entries(state).filter(([key]) => !['history','procurement','warehouse','processing'].includes(key)).flatMap(([, records]) => Object.keys(records)));
+  const ids = new Set(Object.entries(state).filter(([key]) => !['history','procurement','warehouse','processing','studio'].includes(key)).flatMap(([, records]) => Object.keys(records)));
   const numbers = new Set([...Object.values(state.purchaseOrders), ...Object.values(state.goodsReceipts), ...Object.values(state.challans), ...Object.values(state.processingReceipts)].map((r) => r.number));
   ref(state.companies[h.companyId], h.companyId, 'company');
   for (const [collection, entries] of Object.entries(h)) {
@@ -29,7 +29,7 @@ export function inspectHistory(state: DomainState): ValidationIssue[] {
   Object.values(h.fabricProfiles).forEach((r) => { ref(state.fabrics[r.fabricId], r.id, 'fabric'); ref(state.suppliers[r.supplierId], r.id, 'supplier'); });
   Object.values(h.customerProfiles).forEach((r) => ref(state.customers[r.customerId], r.id, 'customer'));
   Object.values(h.contractorProfiles).forEach((r) => ref(state.contractors[r.contractorId], r.id, 'contractor'));
-  Object.values(state.designs).forEach((r) => { if (r.collectionId) ref(h.collections[r.collectionId], r.id, 'collection'); if (r.bomId) ref(h.boms[r.bomId]?.designId === r.id, r.id, 'bom'); });
+  Object.values(state.designs).forEach((r) => { if (r.collectionId) ref(h.collections[r.collectionId] || state.studio?.collections[r.collectionId], r.id, 'collection'); if (r.bomId) ref(h.boms[r.bomId]?.designId === r.id, r.id, 'bom'); });
   Object.values(h.variants).forEach((r) => ref(state.designs[r.designId], r.id, 'design'));
   Object.values(h.designProfiles).forEach((r) => { ref(state.designs[r.designId], r.id, 'design target'); r.productionBatchIds.forEach((id) => ref(h.batches[id]?.designId === r.designId, r.id, 'design production batch')); });
   Object.values(state.finishedSKUs).forEach((r) => { if (r.colorVariantId) ref(h.variants[r.colorVariantId]?.designId === r.designId, r.id, 'variant'); if (!r.catalogueOnly && !Object.values(h.packaging).some((p) => p.skuId === r.id)) fail(r.id, 'Finished SKU lacks packaging provenance'); });
