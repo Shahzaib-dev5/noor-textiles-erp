@@ -1,5 +1,7 @@
 # نور ٹیکسٹائلز لاہور — Noor Textiles ERP
 
+For one business guide explaining every module through Phase 5, its use and its connections, with workflow diagrams, see [Module guide through Phase 5](docs/MODULE_GUIDE_THROUGH_PHASE_5.md).
+
 Frontend-only Urdu RTL textile ERP foundation. Phase 1 implements a connected local demo state, movement-based fabric inventory, three validated transactions and an operational architecture dashboard. It has no backend, real authentication or payment gateway.
 
 Phase 2 adds the enterprise Urdu RTL design system: collapsible grouped sidebar, keyboard search, real notifications, responsive dashboard, reusable tables/forms/charts/dialogs, persistent light/dark/system preferences, and `/design-system` with A4 print preview. See [design system](docs/DESIGN_SYSTEM.md), [component library](docs/COMPONENT_LIBRARY.md), [RTL guidelines](docs/RTL_GUIDELINES.md) and [Phase 2 acceptance](docs/PHASE_2_ACCEPTANCE.md).

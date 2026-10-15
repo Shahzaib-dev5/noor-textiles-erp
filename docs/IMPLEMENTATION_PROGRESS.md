@@ -2,6 +2,8 @@
 
 Updated: 2026-10-14 (Asia/Karachi).
 
+Documentation follow-up: added [one consolidated module guide through Phase 5](MODULE_GUIDE_THROUGH_PHASE_5.md), covering each working module's purpose, usage, relationships, workflow diagrams and future-module boundaries. Linked it from README. This is a documentation-only change; no application behavior changed. Phase 6 remains the next unstarted phase.
+
 Phases 1–5 are complete and verified. The user-authorized **Phase 5: Grey Fabric Warehouse & Advanced Inventory Control** is complete. Full processing management is deferred to Phase 6 under the supplied brief.
 
 | Phase | Scope | Status | Implemented / next action |
