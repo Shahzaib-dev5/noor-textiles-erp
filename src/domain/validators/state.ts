@@ -10,6 +10,9 @@ import { procurementSchema } from '@/domain/entities/procurement';
 import { inspectProcurement } from '@/services/validation/procurement';
 import { warehouseSchema } from '@/domain/entities/warehouse';
 import { inspectWarehouse } from '@/services/validation/warehouse';
+import { processingOperationsSchema } from '@/domain/entities/processing-operations';
+import { inspectProcessing } from '@/services/validation/processing';
+import { processingMovementEffects } from '@/services/inventory/processing';
 import { warehouseMovementEffects } from '@/services/inventory/warehouse';
 
 const reservedKeys = new Set(Object.getOwnPropertyNames(Object.prototype));
@@ -32,7 +35,7 @@ const lengthUnit = z.enum(['METER', 'YARD']);
 const entityMap = <T extends z.ZodTypeAny>(schema: T) => z.record(id, schema);
 
 const rawStateSchema = z.object({
-  history: historySchema.optional(),
+  history: historySchema.optional(), processing: processingOperationsSchema.optional(),
   procurement: procurementSchema.optional(), warehouse: warehouseSchema.optional(),
   companies: entityMap(activeOnly.extend({ name: text, city: text, address: text, currency: z.literal('PKR'), locale: z.literal('ur-PK') }).strict()),
   employees: entityMap(active.extend({ companyId: id, name: text, roleId: id, departmentId: id.optional() }).strict()),
@@ -72,7 +75,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   const allIds = new Set<string>();
   const numberIds = new Set<string>();
   for (const [collection, entries] of Object.entries(state)) {
-    if (collection === 'history' || collection === 'procurement' || collection === 'warehouse') continue;
+    if (collection === 'history' || collection === 'procurement' || collection === 'warehouse' || collection === 'processing') continue;
     for (const [key, entity] of Object.entries(entries as Record<string, EntityMeta>)) {
       if (key !== entity.id || allIds.has(entity.id)) fail(`Duplicate or mismatched entity key: ${collection}/${key}`);
       allIds.add(entity.id);
@@ -98,7 +101,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   Object.values(state.lots).forEach((lot) => {
     ref(state.fabrics[lot.fabricId], lot.id); ref(state.suppliers[lot.supplierId], lot.id);
     const receiptLine = state.goodsReceiptLines[lot.sourceGoodsReceiptLineId];
-    ref(receiptLine && receiptLine.lotId === lot.id, lot.id);
+    ref(receiptLine && (receiptLine.lotId === lot.id || Object.values(state.processing?.outputs ?? {}).some(o => o.lotId === lot.id && state.lots[o.parentLotId]?.sourceGoodsReceiptLineId === lot.sourceGoodsReceiptLineId)), lot.id);
     const orderLine = receiptLine && state.purchaseOrderLines[receiptLine.purchaseOrderLineId];
     ref(orderLine && orderLine.fabricId === lot.fabricId && state.purchaseOrders[orderLine.purchaseOrderId]?.supplierId === lot.supplierId, lot.id);
   });
@@ -150,6 +153,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
     if (line.conversionMetersPerUnit !== (line.originalUnit === 'YARD' ? 0.9144 : 1) || roundQuantity(line.originalQuantity * line.conversionMetersPerUnit) !== line.quantityMeters) fail(`Receipt unit conversion mismatch: ${line.id}`);
   });
   Object.values(state.challans).forEach((challan) => {
+    if (Object.values(state.processing?.issues ?? {}).some(r => r.challanId === challan.id)) return;
     ref(state.contractors[challan.contractorId]?.services.includes(challan.serviceType), challan.id);
     ref(state.locations[challan.fromLocationId]?.category === 'GREY', challan.id);
     ref(state.locations[challan.contractorLocationId]?.category === 'PROCESSING_OUT' && state.locations[challan.contractorLocationId]?.contractorId === challan.contractorId, challan.id);
@@ -173,6 +177,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   });
   Object.values(state.challanLines).forEach((line) => { ref(state.challans[line.challanId]?.lineIds.includes(line.id), line.id); ref(state.lots[line.lotId], line.id); if(line.rollId)ref(state.warehouse&&state.rolls[line.rollId]?.lotId===line.lotId,line.id); });
   Object.values(state.processingReceipts).forEach((receipt) => {
+    if (Object.values(state.processing?.receipts ?? {}).some(r => r.receiptId === receipt.id)) return;
     const challan = state.challans[receipt.challanId];
     ref(challan, receipt.id); ref(state.locations[receipt.destinationLocationId]?.category === 'PROCESSED', receipt.id);
     receipt.lineIds.forEach((lineId) => {
@@ -207,7 +212,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   });
   const expectedKeys = new Map<string, number>();
   Object.values(state.procurement?.returns ?? {}).filter((r) => r.status === 'POSTED').forEach((r) => expected.push({ sourceType: 'PURCHASE_RETURN', sourceDocumentId: r.id, sourceLineId: r.goodsReceiptLineId, lotId: r.lotId, locationId: r.locationId, category: 'GREY', quantityMeters: -r.quantityMeters }));
-  expected.push(...warehouseMovementEffects(state));
+  expected.push(...warehouseMovementEffects(state), ...processingMovementEffects(state));
   expected.forEach((effect) => expectedKeys.set(effectKey(effect), (expectedKeys.get(effectKey(effect)) ?? 0) + 1));
   Object.values(state.movements).forEach((movement) => {
     ref(state.lots[movement.lotId], movement.id); ref(state.locations[movement.locationId]?.category === movement.category, movement.id);
@@ -229,11 +234,12 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   if (Object.keys(state.reservations).length && !state.warehouse) fail('Reservation posting requires warehouse workflow evidence');
   Object.values(state.designs).forEach((design) => { if (!state.history && (design.collectionId || design.bomId)) fail('Collection and BOM require validated history'); });
   Object.values(state.finishedSKUs).forEach((sku) => { ref(state.designs[sku.designId]?.pieceCount === sku.pieceCount, sku.id); if (!state.history && (sku.colorVariantId || !sku.catalogueOnly)) fail('Finished production requires validated history'); });
-  Object.values(state.activityLogs).forEach((log) => { ref(state.employees[log.actorId], log.id); ref(documents.some((document) => document.id === log.documentId) || Boolean(state.suppliers[log.documentId] || state.fabrics[log.documentId] || state.locations[log.documentId] || state.reservations[log.documentId]) || Object.values(state.warehouse ?? {}).some((rows) => typeof rows === 'object' && log.documentId in rows) || Object.values(state.procurement?.requests ?? {}).some((r) => r.id === log.documentId) || Object.values(state.procurement?.bills ?? {}).some((r) => r.id === log.documentId) || Object.values(state.procurement?.payments ?? {}).some((r) => r.id === log.documentId) || Object.values(state.procurement?.returns ?? {}).some((r) => r.id === log.documentId), log.id); });
+  Object.values(state.activityLogs).forEach((log) => { ref(state.employees[log.actorId], log.id); ref(Boolean(state.contractors[log.documentId]) || Object.values(state.processing ?? {}).some(rows => typeof rows === 'object' && log.documentId in rows) || documents.some((document) => document.id === log.documentId) || Boolean(state.suppliers[log.documentId] || state.fabrics[log.documentId] || state.locations[log.documentId] || state.reservations[log.documentId]) || Object.values(state.warehouse ?? {}).some((rows) => typeof rows === 'object' && log.documentId in rows) || Object.values(state.procurement?.requests ?? {}).some((r) => r.id === log.documentId) || Object.values(state.procurement?.bills ?? {}).some((r) => r.id === log.documentId) || Object.values(state.procurement?.payments ?? {}).some((r) => r.id === log.documentId) || Object.values(state.procurement?.returns ?? {}).some((r) => r.id === log.documentId), log.id); });
   inspectInventoryInvariants(state).forEach(fail);
   inspectHistory(state).forEach((issue) => fail(issue.recordId + ': ' + issue.message));
   inspectProcurement(state).forEach(fail);
   inspectWarehouse(state).forEach(fail);
+  inspectProcessing(state).forEach(fail);
 }
 
 export const domainStateSchema: z.ZodType<DomainState> = rawStateSchema.superRefine((state, context) => {

@@ -30,9 +30,12 @@ export function getAvailableMeters(state: DomainState, lotId: string, locationId
 }
 export function getInventorySummary(state: DomainState) {
   const balances = getInventoryBalances(state);
+  const processedLots=new Set(Object.values(state.processing?.outputs??{}).map(o=>o.lotId));
+  const unavailable=['INSPECTION_HOLD','QUARANTINED','REJECTED','DAMAGED'];
+  const heldProcessed=roundQuantity(balances.filter(b=>processedLots.has(b.lotId)&&unavailable.includes(b.category)).reduce((n,b)=>n+b.onHandMeters,0));
   const sum = (category: InventoryLocationType) => roundQuantity(balances.filter((balance) => balance.category === category).reduce((total, balance) => total + balance.onHandMeters, 0));
   return {
-    grey: roundQuantity(sum('GREY')+sum('INSPECTION_HOLD')+sum('QUARANTINED')+sum('REJECTED')+sum('DAMAGED')), processed: sum('PROCESSED'), contractor: sum('PROCESSING_OUT'),
+    grey: roundQuantity(sum('GREY')+sum('INSPECTION_HOLD')+sum('QUARANTINED')+sum('REJECTED')+sum('DAMAGED')-heldProcessed), processed: roundQuantity(sum('PROCESSED')+heldProcessed), contractor: sum('PROCESSING_OUT'),
     loss: roundQuantity(Object.values(state.processingLosses).reduce((total, loss) => total + loss.quantityMeters, 0)),
     finished: Object.values(state.history?.finishedMovements ?? {}).reduce((n, r) => n + r.quantitySuits, 0),
   };

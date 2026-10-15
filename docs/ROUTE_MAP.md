@@ -89,3 +89,7 @@ Owner can perform all purchasing actions. Purchase demo role manages masters/req
 | `/audit` | آڈٹ لاگ | audit | Manager | 14 — placeholder |
 
 Phase 3 expands deterministic demonstration data and has no dedicated operational route. The Phase 1 `/settings` page provides only data-management controls, not a completed future company/security configuration module. Likewise `/modules` is navigation documentation, not implementation of every listed module.
+
+## Phase 6 routes
+
+Contractors: `/contractors`, `/contractors/new`, `/contractors/:id`, `/contractors/:id/edit`, `/contractors/:id/ledger`. Processing: `/processing`, `/processing/dashboard`, `/processing/services`, `/processing/rates`, `/processing/jobs`, `/processing/jobs/new`, `/processing/jobs/:id`, `/processing/jobs/:id/edit`, `/processing/challans`, `/processing/challans/new`, `/processing/challans/:id`, `/processing/receipts`, `/processing/receipts/new`, `/processing/receipts/:id`, `/processing/dyeing`, `/processing/printing`, `/processing/bleaching`, `/processing/calendering`, `/processing/finishing`, `/processing/color-batches`, `/processing/quality-control`, `/processing/losses`, `/processing/custody`, `/processing/bills`, `/processing/bills/new`, `/processing/bills/:id`, `/processing/payments`, `/processing/payments/new`, `/processing/reports`, `/processing/outputs`. Additional detail views use `?record=<id>`; rates and controlled colors edit/create through the shared forms. Existing historical challan URLs remain readable.

@@ -17,4 +17,8 @@
   dialog:has(.print-document) { position: static !important; max-width: none !important; max-height: none !important; width: 100% !important; margin: 0 !important; border: 0 !important; transform: none !important; overflow: visible !important; box-shadow: none !important; }
   dialog:has(.print-document) > div:first-child { display: none !important; }
   dialog:has(.print-document)::backdrop { display: none !important; }
+  :where(.processing-screen, .processing-screen *):has(.print-document) > :not(.print-document):not(:has(.print-document)) { display: none !important; }
+  :where(.processing-screen, .processing-screen *):has(.print-document) { padding: 0 !important; border: 0 !important; box-shadow: none !important; }
+  .processing-screen .print-document table { table-layout: fixed; white-space: normal; }
+  .processing-screen .print-document th, .processing-screen .print-document td { padding: 4px; font-size: 9pt; white-space: normal; overflow-wrap: anywhere; }
 }

@@ -261,3 +261,7 @@ This document defines the whole business chain. **Only goods receipt posting, pr
 - **Output document:** Rendered report or explicit export artifact; Phase 1 supplies reconciliation and JSON demo export.
 - **Possible errors:** Invalid filter range, inconsistent imported references, combining incompatible units or counting both sides of a transfer as new stock.
 - **Related modules:** All ERP modules, reports, dashboard and audit.
+
+## Phase 6 outsourced processing
+
+Maintain contractor and valid service rate, create a multi-input job with agreed rate snapshot, approve, issue eligible warehouse fabric, receive partial physical outputs/QC categories, approve explicit loss, and reconcile custody. Accepted output can feed a later processing stage while preserving original GRN lineage. Settle a completed job with an explicit contractor bill and allocated payment. See [workflow](PROCESSING_WORKFLOW.md), [color batches](DYEING_AND_COLOR_BATCHES.md), [custody and ledger](CONTRACTOR_CUSTODY_AND_LEDGER.md), [costing](PROCESSING_COSTING.md) and [actual acceptance evidence](PHASE_6_ACCEPTANCE.md).

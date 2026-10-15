@@ -12,7 +12,7 @@ export const INVENTORY_CATEGORY = {
 export const FABRIC_UNIT = {
   METER: 'METER', YARD: 'YARD', ROLL: 'ROLL', THAAN: 'THAAN', PIECE: 'PIECE', SUIT: 'SUIT', CARTON: 'CARTON',
 } as const satisfies Record<FabricUnit, FabricUnit>;
-export const PROCESSING_SERVICE = ['BLEACHING', 'DYEING', 'DIGITAL_PRINTING', 'ROTARY_PRINTING', 'SCREEN_PRINTING', 'FINISHING'] as const;
+export const PROCESSING_SERVICE = ['BLEACHING', 'DYEING', 'DIGITAL_PRINTING', 'ROTARY_PRINTING', 'SCREEN_PRINTING', 'FINISHING', 'WASHING', 'CALENDERING', 'EMBROIDERY'] as const;
 export type ProcessingServiceType = typeof PROCESSING_SERVICE[number];
 export type SuitComponent = 'SHIRT' | 'TROUSER' | 'DUPATTA';
 export type ReturnDisposition = 'SALEABLE' | 'INSPECTION_HOLD' | 'REJECTED' | 'DAMAGED';

@@ -4,7 +4,7 @@ import { warehouseMovementEffects, warehouseSum, greyCategories, hasKnownRollCus
 import { roundQuantity } from '@/domain/value-objects/quantity';
 export function inspectWarehouse(data:DomainState):string[]{
  const w=data.warehouse;if(!w)return[];const errors:string[]=[],fail=(id:string,why:string)=>errors.push(id+': '+why),ref=(yes:unknown,id:string)=>{if(!yes)fail(id,'متعلقہ ریکارڈ درست نہیں۔');};
- const ids=new Set(Object.entries(data).filter(([key])=>!['warehouse','history','procurement'].includes(key)).flatMap(([,rows])=>Object.keys(rows)));
+ const ids=new Set(Object.entries(data).filter(([key])=>!['warehouse','history','procurement','processing'].includes(key)).flatMap(([,rows])=>Object.keys(rows)));
  const numbers=new Set([...Object.values(data.purchaseOrders),...Object.values(data.goodsReceipts),...Object.values(data.challans),...Object.values(data.processingReceipts)].map((r)=>r.number));
  for(const ext of [data.history,data.procurement])for(const rows of Object.values(ext??{}))if(typeof rows==='object')for(const r of Object.values(rows) as {id:string;number?:string}[]){ids.add(r.id);if(r.number)numbers.add(r.number);}
  ref(data.companies[w.companyId],w.companyId);
@@ -62,9 +62,9 @@ export function inspectWarehouse(data:DomainState):string[]{
  for(const m of Object.values(data.movements)){
   if(m.companyId)ref(m.companyId===w.companyId&&m.fabricId===data.lots[m.lotId]?.fabricId,m.id);
   if(m.sourceType==='GOODS_RECEIPT'&&m.rollId)fail(m.id,'مجموعی رسید کی حرکت انفرادی رول کی پیمائش نہیں۔');
-  if(['PROCESSING_ISSUE','PROCESSING_RECEIPT','PROCESSING_LOSS'].includes(m.sourceType)){const line=m.sourceType==='PROCESSING_ISSUE'?data.challanLines[m.sourceLineId]:data.challanLines[data.processingReceiptLines[m.sourceLineId]?.challanLineId];ref(m.rollId===line?.rollId,m.id);}
+  if(['PROCESSING_ISSUE','PROCESSING_RECEIPT','PROCESSING_LOSS'].includes(m.sourceType)&&!Object.values(data.processing?.outputs??{}).some(o=>o.lotId===m.lotId)){const line=m.sourceType==='PROCESSING_ISSUE'?data.challanLines[m.sourceLineId]:data.challanLines[data.processingReceiptLines[m.sourceLineId]?.challanLineId];ref(m.rollId===line?.rollId,m.id);}
  }
- for(const m of Object.values(data.movements))if(['WAREHOUSE_TRANSFER','WAREHOUSE_ADJUSTMENT','QUALITY_CHANGE'].includes(m.sourceType)){
+ for(const m of Object.values(data.movements))if(['WAREHOUSE_TRANSFER','WAREHOUSE_ADJUSTMENT','QUALITY_CHANGE'].includes(m.sourceType)&&!data.processing?.quality[m.sourceDocumentId]){
   ref(m.companyId===w.companyId&&m.fabricId===data.lots[m.lotId]?.fabricId&&m.role&&m.reason,m.id);
   if(!m.rollId&&!Object.values(data.movements).some((a)=>a.lotId===m.lotId&&a.sourceType!=='GOODS_RECEIPT'&&!['WAREHOUSE_TRANSFER','WAREHOUSE_ADJUSTMENT','QUALITY_CHANGE'].includes(a.sourceType)&&!a.rollId&&!a.companyId))fail(m.id,'نئی معلوم تحویل میں غیر مختص رول حرکت نہیں ہو سکتی۔');
   const e=effects.find((e)=>e.sourceDocumentId===m.sourceDocumentId&&e.sourceLineId===m.sourceLineId&&e.locationId===m.locationId&&e.quantityMeters===m.quantityMeters);ref(e&&e.rollId===m.rollId,m.id);

@@ -3,6 +3,7 @@ import { useERPStore } from '@/store';
 import { DataTable } from '@/components/tables/DataTable';
 import { formatPKR } from '@/lib/formatters';
 import { StatusBadge } from '@/components/tables/StatusBadge';
+import { services } from '@/store/selectors/processing';
 interface Row { id: string; name: string; code: string; detail: string }
 export function HistoricalDirectory({ module }: { module: string }) {
   const data = useERPStore((s) => s.data); const [, setParams] = useSearchParams(); const h = data.history;
@@ -11,7 +12,7 @@ export function HistoricalDirectory({ module }: { module: string }) {
   if (module === 'suppliers') rows = Object.values(data.suppliers).map((r) => { const p = Object.values(h.supplierProfiles).find((p) => p.supplierId === r.id); return { id: r.id, name: r.name, code: p?.code ?? r.id, detail: r.city + ' · ' + (p?.nameEnglish ?? '') + ' · ' + (p?.termDays ?? 0) + ' دن' }; });
   if (module === 'fabrics') rows = Object.values(data.fabrics).map((r) => { const p = Object.values(h.fabricProfiles).find((p) => p.fabricId === r.id); return { id: r.id, name: r.name, code: p?.code ?? r.id, detail: r.composition + ' · ' + r.widthInches + '″ · GSM ' + p?.gsm + ' · ' + formatPKR(p?.ratePaisa ?? 0) + '/میٹر' }; });
   if (module === 'customers') rows = Object.values(data.customers).map((r) => ({ id: r.id, name: r.name, code: r.id, detail: r.city + ' · فرضی کاروباری شناخت' }));
-  if (module === 'contractors') rows = Object.values(data.contractors).map((r) => ({ id: r.id, name: r.name, code: r.id, detail: r.city + ' · ' + r.services.map((s) => ({ BLEACHING: 'بلیچنگ', DYEING: 'رنگائی', DIGITAL_PRINTING: 'ڈیجیٹل پرنٹنگ', ROTARY_PRINTING: 'روٹری پرنٹنگ', SCREEN_PRINTING: 'اسکرین پرنٹنگ', FINISHING: 'فنشنگ' })[s]).join('، ') }));
+  if (module === 'contractors') rows = Object.values(data.contractors).map((r) => ({ id: r.id, name: r.name, code: r.id, detail: r.city + ' · ' + r.services.map((s) => services[s]).join('، ') }));
   if (module === 'designs') rows = Object.values(data.designs).map((r) => ({ id: r.id, name: r.name, code: r.code, detail: (r.collectionId ? h.collections[r.collectionId].name : '') + ' · ' + r.pieceCount + ' پیس · نمونہ مقامی خاکہ' }));
   if (!rows.length) return null;
   return <div className="mb-6"><DataTable title="مربوط نمونہ ڈائریکٹری — صرف مشاہدہ" rows={rows} rowId={(r) => r.id} columns={[{ id: 'name', label: 'نام', value: (r) => r.name }, { id: 'code', label: 'کوڈ', value: (r) => r.code, technical: true }, { id: 'detail', label: 'تفصیل', value: (r) => r.detail }]} onDetails={(r) => setParams({ record: r.id })} /></div>;

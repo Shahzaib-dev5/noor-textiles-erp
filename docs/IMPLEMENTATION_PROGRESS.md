@@ -1,10 +1,10 @@
 # Implementation progress
 
-Updated: 2026-10-14 (Asia/Karachi).
+Updated: 2026-10-15 (Asia/Karachi).
 
-Documentation follow-up: added [one consolidated module guide through Phase 5](MODULE_GUIDE_THROUGH_PHASE_5.md), covering each working module's purpose, usage, relationships, workflow diagrams and future-module boundaries. Linked it from README. This is a documentation-only change; no application behavior changed. Phase 6 remains the next unstarted phase.
+Documentation follow-up: added [one consolidated module guide through Phase 5](MODULE_GUIDE_THROUGH_PHASE_5.md), covering each working module's purpose, usage, relationships, workflow diagrams and future-module boundaries. The guide records the completed Phase 5 scope; current Phase 6 work is tracked below.
 
-Phases 1–5 are complete and verified. The user-authorized **Phase 5: Grey Fabric Warehouse & Advanced Inventory Control** is complete. Full processing management is deferred to Phase 6 under the supplied brief.
+Phases 1–6 are complete and verified. **Phase 6: Complete Textile Processing, Challans & Contractor Management** is implemented on `phase-06-processing`. See [acceptance evidence](PHASE_6_ACCEPTANCE.md).
 
 | Phase | Scope | Status | Implemented / next action |
 | --- | --- | --- | --- |
@@ -13,8 +13,8 @@ Phases 1–5 are complete and verified. The user-authorized **Phase 5: Grey Fabr
 | 3 | Connected demo data and advanced business dashboard | Complete — verified | Deterministic opt-in purchasing/processing/production/wholesale history, safe replacement, strict validation, pure analytics, scoped filters, charts, alerts and reconciliation; 156 tests, TypeScript, lint, build and all three browser suites passed |
 | 4 | Suppliers, fabric master and purchasing | Complete — verified | Persistent masters, requests, PO/GRN, bills/payments/ledger/returns, dashboard/reports/print/search/alerts/audit; 190 tests, typecheck, lint, build and four production browser suites passed; company CRUD and warehouse enhancements excluded by the supplied brief |
 | 5 | Grey warehouse and inventory control | Complete — verified | Location hierarchy, roll portions, putaway/transfers, reservations, stocktakes/adjustments, quality holds/write-offs, custody, movement/report/search/print; 220 tests, TypeScript, lint, build and five production browser suites passed |
-| 6 | Full processing operations | Not started | User brief defers full challan/job/partial receipt editors here; earlier design/collection numbering is provisional and awaits the next brief |
-| 7 | Production planning and cutting | Not started | Proposed: plans/work orders, protected material allocation, WIP, cutting outputs and loss |
+| 6 | Full processing operations | Complete — verified | Contractor/rate/job/challan/receipt/QC/color/cost/finance workflows, shared-ledger multi-stage lineage, dashboard/reports/search/alerts; 255 tests, TypeScript, lint, production build and six browser suites passed |
+| 7 | Design studio | Not started | Await the supplied Phase 7 brief; production planning/cutting shifts to the later roadmap |
 | 8 | Embroidery, quality and suit assembly | Not started | Proposed: optional embroidery custody, inspections/defects, component matching |
 | 9 | Packaging and finished inventory | Not started | Proposed: inspected packaging completion, unit-safe finished-stock movements and SKU availability |
 | 10 | Pricing, quotations and wholesale orders | Not started | Proposed: price lists, quotations, credit-aware orders and exclusive reservations |
@@ -22,6 +22,8 @@ Phases 1–5 are complete and verified. The user-authorized **Phase 5: Grey Fabr
 | 12 | Receipts, expenses and accounts | Not started | Proposed: payment allocation, customer/supplier ledgers, expenses; demonstration accounting only |
 | 13 | Returns and batch costing | Not started | Proposed: inspected disposition, credit notes, source-linked expense allocation and unit cost |
 | 14 | Reports, notifications and audit | Not started | Proposed: cross-module read-only projections, reconciliation, activity history and final integration verification |
+
+Phases 8–14 retain provisional planning labels. Reconcile their numbering against the next authorized brief; Phase 6 does not implement design studio, cutting or finished-suit production.
 
 ## Phase 1 implementation ledger
 
@@ -47,7 +49,7 @@ Phases 1–5 are complete and verified. The user-authorized **Phase 5: Grey Fabr
 
 ## Known boundaries and outstanding work
 
-- No known blocking Phase 1–5 issues remain within their documented scopes. Full Phase 6 and later operations remain proposed.
+- No known blocking Phase 1–6 issues remain within their documented scopes. Later operations remain proposed; Phase 6 limitations are recorded in its acceptance document.
 - localStorage is a local demonstration snapshot store with size, durability and concurrency limits; a changed-snapshot guard cannot eliminate simultaneous-tab races.
 - Demo roles are not secure authorization or authentication.
 - Future production, finished-goods, reservation, dispatch, invoice, payment and return transactions are typed contracts, not implemented workflows.
@@ -97,6 +99,10 @@ Phases 1–5 are complete and verified. The user-authorized **Phase 5: Grey Fabr
 - Added warehouse dashboards, 800-roll pagination/indexed projections, fourteen reports, date/fabric/lot/location/warehouse/quality filters, source movement drawer, filtered CSV/A4, search, alerts, ageing and independent lot/roll reconciliation.
 - Final TypeScript, lint, 220 tests in 12 files, production build and all five production browser suites passed. A–F workflows, accurate posted-only custody, numeric CSV, A4, refresh/preferences and four widths in both themes are verified; see [Phase 5 acceptance](PHASE_5_ACCEPTANCE.md).
 
-## Phase 6 handoff
+## Phase 5 handoff to Phase 6 (historical)
 
 Implement full processing editors only after the next authorized brief. Use existing typed warehouse issue/reservation-consumption commands and optional challan-line roll references for exact source portions. Partial receipts must retain roll custody identities and recognized loss evidence. Preserve old unassigned historical events, purchasing/warehouse sources, reservations, money/meter/suit separation, import/export and all regression fixtures. Supplier advance reallocation/refund and posted-payment reversal remain outside this phase. No backend or real authentication/payment processing was added.
+
+## Phase 6 implementation follow-up (2026-10-15)
+
+Completed on `phase-06-processing`: operational schemas, pure transactions and validation, contractor/rate/job/challan/receipt/QC/color/billing/payment screens, shared ledger integration, output lineage/costing, reports/search/alerts and Phase 6 tests/browser scenarios. All 255 tests passed, including the original 220 and 35 processing tests. TypeScript, lint, production build and all six browser suites passed. Final Phase 6 browser coverage includes QC hold/release, output inspection history and warehouse movement links, scoped A4 printing, refresh persistence and four widths in both themes. See [Phase 6 acceptance](PHASE_6_ACCEPTANCE.md) for evidence and deliberate limits. Next: Phase 7 design studio, awaiting its brief; no later-phase implementation has started.

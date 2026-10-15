@@ -1,9 +1,13 @@
 # Noor Textiles ERP — implementation progress
 
-The canonical phase-by-phase ledger is [docs/IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md). The acceptance checklist and executed command results are [docs/PHASE_1_ACCEPTANCE.md](docs/PHASE_1_ACCEPTANCE.md).
+The canonical phase-by-phase ledger is [docs/IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md). Current acceptance evidence is [docs/PHASE_6_ACCEPTANCE.md](docs/PHASE_6_ACCEPTANCE.md).
 
-Current scope: **Phase 5 — Grey Fabric Warehouse & Advanced Inventory Control: complete and verified**. Phases 1–4 remain preserved; full processing management is Phase 6. See [Phase 5 acceptance](docs/PHASE_5_ACCEPTANCE.md).
+Current scope: **Phase 6 — Complete Textile Processing, Challans & Contractor Management: complete and verified** on `phase-06-processing`. Phases 1–5 and their historical data remain preserved.
 
-Verification: strict TypeScript, ESLint, all 220 automated tests, production build and all five Edge browser suites passed, including Phase 5 A–F and 375/768/1024/1440 px warehouse checks in light/dark themes. The separate golden fixture remains 600 m grey + 380 m processed + 10 m contractor-held + 10 m loss = 1,000 m, with zero suits. Expanded opt-in history reconciles 52,920 purchased meters and 900 packaged suits; 712 suits are physically held in the saleable category, 70 reserved and 642 available.
+Verification: strict TypeScript, ESLint, **255 automated tests** (220 preserved plus 35 processing tests), production build and all six Edge browser suites passed. Phase 6 additionally verifies QC hold/release, warehouse source links, refresh, CSV/A4 and 375/768/1024/1440 px RTL layouts in both themes. The golden fixture remains 600 m grey + 380 m processed + 10 m contractor-held + 10 m loss = 1,000 m, with zero suits. Original expanded history retains 37,400 m issued and 5,501 m contractor-held.
 
-The expanded-data definitions, test evidence and limits are in [docs/PHASE_3_ACCEPTANCE.md](docs/PHASE_3_ACCEPTANCE.md). The Phase 6 handoff is in the canonical progress ledger. Preserve historical business state, transactions, preferences and regression tests when extending the application.
+Contractor profiles, rates, jobs, issue challans, partial receipts, color/shade batches, QC, losses, multi-stage output lineage, costing, bills, payments, ledger, dashboard and reports use the central persisted store and shared stock ledger. Preserve historical business state, transactions, preferences and regression tests when extending the application.
+
+## Next phase
+
+Phase 7 design studio awaits its brief. Cutting, panel production and finished-suit production remain future work. See [Phase 6 acceptance and limitations](docs/PHASE_6_ACCEPTANCE.md) and [processing workflow with diagram](docs/PROCESSING_WORKFLOW.md).

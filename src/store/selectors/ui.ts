@@ -1,3 +1,4 @@
+import { processingRows, processingAlerts, processPath } from './processing';
 import type { DomainState } from '@/domain/entities';
 import { routeRegistry, getRoute } from '@/routes/registry';
 import { t } from '@/locales/ur';
@@ -22,7 +23,8 @@ export function selectGlobalSearch(data: DomainState, query: string): SearchResu
     ...Object.values(data.goodsReceipts).map((record)=>({id:record.id,title:record.number,type:'مال وصولی',description:data.purchaseOrders[record.purchaseOrderId].number,path:getRoute('receipt-detail').path.replace(':id',encodeURIComponent(record.id))})),
     ...supplierBills(data).map((record)=>({id:record.id,title:record.number,type:'سپلائر بل',description:data.suppliers[record.supplierId].name,path:getRoute('supplier-bill-detail').path.replace(':id',encodeURIComponent(record.id))})),
     ...Object.values(data.contractors).map((record) => ({ id: record.id, title: record.name, type: 'ٹھیکیدار', description: record.city, path: `${getRoute('contractors').path}?record=${encodeURIComponent(record.id)}` })),
-    ...Object.values(data.lots).map((r)=>({id:r.id,title:r.code,type:'لاٹ',description:data.fabrics[r.fabricId].name,path:detailUrl('lots',r.id)})),
+    ...(['jobs','challans','receipts','color-batches','bills'] as const).flatMap(f=>processingRows(data,f).map(r=>({id:r.id,title:r.label,type:'پروسیسنگ',description:r.detail,path:r.path}))),
+    ...Object.values(data.lots).map((r)=>({id:r.id,title:r.code,type:'لاٹ',description:data.fabrics[r.fabricId].name,path:Object.values(data.processing?.outputs??{}).find(o=>o.lotId===r.id)?processPath('outputs',Object.values(data.processing!.outputs).find(o=>o.lotId===r.id)!.id):detailUrl('lots',r.id)})),
     ...Object.values(data.rolls).map((r)=>({id:r.id,title:r.label,type:'تھان',description:r.id+' · '+data.lots[r.lotId].code,path:detailUrl('rolls',r.id)})),
     ...Object.values(data.locations).filter((r)=>r.warehouseId&&['GREY','INSPECTION_HOLD','QUARANTINED','REJECTED','DAMAGED'].includes(r.category)).map((r)=>({id:r.id,title:r.name,type:'گودام مقام',description:locationProfile(data,r.id).code,path:detailUrl('locations',r.id)})),
     ...(['transfers','reservationProfiles','stocktakes','adjustments']as const).flatMap((key)=>Object.values(data.warehouse?.[key]??{}).map((r)=>({id:r.id,title:r.number,type:{transfers:'منتقلی',reservationProfiles:'رزرو',stocktakes:'جسمانی گنتی',adjustments:'ایڈجسٹمنٹ'}[key],description:r.reason,path:detailUrl(key==='reservationProfiles'?'reservations':key,r.id)}))),
@@ -69,7 +71,7 @@ export function selectEnterpriseDashboard(data: DomainState) {
 export interface DemoNotification { id: string; title: string; description: string; path: string; tone: 'warning' | 'info' }
 export function selectNotifications(data: DomainState, asOf?:string): DemoNotification[] {
   const reportDate=asOf??Object.values(data.procurement?.audits??{}).reduce((max,r)=>r.createdAt.slice(0,10)>max?r.createdAt.slice(0,10):max,data.history?.asOf??'1970-01-01');
-  const purchasing=[...selectProcurementAlerts(data,reportDate),...selectWarehouseAlerts(data,reportDate)];
+  const purchasing=[...processingAlerts(data,asOf??new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Karachi'}).format(new Date())),...selectProcurementAlerts(data,reportDate),...selectWarehouseAlerts(data,reportDate)];
   if (data.history) return [...selectBusinessAlerts(data),...purchasing];
   const summary = selectEnterpriseDashboard(data);
   const notifications: DemoNotification[] = summary.contractors.filter((c) => c.held > 0).map((c) => ({ id: `custody:${c.id}`, title: 'پروسیسنگ کی وصولی باقی ہے', description: `${c.name} · ${c.held} میٹر باقی`, path: getRoute('processing').path, tone: 'info' }));
