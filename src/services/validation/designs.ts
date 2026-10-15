@@ -1,7 +1,7 @@
 import type { DomainState } from '@/domain/entities';
 import { bomSnapshot,validateSuitLines,calculateDesignCost,studioCollections,currentBOM,variantReferencesMatch } from '@/services/designs/planning';
 export function inspectDesigns(d:DomainState){const p=d.studio,errors:string[]=[];const check=(v:unknown,m:string)=>{if(!v)errors.push(m);};const codes=new Set<string>();for(const g of Object.values(d.designs)){check(!codes.has(g.code.toUpperCase()),'Duplicate design code');codes.add(g.code.toUpperCase());}if(!p)return errors;
- check(d.companies[p.companyId],'Studio company');const ids=new Set(Object.entries(d).filter(([key])=>!['history','procurement','warehouse','processing','studio'].includes(key)).flatMap(([,rows])=>Object.keys(rows)));
+ check(d.companies[p.companyId],'Studio company');const ids=new Set(Object.entries(d).filter(([key])=>!['history','procurement','warehouse','processing','studio','production'].includes(key)).flatMap(([,rows])=>Object.keys(rows)));
  for(const ext of [d.history,d.procurement,d.warehouse,d.processing])for(const rows of Object.values(ext??{}))if(typeof rows==='object')for(const r of Object.values(rows)as {id:string}[])ids.add(r.id);
  const numbers=new Set<string>();for(const r of [...Object.values(p.boms),...Object.values(p.samples)]){check(!numbers.has(r.number),'Studio document number duplicated');numbers.add(r.number);}
  for(const b of Object.values(p.boms))if(b.status==='SUPERSEDED')check(Object.values(p.boms).some(next=>next.variantId===b.variantId&&next.version>b.version&&next.status==='APPROVED'),'Superseded BOM has no later approved revision');

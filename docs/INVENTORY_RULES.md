@@ -108,3 +108,7 @@ Lot valuation rounds source goods cost by scaled meter weights at lot totals, pr
 ## Phase 6 processing effects
 
 Operational issues may consume eligible GREY or PROCESSED material, with known grey roll identity and reservation protection. Issue debits warehouse and credits contractor custody once. Receipt debits source custody for physical return, credits distinct processed/held/rejected output lots and records separate approved loss. QC reclassifies returned output through paired movements. The validator reconstructs these effects from processing documents and checks the same shared movement timeline. All stages conserve accounted material; no automatic gain or universal service-unit-to-meter conversion is assumed. See [challan rules](PROCESSING_CHALLAN_RULES.md) and [receipt/loss rules](PROCESSING_RECEIPTS_AND_LOSSES.md).
+
+## Phase 8 operational production
+
+Linked reservations reduce processed availability without physical movements. Material posting consumes its own reserve and pairs PROCESSED out with order WIP in. Cutting consumes usable meters, recognizes scrap, returns recoverable leftovers to source, and leaves remaining WIP. Reconciliation adds operational WIP/scrap and consumption without changing historical production totals. Component count movements conserve each cut output by unit/state/custody; they never increase finished suits. [Allocation rules](MATERIAL_ALLOCATION_AND_ISSUE.md).

@@ -5,7 +5,7 @@ const text=z.string().trim().min(1).max(500), notes=z.string().max(1000), positi
 const meta=z.object({id,companyId:id,createdAt:z.string().datetime(),updatedAt:z.string().datetime(),createdBy:id,updatedBy:id,origin:z.literal('USER')});
 const doc=meta.extend({number:text,date:day});
 const map=<T extends z.ZodRawShape>(s:z.ZodObject<T>)=>z.record(id,s.strict());
-export const rateUnit=z.enum(['METER','YARD','KILOGRAM','PIECE','SUIT','PANEL','BATCH']);
+export const rateUnit=z.enum(['METER','YARD','KILOGRAM','PIECE','SUIT','PANEL','BATCH','SET','DESIGN']);
 export const chargeBasis=z.enum(['ISSUED','ACCEPTED','RETURNED','SERVICE_QUANTITY']);
 export const allocation=z.object({lotId:id,rollId:id.optional(),locationId:id,quantityMeters:positive,reservationId:id.optional()}).strict();
 export const rateFields={contractorId:id,service:z.enum(PROCESSING_SERVICE),unit:rateUnit,ratePaisa:money,basis:chargeBasis,minimumPaisa:money,additionalPaisa:money,effectiveOn:day,validUntil:day,status:z.enum(['ACTIVE','INACTIVE'])};
@@ -23,7 +23,7 @@ export const processingOperationsSchema=z.object({
  colors:map(meta.extend({code:text,name:text,nameEnglish:notes,status:z.enum(['ACTIVE','INACTIVE'])})),
  batches:map(doc.extend({jobId:id,colorId:id,shade:text,targetMeters:positive,status:z.enum(['PENDING','APPROVED','REJECTED','REWORK']),approvedById:id.optional(),notes})),
  quality:map(doc.extend({outputId:id,inspectorId:id,fromLocationId:id,toLocationId:id,quantityMeters:positive,result:z.enum(['ACCEPTED','QUALITY_HOLD','REJECTED','REWORK_REQUIRED','DAMAGED']),defect:notes,notes})),
- bills:map(doc.extend({contractorId:id,jobId:id,chargeQuantity:positive,unit:rateUnit,ratePaisa:money,additionalPaisa:money,discountPaisa:money,creditPaisa:money,totalPaisa:money,dueOn:day,status:z.enum(['DRAFT','POSTED','CANCELLED']),references:z.array(id)})),
+ bills:map(doc.extend({contractorId:id,jobId:id,productionJobId:id.optional(),chargeQuantity:positive,unit:rateUnit,ratePaisa:money,additionalPaisa:money,discountPaisa:money,creditPaisa:money,totalPaisa:money,dueOn:day,status:z.enum(['DRAFT','POSTED','CANCELLED']),references:z.array(id)})),
  payments:map(doc.extend({contractorId:id,amountPaisa:money.refine(v=>v>0),method:z.enum(['CASH','BANK','CHEQUE']),reference:notes,notes:notes.optional(),allocations:z.array(z.object({billId:id,amountPaisa:money.refine(v=>v>0)}).strict()),status:z.enum(['DRAFT','POSTED','CANCELLED'])})),
 }).strict();
 export type ProcessingOperations=z.infer<typeof processingOperationsSchema>;

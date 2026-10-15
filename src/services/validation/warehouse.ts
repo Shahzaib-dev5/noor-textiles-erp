@@ -4,7 +4,7 @@ import { warehouseMovementEffects, warehouseSum, greyCategories, hasKnownRollCus
 import { roundQuantity } from '@/domain/value-objects/quantity';
 export function inspectWarehouse(data:DomainState):string[]{
  const w=data.warehouse;if(!w)return[];const errors:string[]=[],fail=(id:string,why:string)=>errors.push(id+': '+why),ref=(yes:unknown,id:string)=>{if(!yes)fail(id,'متعلقہ ریکارڈ درست نہیں۔');};
- const ids=new Set(Object.entries(data).filter(([key])=>!['warehouse','history','procurement','processing','studio'].includes(key)).flatMap(([,rows])=>Object.keys(rows)));
+ const ids=new Set(Object.entries(data).filter(([key])=>!['warehouse','history','procurement','processing','studio','production'].includes(key)).flatMap(([,rows])=>Object.keys(rows)));
  const numbers=new Set([...Object.values(data.purchaseOrders),...Object.values(data.goodsReceipts),...Object.values(data.challans),...Object.values(data.processingReceipts)].map((r)=>r.number));
  for(const ext of [data.history,data.procurement])for(const rows of Object.values(ext??{}))if(typeof rows==='object')for(const r of Object.values(rows) as {id:string;number?:string}[]){ids.add(r.id);if(r.number)numbers.add(r.number);}
  ref(data.companies[w.companyId],w.companyId);
@@ -33,13 +33,13 @@ export function inspectWarehouse(data:DomainState):string[]{
  }
  const reservationIds=new Set<string>(),consumedChallans=new Set<string>();
  for(const p of Object.values(w.reservationProfiles)){
-  const r=data.reservations[p.reservationId];ref(r&&r.sourceDocumentId===p.id&&r.category==='GREY',p.id);if(reservationIds.has(p.reservationId))fail(p.id,'رزرو کا پروفائل دہرایا گیا۔');reservationIds.add(p.reservationId);if(!r)continue;portion({...r,rollId:p.rollId},p.id);
+  const r=data.reservations[p.reservationId];ref(r&&r.sourceDocumentId===p.id&&r.category===(p.workOrderId?'PROCESSED':'GREY'),p.id);if(reservationIds.has(p.reservationId))fail(p.id,'رزرو کا پروفائل دہرایا گیا۔');reservationIds.add(p.reservationId);if(!r)continue;portion({...r,rollId:p.rollId},p.id);
   const remaining=roundQuantity(p.originalMeters-p.releasedMeters-p.consumedMeters);
   chronology(r.lotId,p.date,p.id);
-  if(r.status==='ACTIVE'&&p.rollId&&!hasKnownRollCustody(data,r.lotId))fail(p.id,'انفرادی رزرو کے ساتھ غیر مختص رول اجرا نہیں ہو سکتا۔');
+  if(!p.workOrderId&&r.status==='ACTIVE'&&p.rollId&&!hasKnownRollCustody(data,r.lotId))fail(p.id,'انفرادی رزرو کے ساتھ غیر مختص رول اجرا نہیں ہو سکتا۔');
   if(remaining<0||r.status==='ACTIVE'&&r.quantityMeters!==remaining||remaining>0&&r.status!=='ACTIVE'||remaining===0&&r.status==='ACTIVE')fail(p.id,'رزرو مقدار مصالحت میں فرق۔');
   if(p.expiresOn&&p.expiresOn<p.date)fail(p.id,'اختتام کی تاریخ درست نہیں۔');
-  if(p.consumedMeters>0){for(const id of p.consumedChallanIds){const c=data.challans[id];ref(c&&['POSTED','PARTIALLY_RECEIVED','COMPLETED'].includes(c.status)&&c.fromLocationId===r.locationId&&c.lineIds.every((id)=>data.challanLines[id].lotId===r.lotId&&(!p.rollId||data.challanLines[id].rollId===p.rollId)),p.id);if(consumedChallans.has(id))fail(p.id,'ایک چالان متعدد رزرو میں استعمال نہیں ہو سکتا۔');consumedChallans.add(id);}const total=warehouseSum(p.consumedChallanIds.map((id)=>data.challans[id]).filter(Boolean).flatMap((c)=>c.lineIds.map((id)=>data.challanLines[id])),(l)=>l.quantityMeters);if(total!==p.consumedMeters)fail(p.id,'رزرو اجرا کی مقدار مختلف ہے۔');}
+  if(p.workOrderId){ref(data.production?.orders[p.workOrderId]?.lines.some(l=>l.key===p.bomLineKey),p.id);ref(p.consumedChallanIds.length===0,p.id);const issueIds=p.consumedIssueIds??[];ref(new Set(issueIds).size===issueIds.length,p.id);const issues=issueIds.map(id=>data.production?.issues[id]);ref(issues.every(i=>i?.status==='POSTED'&&i.reservationProfileId===p.id&&i.orderId===p.workOrderId&&i.lotId===r.lotId&&i.fromLocationId===r.locationId),p.id);ref(warehouseSum(issues.filter(i=>i!==undefined),i=>i.quantityMeters)===p.consumedMeters,p.id);}else if(p.consumedMeters>0){for(const id of p.consumedChallanIds){const c=data.challans[id];ref(c&&['POSTED','PARTIALLY_RECEIVED','COMPLETED'].includes(c.status)&&c.fromLocationId===r.locationId&&c.lineIds.every((id)=>data.challanLines[id].lotId===r.lotId&&(!p.rollId||data.challanLines[id].rollId===p.rollId)),p.id);if(consumedChallans.has(id))fail(p.id,'ایک چالان متعدد رزرو میں استعمال نہیں ہو سکتا۔');consumedChallans.add(id);}const total=warehouseSum(p.consumedChallanIds.map((id)=>data.challans[id]).filter(Boolean).flatMap((c)=>c.lineIds.map((id)=>data.challanLines[id])),(l)=>l.quantityMeters);if(total!==p.consumedMeters)fail(p.id,'رزرو اجرا کی مقدار مختلف ہے۔');}
  }
  for(const r of Object.values(data.reservations))if(!reservationIds.has(r.id))fail(r.id,'رزرو کی عملی دستاویز نہیں ملی۔');
  for(const s of Object.values(w.stocktakes)){

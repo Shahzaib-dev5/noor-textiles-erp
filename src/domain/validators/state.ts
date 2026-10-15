@@ -14,6 +14,9 @@ import { processingOperationsSchema } from '@/domain/entities/processing-operati
 import { inspectProcessing } from '@/services/validation/processing';
 import { designOperationsSchema } from '@/domain/entities/design-operations';
 import { inspectDesigns } from '@/services/validation/designs';
+import { productionOperationsSchema } from '@/domain/entities/production-operations';
+import { productionMeterEffects } from '@/services/production/materials';
+import { inspectProduction } from '@/services/validation/production';
 import { processingMovementEffects } from '@/services/inventory/processing';
 import { warehouseMovementEffects } from '@/services/inventory/warehouse';
 
@@ -37,6 +40,7 @@ const lengthUnit = z.enum(['METER', 'YARD']);
 const entityMap = <T extends z.ZodTypeAny>(schema: T) => z.record(id, schema);
 
 const rawStateSchema = z.object({
+  production: productionOperationsSchema.optional(),
   studio: designOperationsSchema.optional(),
   history: historySchema.optional(), processing: processingOperationsSchema.optional(),
   procurement: procurementSchema.optional(), warehouse: warehouseSchema.optional(),
@@ -59,7 +63,7 @@ const rawStateSchema = z.object({
   processingReceipts: entityMap(receiptDocument.extend({ challanId: id, destinationLocationId: id, lineIds: childIds }).strict()),
   processingReceiptLines: entityMap(activeOnly.extend({ processingReceiptId: id, challanLineId: id, outputMeters: quantity, lossMeters: quantity, lossReason: z.string().max(500), lossApprovedById: id.optional() }).strict()),
   processingLosses: entityMap(posted.extend({ receiptId: id, receiptLineId: id, challanId: id, challanLineId: id, lotId: id, quantityMeters: positiveQuantity, reason: text, approvedById: id }).strict()),
-  movements: entityMap(posted.extend({ sourceType: z.enum(['GOODS_RECEIPT', 'PROCESSING_ISSUE', 'PROCESSING_RECEIPT', 'PROCESSING_LOSS', 'PURCHASE_RETURN', 'WAREHOUSE_TRANSFER', 'WAREHOUSE_ADJUSTMENT', 'QUALITY_CHANGE']), sourceDocumentId: id, sourceLineId: id, lotId: id, rollId: id.optional(), locationId: id, category, quantityMeters: z.number().refine((value) => value !== 0 && isQuantity(Math.abs(value), false)), occurredAt: dateTime, contractorId: id.optional(), companyId: id.optional(), fabricId: id.optional(), fromLocationId: id.optional(), toLocationId: id.optional(), role: z.enum(['owner','purchase','warehouse','production','sales','accounts']).optional(), reason: text.optional() }).strict()),
+  movements: entityMap(posted.extend({ sourceType: z.enum(['GOODS_RECEIPT', 'PROCESSING_ISSUE', 'PROCESSING_RECEIPT', 'PROCESSING_LOSS', 'PURCHASE_RETURN', 'WAREHOUSE_TRANSFER', 'WAREHOUSE_ADJUSTMENT', 'QUALITY_CHANGE', 'PRODUCTION_ISSUE', 'PRODUCTION_RETURN', 'CUTTING_CONSUMPTION', 'CUTTING_SCRAP']), sourceDocumentId: id, sourceLineId: id, lotId: id, rollId: id.optional(), locationId: id, category, quantityMeters: z.number().refine((value) => value !== 0 && isQuantity(Math.abs(value), false)), occurredAt: dateTime, contractorId: id.optional(), companyId: id.optional(), fabricId: id.optional(), fromLocationId: id.optional(), toLocationId: id.optional(), role: z.enum(['owner','purchase','warehouse','production','sales','accounts']).optional(), reason: text.optional() }).strict()),
   reservations: entityMap(meta.extend({ status: z.enum(['ACTIVE', 'COMPLETED', 'CANCELLED']), lotId: id, locationId: id, category, quantityMeters: positiveQuantity, sourceDocumentId: id }).strict()),
   customers: entityMap(active.extend({ name: text, city: text, phone: text, openingBalancePaisa: money }).strict()),
   designs: entityMap(meta.extend({ status: z.enum(['DRAFT', 'APPROVED', 'INACTIVE']), code: text, name: text, pieceCount: z.union([z.literal(2), z.literal(3)]), imagePath: z.string().startsWith('/'), collectionId: id.optional(), bomId: id.optional() }).strict()),
@@ -78,7 +82,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   const allIds = new Set<string>();
   const numberIds = new Set<string>();
   for (const [collection, entries] of Object.entries(state)) {
-    if (collection === 'history' || collection === 'procurement' || collection === 'warehouse' || collection === 'processing' || collection === 'studio') continue;
+    if (collection === 'history' || collection === 'procurement' || collection === 'warehouse' || collection === 'processing' || collection === 'studio' || collection === 'production') continue;
     for (const [key, entity] of Object.entries(entries as Record<string, EntityMeta>)) {
       if (key !== entity.id || allIds.has(entity.id)) fail(`Duplicate or mismatched entity key: ${collection}/${key}`);
       allIds.add(entity.id);
@@ -215,7 +219,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   });
   const expectedKeys = new Map<string, number>();
   Object.values(state.procurement?.returns ?? {}).filter((r) => r.status === 'POSTED').forEach((r) => expected.push({ sourceType: 'PURCHASE_RETURN', sourceDocumentId: r.id, sourceLineId: r.goodsReceiptLineId, lotId: r.lotId, locationId: r.locationId, category: 'GREY', quantityMeters: -r.quantityMeters }));
-  expected.push(...warehouseMovementEffects(state), ...processingMovementEffects(state));
+  expected.push(...warehouseMovementEffects(state), ...processingMovementEffects(state),...productionMeterEffects(state));
   expected.forEach((effect) => expectedKeys.set(effectKey(effect), (expectedKeys.get(effectKey(effect)) ?? 0) + 1));
   Object.values(state.movements).forEach((movement) => {
     ref(state.lots[movement.lotId], movement.id); ref(state.locations[movement.locationId]?.category === movement.category, movement.id);
@@ -244,6 +248,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   inspectWarehouse(state).forEach(fail);
   inspectProcessing(state).forEach(fail);
   inspectDesigns(state).forEach(fail);
+  inspectProduction(state).forEach(fail);
 }
 
 export const domainStateSchema: z.ZodType<DomainState> = rawStateSchema.superRefine((state, context) => {

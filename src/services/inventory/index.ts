@@ -49,9 +49,11 @@ export function getReconciliation(state: DomainState) {
   const adjustmentNet = roundQuantity(Object.values(state.movements).filter((m)=>m.sourceType==='WAREHOUSE_ADJUSTMENT').reduce((n,m)=>n+m.quantityMeters,0));
   const warehouseGains=roundQuantity(Object.values(state.movements).filter((m)=>m.sourceType==='WAREHOUSE_ADJUSTMENT'&&m.quantityMeters>0).reduce((n,m)=>n+m.quantityMeters,0));
   const warehouseLoss=roundQuantity(-Object.values(state.movements).filter((m)=>m.sourceType==='WAREHOUSE_ADJUSTMENT'&&m.quantityMeters<0).reduce((n,m)=>n+m.quantityMeters,0));
-  const difference = roundQuantity(purchased + adjustmentNet - returned - totals.grey - totals.processed - totals.contractor - totals.loss - productionConsumed);
-  return { ...totals, ...(state.history ? { productionConsumed } : {}), ...(state.procurement ? { returned } : {}), ...(state.warehouse ? {adjustmentNet,warehouseGains,warehouseLoss} : {}), purchased, issued, difference, balanced: difference === 0 };
+  const productionWIP=roundQuantity(getInventoryBalances(state).filter(b=>b.category==='PRODUCTION_WIP').reduce((n,b)=>n+b.onHandMeters,0));
+  const productionScrap=roundQuantity(-Object.values(state.movements).filter(m=>m.sourceType==='CUTTING_SCRAP').reduce((n,m)=>n+m.quantityMeters,0));
+  const difference = roundQuantity(purchased + adjustmentNet - returned - totals.grey - totals.processed - totals.contractor - totals.loss - productionConsumed-productionWIP-productionScrap);
+  return { ...totals, ...(state.history||state.production ? { productionConsumed } : {}),...(state.production?{productionWIP,productionScrap}:{}), ...(state.procurement ? { returned } : {}), ...(state.warehouse ? {adjustmentNet,warehouseGains,warehouseLoss} : {}), purchased, issued, difference, balanced: difference === 0 };
 }
 export function getProductionConsumedMeters(state: DomainState) {
-  return roundQuantity(Object.values(state.history?.materialAllocations ?? {}).reduce((n, r) => n + r.quantityMeters, 0));
+  return roundQuantity(Object.values(state.history?.materialAllocations ?? {}).reduce((n, r) => n + r.quantityMeters, 0)-Object.values(state.movements).filter(m=>m.sourceType==='CUTTING_CONSUMPTION').reduce((n,m)=>n+m.quantityMeters,0));
 }

@@ -29,3 +29,10 @@
  .studio-screen .print-document table { table-layout: fixed; white-space: normal; }
  .studio-screen .print-document td, .studio-screen .print-document th { overflow-wrap: anywhere; font-size: 9pt; padding: 4px; }
 }
+
+@media print {
+ :where(.production-screen, .production-screen *):has(.print-document) > :not(.print-document):not(:has(.print-document)) { display: none !important; }
+ :where(.production-screen, .production-screen *):has(.print-document) { padding: 0 !important; border: 0 !important; box-shadow: none !important; }
+ .production-screen .print-document table { table-layout: fixed; white-space: normal; }
+ .production-screen .print-document td, .production-screen .print-document th { overflow-wrap: anywhere; font-size: 9pt; padding: 4px; }
+}

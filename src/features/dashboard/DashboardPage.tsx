@@ -1,3 +1,4 @@
+import { ProductionMetrics } from '@/features/production/ProductionMetrics';
 import { StudioMetrics } from '@/features/designs/StudioMetrics';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -23,7 +24,7 @@ import { WarehouseDashboard } from '@/features/warehouse/WarehouseDashboard';
 export default function DashboardPage() {
   const expanded = useERPStore((s) => Boolean(s.data.history));
   const data=useERPStore((s)=>s.data);
-  return <>{expanded ? <BusinessDashboard /> : <FoundationDashboard />}<WarehouseDashboard data={data} compact/><StudioMetrics/></>;
+  return <>{expanded ? <BusinessDashboard /> : <FoundationDashboard />}<WarehouseDashboard data={data} compact/><StudioMetrics/><ProductionMetrics/></>;
 }
 
 type RecentTransaction = ReturnType<typeof selectEnterpriseDashboard>['recent'][number];

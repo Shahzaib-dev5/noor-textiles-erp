@@ -6,7 +6,7 @@ export function inspectProcurement(state: DomainState): string[] {
   const p = state.procurement; if (!p) return [];
   const problems: string[] = [], fail = (id: string, message: string) => problems.push(id + ': ' + message);
   const ref = (exists: unknown, id: string) => { if (!exists) fail(id, 'متعلقہ ریکارڈ درست نہیں۔'); };
-  const allIds = new Set(Object.entries(state).filter(([k]) => !['history', 'procurement','warehouse','processing','studio'].includes(k)).flatMap(([, rows]) => Object.keys(rows)));
+  const allIds = new Set(Object.entries(state).filter(([k]) => !['history', 'procurement','warehouse','processing','studio','production'].includes(k)).flatMap(([, rows]) => Object.keys(rows)));
   const numbers = new Set([...Object.values(state.purchaseOrders), ...Object.values(state.goodsReceipts), ...Object.values(state.challans), ...Object.values(state.processingReceipts)].map((r) => r.number));
   for (const rows of Object.values(state.history ?? {})) if (typeof rows === 'object') for (const r of Object.values(rows) as { id: string; number?: string }[]) { allIds.add(r.id); if (r.number) numbers.add(r.number); }
   ref(state.companies[p.companyId], p.companyId);

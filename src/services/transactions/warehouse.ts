@@ -1,3 +1,4 @@
+import { productionReservationErrors } from '@/services/production/materials';
 import { z } from 'zod';
 import type { DomainState, InventoryMovement } from '@/domain/entities';
 import { emptyWarehouse, warehouseCategory, qualityCategory, warehouseText as text, warehouseQuantity as positive, portionInput } from '@/domain/entities/warehouse';
@@ -17,7 +18,7 @@ export const warehouseCommandSchema=z.discriminatedUnion('kind',[
  z.object({kind:z.literal('deactivateLocation'),id}).strict(),
  z.object({kind:z.literal('saveTransfer'),id:id.optional(),transferKind:z.enum(['TRANSFER','PUTAWAY']),date:day,fromLocationId:id,toLocationId:id,reason:text,lines:z.array(portionInput).min(1).max(100)}).strict(),
  z.object({kind:z.literal('transferAction'),id,action:z.enum(['SUBMIT','APPROVE','POST','CANCEL'])}).strict(),
- z.object({kind:z.literal('createReservation'),lotId:id,rollId:id.optional(),locationId:id,quantityMeters:positive,date:day,purpose:text,reference:notes,expiresOn:day.optional(),reason:text}).strict(),
+ z.object({kind:z.literal('createReservation'),lotId:id,rollId:id.optional(),locationId:id,quantityMeters:positive,workOrderId:id.optional(),bomLineKey:id.optional(),date:day,purpose:text,reference:notes,expiresOn:day.optional(),reason:text}).strict(),
  z.object({kind:z.literal('reservationAction'),id,action:z.enum(['RELEASE','CANCEL','CONSUME']),quantityMeters:positive.optional(),challanId:id.optional()}).strict(),
  z.object({kind:z.literal('createStocktake'),date:day,locationId:id,fabricId:id.optional(),lotId:id.optional(),rollId:id.optional(),reason:text}).strict(),
  z.object({kind:z.literal('recordCounts'),id,lines:z.array(z.object({lineId:id,countedMeters:qty,notes}).strict()).min(1)}).strict(),
@@ -35,7 +36,7 @@ function operation(input:DomainState,raw:WarehouseCommand,ctx:ProcurementContext
  let data=valid.state;const c=parsed.data;
  const rule:(yes:unknown,message:string)=>asserts yes=(yes,message)=>{if(!yes)throw new Error(message);};
  rule(z.string().datetime().safeParse(ctx.at).success&&data.employees[ctx.actorId]?.status==='ACTIVE','فعال ملازم اور درست وقت ضروری ہیں۔');
- rule(canWarehouse(ctx.role,c.kind,'action'in c?c.action:undefined),'منتخب ڈیمو کردار اس کارروائی کا مجاز نہیں۔');
+ rule(canWarehouse(ctx.role,c.kind,'action'in c?c.action:undefined)||ctx.role==='production'&&(c.kind==='createReservation'&&Boolean(c.workOrderId)||c.kind==='reservationAction'&&c.action!=='CONSUME'&&Boolean(data.warehouse?.reservationProfiles[c.id]?.workOrderId)),'منتخب ڈیمو کردار اس کارروائی کا مجاز نہیں۔');
  rule(ctx.at>=Object.values(data.movements).reduce((max,m)=>m.occurredAt>max?m.occurredAt:max,''),'کارروائی کا وقت سابقہ پوسٹنگ سے پہلے نہیں ہو سکتا۔');
  const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Karachi'}).format(new Date(ctx.at));if('date'in c)rule(c.date<=today,'تاریخ موجودہ دن کے بعد نہیں ہو سکتی۔');
  data.warehouse??=emptyWarehouse(Object.keys(data.companies)[0]);let w=data.warehouse;
@@ -103,13 +104,14 @@ function operation(input:DomainState,raw:WarehouseCommand,ctx:ProcurementContext
   }touch(t);docId=t.id;status=t.status;reason=t.reason;break;
  }
  case 'createReservation':{
-  rule(location(c.locationId).category==='GREY','صرف قابلِ استعمال کورا کپڑا رزرو ہو سکتا ہے۔');portion(c.lotId,c.rollId,c.locationId,c.quantityMeters);rule(!c.expiresOn||c.expiresOn>=c.date,'اختتام کی تاریخ درست کریں۔');const num=next('RSV',c.date),pid='warehouse-reservation:'+num,rid='reservation:'+num;
-  data.reservations[rid]={...base(rid,'ACTIVE'),lotId:c.lotId,locationId:c.locationId,category:'GREY',quantityMeters:c.quantityMeters,sourceDocumentId:pid};
-  w.reservationProfiles[pid]={...meta(pid,'ACTIVE'),reservationId:rid,number:num,date:c.date,reason:c.reason,originalMeters:c.quantityMeters,releasedMeters:0,consumedMeters:0,purpose:c.purpose,reference:c.reference,consumedChallanIds:[],...(c.rollId?{rollId:c.rollId}:{}),...(c.expiresOn?{expiresOn:c.expiresOn}:{})};docId=pid;status='ACTIVE';reason=c.reason;break;
+  if(c.workOrderId){rule(c.bomLineKey,'پیداواری BOM لائن ضروری ہے۔');const errors=productionReservationErrors(data,{...c,workOrderId:c.workOrderId,bomLineKey:c.bomLineKey});rule(!errors.length,errors.join(' '));}else{rule(!c.bomLineKey,'ورک آرڈر ضروری ہے۔');rule(location(c.locationId).category==='GREY','بغیر پیداواری حوالے کے صرف گرے کپڑا رزرو ہوتا ہے۔');portion(c.lotId,c.rollId,c.locationId,c.quantityMeters);}rule(!c.expiresOn||c.expiresOn>=c.date,'اختتام کی تاریخ درست کریں۔');const num=next('RSV',c.date),pid='warehouse-reservation:'+num,rid='reservation:'+num;
+  data.reservations[rid]={...base(rid,'ACTIVE'),lotId:c.lotId,locationId:c.locationId,category:c.workOrderId?'PROCESSED':'GREY',quantityMeters:c.quantityMeters,sourceDocumentId:pid};
+  w.reservationProfiles[pid]={...meta(pid,'ACTIVE'),reservationId:rid,number:num,date:c.date,reason:c.reason,originalMeters:c.quantityMeters,releasedMeters:0,consumedMeters:0,purpose:c.purpose,reference:c.reference,consumedChallanIds:[],...(c.workOrderId?{workOrderId:c.workOrderId,bomLineKey:c.bomLineKey,consumedIssueIds:[]}:{}),...(c.rollId?{rollId:c.rollId}:{}),...(c.expiresOn?{expiresOn:c.expiresOn}:{})};docId=pid;status='ACTIVE';reason=c.reason;break;
  }
  case 'reservationAction':{
   const p=w.reservationProfiles[c.id],r=p&&data.reservations[p.reservationId];rule(p&&r?.status==='ACTIVE','فعال رزرو منتخب کریں۔');old=p.status;const amount=c.quantityMeters??r.quantityMeters;rule(amount<=r.quantityMeters,'رزرو سے زیادہ رہائی / استعمال نہیں ہو سکتا۔');
   if(c.action==='CONSUME'){
+   rule(!p.workOrderId,'پیداواری رزرو صرف مربوط مواد اجرا سے استعمال ہوتا ہے۔');
    const challan=c.challanId?data.challans[c.challanId]:undefined;rule(challan?.status==='APPROVED'&&challan.lineIds.length===1&&challan.fromLocationId===r.locationId,'ایک منظور شدہ اسی مقام کا چالان ضروری ہے۔');const line=data.challanLines[challan.lineIds[0]];rule(line.lotId===r.lotId&&line.quantityMeters===amount,'چالان کی لاٹ اور اجرا مقدار رزرو سے ملنی چاہیے۔');
    if(p.rollId)line.rollId=p.rollId;
    // Temporarily release the owned portion for the existing issue reducer; the final commit records consumption.

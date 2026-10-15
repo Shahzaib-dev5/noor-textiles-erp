@@ -1,17 +1,17 @@
-# Noor Textiles ERP — implementation progress
+# Noor Textiles ERP - implementation progress
 
-The canonical phase-by-phase ledger is [docs/IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md). Current acceptance evidence is [docs/PHASE_7_ACCEPTANCE.md](docs/PHASE_7_ACCEPTANCE.md).
+The canonical phase-by-phase ledger is [docs/IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md). Current evidence is [Phase 8 acceptance](docs/PHASE_8_ACCEPTANCE.md).
 
-Current scope: **Phase 7 — Design Studio, Collections & Bill of Materials: complete and verified** on `phase-07-design-studio`. Phases 1–6 and their historical data remain preserved.
+Current scope: **Phase 8 production - complete and verified** on `phase-08-production`, from Phase 7 baseline `14cce2c`. Phases 1-7 and their historical data remain preserved.
 
-Verification: strict TypeScript, ESLint, **293 automated tests** (255 preserved plus 38 studio tests), production build and all seven Edge browser suites passed. Phase 7 A–H, BOM link/incorrect-color guards, six A4 sheets, CSV, reload and 375/768/1024/1440 px RTL layouts in both themes passed. The final material-grade display check passed. The golden fixture remains 600 m grey + 380 m processed + 10 m contractor-held + 10 m loss = 1,000 m, with zero suits. Original expanded history retains 4 collections, 30 designs, 90 variants, 10 production batches and 5,501 m contractor-held.
+Verification: strict TypeScript, ESLint, **326 automated tests in 17 files** (293 preserved plus 33 production tests), production build and **all eight Edge browser suites passed**. Phase 8 A-I, shared embroidery billing, eight Urdu A4 documents, CSV, reload and 375/768/1024/1440px RTL layouts in both themes passed. The temporary preview server is stopped.
 
-Contractor profiles, rates, jobs, issue challans, partial receipts, color/shade batches, QC, losses, multi-stage output lineage, costing, bills, payments, ledger, dashboard and reports use the central persisted store and shared stock ledger. Preserve historical business state, transactions, preferences and regression tests when extending the application.
+Production plans/orders freeze approved studio BOMs and specifications. Existing warehouse reservations support explicit processed-fabric allocation and partial issues. The shared meter ledger tracks WIP, cutting consumption, recoverable returns and scrap. Typed component lots/movements support embroidery custody, partial receipts, QC, rework and disposal. Actual embroidery bills/payments reuse contractor accounts; costing separates recorded amounts, estimates and unpriced sources. Dashboards, source search, alerts, reports and activity details read the central persisted state.
 
-## Phase 7 implementation
+The golden fixture remains600m grey +380m processed +10m contractor-held +10m loss =1000m, with zero suits. Expanded historical collections/designs/variants/batches/SKUs and 5501m original contractor custody remain preserved. Phase 8 creates no packaged suits or finished SKUs.
 
-Collections/designs/colors/BOM revisions/sampling/costing/material planning/readiness and integrated reports use the same persisted state. Approved BOMs remain immutable; planning creates no stock or reservations. See [Phase 7 acceptance](docs/PHASE_7_ACCEPTANCE.md) and [workflow diagram](docs/DESIGN_STUDIO_WORKFLOW.md).
+See [production workflow and diagram](docs/PRODUCTION_PLANNING_WORKFLOW.md) for module usage and links to order, material, cutting, embroidery, quality and cost rules. Known limits are frontend-only persistence, explicitly untracked accessories and unknown individual roll identity in aggregate historical records. No known outstanding Phase 8 failures remain.
 
 ## Next phase
 
-Phase 8 production planning/execution awaits its brief. Cutting, panel production and finished-suit production remain future work. Earlier phase evidence remains unchanged.
+Phase 9: explicit assembly, packaging inspection and finished-inventory posting from accepted components. Extend source-validated count effects; preserve frozen work orders and historical output. Readiness alone must never create or replay finished goods.
