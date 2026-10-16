@@ -37,7 +37,7 @@ export function getInventorySummary(state: DomainState) {
   return {
     grey: roundQuantity(sum('GREY')+sum('INSPECTION_HOLD')+sum('QUARANTINED')+sum('REJECTED')+sum('DAMAGED')-heldProcessed), processed: roundQuantity(sum('PROCESSED')+heldProcessed), contractor: sum('PROCESSING_OUT'),
     loss: roundQuantity(Object.values(state.processingLosses).reduce((total, loss) => total + loss.quantityMeters, 0)),
-    finished: Object.values(state.history?.finishedMovements ?? {}).reduce((n, r) => n + r.quantitySuits, 0),
+    finished: Object.values(state.history?.finishedMovements ?? {}).reduce((n, r) => n + r.quantitySuits, 0)+Object.values(state.finishing?.finishedMovements??{}).reduce((n,m)=>n+m.quantity,0),
   };
 }
 export function getReconciliation(state: DomainState) {

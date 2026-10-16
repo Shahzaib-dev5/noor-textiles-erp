@@ -1,0 +1,13 @@
+# Phase 9 contract assessment
+
+Inspected clean `phase-09-finished-goods` at `1e6ba3f` (committed Phase 8). The production schema, pure commands, component ledger, frozen BOMs, quality/rework, costing, persistence and acceptance evidence are present. Baseline verification ran before implementation: 323 of 326 tests passed initially, with three timing failures. All 47 tests in the affected files passed on retry with a longer timeout. Assertions were preserved; execution/async wait limits now accommodate observed workstation timings.
+
+Phase 8 components represent one completed frozen BOM fabric-line component per count, with explicit PIECE/PANEL/SET units. Assembly requirements therefore derive from every frozen fabric line, rather than globally hardcoding shirt/trouser/dupatta. Extra fabric components remain mandatory. Accessory BOM lines need an explicit counted-material mapping; Phase 8's untracked acknowledgment cannot create accessory stock.
+
+Extend the existing production component movement map for assembly custody, matching consumption, returns and replacement disposition. Never maintain a second mutable component balance. Production handoff must remain valid after components leave a completed production order; downstream consumption must not reopen that order or replay its source postings.
+
+Add one optional version-9 finishing document extension within the existing schema-1 envelope. Absence is a lossless no-op for older snapshots, not a reset or forced write. Store set-quality, counted material and finished suit movements with distinct units and independent source-effect validation. Historical finished movement/reservation records remain immutable and are read through a unified stock projection alongside new operational movements. Historical SKU stock without individual lot/carton detail is identified as an aggregate historical portion.
+
+Packaging is atomic: accepted assembled sets and allocated counted materials are consumed together; one completion creates one finished receipt/lot. Partial completion is explicit and all-or-nothing for the requested session quantity. Cartons are memberships in existing finished stock, never another stock receipt. Transfers/quality reclassification use balanced pairs; counts/adjustments require approval and stale-snapshot protection. Historical active reservations remain protected.
+
+Costs freeze at issue, matching and packaging boundaries. Recorded costs and estimates/incomplete lineage remain separate; later rates never rewrite old lots. Barcode generation uses offline Code 128, with an independent decoder check; it does not imply GS1 or GTIN registration. Phase 10 wholesale lifecycle remains outside this phase.

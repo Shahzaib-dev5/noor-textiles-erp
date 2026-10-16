@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { finishingSchema } from '@/domain/entities/finishing';
+import { inspectFinishing } from '@/services/validation/finishing';
 import type { DomainState, InventoryMovement } from '@/domain/entities';
 import { PROCESSING_SERVICE } from '@/domain/enums';
 import { isQuantity, roundQuantity, toMeters } from '@/domain/value-objects/quantity';
@@ -40,6 +42,7 @@ const lengthUnit = z.enum(['METER', 'YARD']);
 const entityMap = <T extends z.ZodTypeAny>(schema: T) => z.record(id, schema);
 
 const rawStateSchema = z.object({
+  finishing: finishingSchema.optional(),
   production: productionOperationsSchema.optional(),
   studio: designOperationsSchema.optional(),
   history: historySchema.optional(), processing: processingOperationsSchema.optional(),
@@ -82,7 +85,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   const allIds = new Set<string>();
   const numberIds = new Set<string>();
   for (const [collection, entries] of Object.entries(state)) {
-    if (collection === 'history' || collection === 'procurement' || collection === 'warehouse' || collection === 'processing' || collection === 'studio' || collection === 'production') continue;
+    if (collection === 'history' || collection === 'procurement' || collection === 'warehouse' || collection === 'processing' || collection === 'studio' || collection === 'production' || collection === 'finishing') continue;
     for (const [key, entity] of Object.entries(entries as Record<string, EntityMeta>)) {
       if (key !== entity.id || allIds.has(entity.id)) fail(`Duplicate or mismatched entity key: ${collection}/${key}`);
       allIds.add(entity.id);
@@ -240,7 +243,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   // Reservation command contracts are defined for later phases; accepting imported reservations now would claim an unimplemented workflow.
   if (Object.keys(state.reservations).length && !state.warehouse) fail('Reservation posting requires warehouse workflow evidence');
   Object.values(state.designs).forEach((design) => { if (design.collectionId) ref(state.history?.collections[design.collectionId] || state.studio?.collections[design.collectionId],design.id); if(design.bomId)ref(state.history?.boms[design.bomId]?.designId===design.id,design.id); });
-  Object.values(state.finishedSKUs).forEach((sku) => { ref(state.designs[sku.designId]?.pieceCount === sku.pieceCount, sku.id); if (!state.history && (sku.colorVariantId || !sku.catalogueOnly)) fail('Finished production requires validated history'); });
+  Object.values(state.finishedSKUs).forEach((sku) => { ref(state.designs[sku.designId]?.pieceCount === sku.pieceCount, sku.id); if (!state.history && !state.finishing?.skus[sku.id] && (sku.colorVariantId || !sku.catalogueOnly)) fail('Finished production requires validated history'); });
   Object.values(state.activityLogs).forEach((log) => { ref(state.employees[log.actorId], log.id); ref(Boolean(state.contractors[log.documentId]) || Object.values(state.processing ?? {}).some(rows => typeof rows === 'object' && log.documentId in rows) || documents.some((document) => document.id === log.documentId) || Boolean(state.suppliers[log.documentId] || state.fabrics[log.documentId] || state.locations[log.documentId] || state.reservations[log.documentId]) || Object.values(state.warehouse ?? {}).some((rows) => typeof rows === 'object' && log.documentId in rows) || Object.values(state.procurement?.requests ?? {}).some((r) => r.id === log.documentId) || Object.values(state.procurement?.bills ?? {}).some((r) => r.id === log.documentId) || Object.values(state.procurement?.payments ?? {}).some((r) => r.id === log.documentId) || Object.values(state.procurement?.returns ?? {}).some((r) => r.id === log.documentId), log.id); });
   inspectInventoryInvariants(state).forEach(fail);
   inspectHistory(state).forEach((issue) => fail(issue.recordId + ': ' + issue.message));
@@ -249,6 +252,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   inspectProcessing(state).forEach(fail);
   inspectDesigns(state).forEach(fail);
   inspectProduction(state).forEach(fail);
+  inspectFinishing(state).forEach(fail);
 }
 
 export const domainStateSchema: z.ZodType<DomainState> = rawStateSchema.superRefine((state, context) => {

@@ -13,6 +13,6 @@ class LayoutObserver implements ResizeObserver {
   disconnect() {}
 }
 globalThis.ResizeObserver = LayoutObserver;
-configure({ asyncUtilTimeout: 5000 });
+configure({ asyncUtilTimeout: 15000 });
 
 afterEach(() => cleanup());

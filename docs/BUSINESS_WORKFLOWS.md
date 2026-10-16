@@ -275,3 +275,14 @@ Each approved revision is immutable; later revisions retain history and require 
 ## Phase 8: production execution
 
 Approved design/BOM -> approved plan -> frozen work order -> explicit reservation -> material issue -> cutting -> components -> embroidery/partial receipts -> QC/rework -> accepted component readiness and closure. Every physical action posts once with source references. Actual contractor bills and payment allocation reuse existing accounts. See the [complete diagram](PRODUCTION_PLANNING_WORKFLOW.md).
+
+## Phase 9 - accepted components to available wholesale stock
+
+1. Open `/assembly/components` to inspect actual Phase 8 accepted component lots and compatibility. Create and approve a matching plan linked to the original work order and frozen BOM.
+2. Reserve exact lots, approve/post issues, record shortages or mismatches and match only complete available requirements. Return unused WIP and release unused reservations explicitly.
+3. Inspect matched sets into exclusive accepted/hold/rejected/rework states. Rework consumes actual replacements where needed, records costs and requires a fresh inspection without adding output sets.
+4. Record counted material openings/receipts, configure the packaging recipe and create a compatible stable SKU. Approve an order against accepted sets and allocate its materials.
+5. Post partial or final completion to consume sets/materials and create exactly one finished receipt/lot per session. Print actual SKU/batch Code128 labels and care/specification details.
+6. Put away finished lots, pack itemized cartons, transfer loose stock or whole cartons, quarantine damaged stock and post approved stale-safe counts. Use warehouse, cost and seventeen report views for reconciliation, CSV and A4.
+
+[Suit matching diagram](SUIT_MATCHING_WORKFLOW.md) connects the modules. [Packaging](PACKAGING_WORKFLOW.md), [set QC](FINAL_SUIT_QUALITY_CONTROL.md) and [finished ledger](FINISHED_GOODS_LEDGER.md) document states and exceptions. Wholesale customer orders, dispatch reservation ownership and invoicing remain Phase 10 handoff work.

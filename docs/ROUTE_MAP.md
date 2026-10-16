@@ -103,3 +103,48 @@ Collections: `/collections`, `/collections/new`, `/collections/:id`, `/collectio
 ## Phase 8 production
 
 Implemented `/production` and `/production/dashboard`; plans list/new/detail; orders list/new/detail/edit; materials requirements/allocations/issues/returns; cutting list/new/detail; components list/detail; embroidery list/new/detail; receipts list/new; quality-control list/new/detail; rework/wastage/costing/expenses/allowances/reports. Existing `/cutting`, `/embroidery`, `/quality-control` open the connected production screens. Remaining create/update source actions use shared dialogs, including reserve release, WIP returns, rework/disposal/expenses and service billing. See `src/routes/registry.ts` and the [workflow](PRODUCTION_PLANNING_WORKFLOW.md).
+
+## Phase 9 finishing routes
+
+The existing `/suit-assembly`, `/packaging` and `/inventory/finished` routes now open operational Phase 9 screens. Added paths:
+
+- `/assembly`
+- `/assembly/dashboard`
+- `/assembly/plans`
+- `/assembly/plans/new`
+- `/assembly/plans/:id`
+- `/assembly/plans/:id/edit`
+- `/assembly/matching`
+- `/assembly/matching/new`
+- `/assembly/matching/:id`
+- `/assembly/components`
+- `/assembly/reservations`
+- `/assembly/issues`
+- `/assembly/returns`
+- `/assembly/incomplete`
+- `/assembly/quality-control`
+- `/assembly/rework`
+- `/packaging/orders`
+- `/packaging/orders/new`
+- `/packaging/orders/:id`
+- `/packaging/orders/:id/edit`
+- `/packaging/materials`
+- `/packaging/materials/receipts`
+- `/packaging/materials/allocations`
+- `/packaging/labels`
+- `/packaging/cartons`
+- `/packaging/completions`
+- `/finished-products`
+- `/finished-products/skus`
+- `/finished-products/skus/:id`
+- `/inventory/finished/lots`
+- `/inventory/finished/lots/:id`
+- `/inventory/finished/locations`
+- `/inventory/finished/transfers`
+- `/inventory/finished/adjustments`
+- `/inventory/finished/quality-holds`
+- `/inventory/finished/movements`
+- `/finished-goods/costing`
+- `/finished-goods/reports`
+
+Registers open source details with `?record=<id>` where a dedicated detail route is not listed. Shared dialogs implement receipt/issue/QC posting, rework, replacement, material allocation, completion, location, carton and quality actions. SKU details include metadata editing, real stock/movement/batch tables and labels with a selected actual packaging batch. [Workflow](SUIT_MATCHING_WORKFLOW.md).

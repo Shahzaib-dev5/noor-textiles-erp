@@ -112,3 +112,13 @@ Operational issues may consume eligible GREY or PROCESSED material, with known g
 ## Phase 8 operational production
 
 Linked reservations reduce processed availability without physical movements. Material posting consumes its own reserve and pairs PROCESSED out with order WIP in. Cutting consumes usable meters, recognizes scrap, returns recoverable leftovers to source, and leaves remaining WIP. Reconciliation adds operational WIP/scrap and consumption without changing historical production totals. Component count movements conserve each cut output by unit/state/custody; they never increase finished suits. [Allocation rules](MATERIAL_ALLOCATION_AND_ISSUE.md).
+
+## Phase 9 count inventories
+
+Assembly reservations reduce accepted component availability without changing physical counts. Approved issues transfer reserved components into assembly WIP in the original component movement ledger. Posted matching consumes complete configured BOM requirements into identified assembled sets; planned targets, shortages and incomplete WIP create no suits. Reusable returns and rework replacements require real component sources and controlled disposition.
+
+For every matched batch: original matched quantity = QC pending + accepted + held + rejected + rework + packaged. Packaging may consume only accepted, unconsumed sets protected by its own approved order. Counted packaging/accessory materials require explicit openings/receipts and remain separate from fabric meters; completion consumes its allocated recipe atomically.
+
+Finished physical = historical net physical + operational receipts + posted net count adjustments. Transfers and quality reclassification net to zero. Physical = available + reserved + held + damaged. Cartoned suits are a subset, never additional stock. Counts capture a scope fingerprint and reject stale postings; adjustments cannot consume reservations or carton contents. Historical reservations remain protected and no new sales-reservation lifecycle is introduced.
+
+Recorded and estimated stock values are separate; source costs freeze at posting. Largest-remainder distribution retains every paisa when lot quantities split across bins/quality states. Counted carton handling cost is reported separately from manufacturing receipt value. See [cost rules](FINISHED_GOODS_COSTING.md).

@@ -36,3 +36,11 @@
  .production-screen .print-document table { table-layout: fixed; white-space: normal; }
  .production-screen .print-document td, .production-screen .print-document th { overflow-wrap: anywhere; font-size: 9pt; padding: 4px; }
 }
+
+@media print {
+ :where(.finishing-screen, .finishing-screen *):has(.print-document) > :not(.print-document):not(:has(.print-document)) { display: none !important; }
+ :where(.finishing-screen, .finishing-screen *):has(.print-document) { padding: 0 !important; border: 0 !important; box-shadow: none !important; }
+ .finishing-screen .print-document table { table-layout: fixed; white-space: normal; }
+ .finishing-screen .print-document td, .finishing-screen .print-document th { overflow-wrap: anywhere; font-size: 9pt; padding: 4px; }
+ .finishing-screen .print-document svg { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}

@@ -1,0 +1,4 @@
+import type { DomainState } from '@/domain/entities';
+import type { AssemblyPlan } from '@/domain/entities/finishing';
+/** Sellable properties exclude lot identities, rates, waste allowances and revision administration. */
+export function sellableKey(d:DomainState,p:AssemblyPlan){const lines=JSON.parse(p.bomSnapshot).lines as {key:string;component:string;materialType:string;fabricId?:string;widthInches?:number;composition?:string;quantity:number;unit:string}[];return JSON.stringify([p.companyId,p.collectionId,p.designId,p.variantId,d.designs[p.designId].pieceCount,lines.map(l=>[l.component,l.materialType,l.fabricId??'',l.widthInches??null,l.composition??'',l.quantity,l.unit,p.requirements.find(r=>r.key===l.key)?.embroideryRequired??false]).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)))]);}

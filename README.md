@@ -104,3 +104,9 @@ See [workflow and diagram](docs/DESIGN_STUDIO_WORKFLOW.md), [BOM revision rules]
 ## Phase 8 production
 
 Production plans, work orders, processed-fabric allocation/issue, cutting, component stock, embroidery, QC/rework and costing are implemented and verified in the central localStorage demo. TypeScript, lint,326 tests, the production build and all eight Edge browser suites pass. See [workflow](docs/PRODUCTION_PLANNING_WORKFLOW.md) and [acceptance](docs/PHASE_8_ACCEPTANCE.md). Phase 9 assembly/packaging is outside this phase.
+
+## Phase 9 - matching, packaging and finished goods
+
+The operational Urdu RTL workflow now continues from accepted Phase 8 components through matching, final set QC/rework, counted packaging materials, stable SKU labels, partial packaging and finished receipts. Cartons contain existing stock; transfers, quality holds and approved counts preserve source traceability and protect historical reservations. Start at `/assembly`, `/packaging` or `/inventory/finished`. No demo stock is created merely by opening these pages.
+
+Read the [matching workflow and diagram](docs/SUIT_MATCHING_WORKFLOW.md), [packaging workflow](docs/PACKAGING_WORKFLOW.md), [finished ledger](docs/FINISHED_GOODS_LEDGER.md) and [Phase 9 acceptance](docs/PHASE_9_ACCEPTANCE.md). The optional version-9 extension preserves old exports and all historical records without replaying packaged output. Phase 10 will implement the wholesale order lifecycle using the unified source-aware availability projection.

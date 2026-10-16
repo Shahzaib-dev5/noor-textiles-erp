@@ -1,8 +1,8 @@
 # Implementation progress
 
-Updated: 2026-10-15 (Asia/Karachi).
+Updated: 2026-10-16 (Asia/Karachi).
 
-Current scope: **Phase 8 Production - complete and verified**, on `phase-08-production` from Phase7 baseline `14cce2c`. See [Phase8 acceptance](PHASE_8_ACCEPTANCE.md).
+Current scope: **Phase 9 matching, packaging and finished goods - complete and verified**, on `phase-09-finished-goods` from committed Phase 8 baseline `1e6ba3f`. See [Phase 9 acceptance](PHASE_9_ACCEPTANCE.md).
 
 Documentation follow-up: added [one consolidated module guide through Phase 5](MODULE_GUIDE_THROUGH_PHASE_5.md), covering each working module's purpose, usage, relationships, workflow diagrams and future-module boundaries. That guide preserves Phase 5 scope; later work is tracked below.
 
@@ -20,14 +20,14 @@ Previous verified scope: **Phase 7 Design Studio — complete and verified**, on
 | 6 | Full processing operations | Complete — verified | Contractor/rate/job/challan/receipt/QC/color/cost/finance workflows, shared-ledger multi-stage lineage, dashboard/reports/search/alerts; 255 tests, TypeScript, lint, production build and six browser suites passed |
 | 7 | Design studio | Complete — verified | Collections, core designs, colors, immutable BOM revisions, samples/reviews, costing, availability, readiness, catalog/reports/search/alerts/CSV/A4; 293 tests, TypeScript, lint, build and seven browser suites passed |
 | 8 | Production planning and execution | Complete - verified | Connected plans/orders, shared reserves/issues, cutting/component ledger, embroidery/payables, QC/rework, costing and reports;326 tests, TypeScript, lint, build and all eight browser suites passed |
-| 9 | Packaging and finished inventory | Not started | Proposed: inspected packaging completion, unit-safe finished-stock movements and SKU availability |
+| 9 | Suit matching, packaging and finished inventory | Complete - verified | Accepted-component assembly, final QC/rework, counted materials, atomic partial packaging, stable SKU/barcodes, cartons, warehouse/cost/report integration; 374 tests, TypeScript, lint, build and all nine browser suites passed |
 | 10 | Pricing, quotations and wholesale orders | Not started | Proposed: price lists, quotations, credit-aware orders and exclusive reservations |
 | 11 | Dispatch and invoicing | Not started | Proposed: order-limited dispatch, reservation consumption, separate billing and receivable records |
 | 12 | Receipts, expenses and accounts | Not started | Proposed: payment allocation, customer/supplier ledgers, expenses; demonstration accounting only |
 | 13 | Returns and batch costing | Not started | Proposed: inspected disposition, credit notes, source-linked expense allocation and unit cost |
 | 14 | Reports, notifications and audit | Not started | Proposed: cross-module read-only projections, reconciliation, activity history and final integration verification |
 
-Phases 9–14 retain provisional planning labels. Reconcile their numbering against the next authorized brief; Phase 6 does not implement design studio, cutting or finished-suit production.
+Phases 10–14 retain provisional planning labels. Reconcile their numbering against the next authorized brief; Phase 6 does not implement design studio, cutting or finished-suit production.
 
 ## Phase 1 implementation ledger
 
@@ -126,3 +126,15 @@ Completed on `phase-06-processing`: operational schemas, pure transactions and v
 Implemented on `phase-08-production` from Phase 7 baseline `14cce2c`. Production plans/orders freeze approved BOMs; allocations reuse shared warehouse reservations; material postings update the meter ledger; cutting creates typed component lots; embroidery custody, QC/rework and actual shared service billing remain connected. Live dashboards/search/alerts/reports, Urdu forms, CSV and A4 views are implemented.
 
 Verification complete: **326 tests in17 files passed** (293 preserved +33 Phase8); strict TypeScript, lint, production build and **all eight Edge browser suites passed**. Phase8 A-I, actual PKR17,000 shared service billing, eight Urdu A4 documents, CSV, refresh and four RTL viewport sizes in both themes passed. No known outstanding Phase8 failures. Intentional limits: untracked accessories, unknown aggregate historical roll identity and frontend-only persistence. See [acceptance](PHASE_8_ACCEPTANCE.md). Next phase: Phase 9 explicit assembly/packaging/finished-stock documents, without replaying historical batches.
+
+## Phase 9 implementation (2026-10-16)
+
+Implemented on `phase-09-finished-goods` from committed Phase 8 baseline `1e6ba3f`. The actual accepted-component ledger feeds frozen matching plans, exact reservations, approved issues/returns, partial matching, mismatches, final set QC and rework with recorded replacement disposition. Closed production orders retain valid downstream handoff.
+
+Counted packaging/accessory materials use explicit openings/receipts, allocation and exact-value consumption. Partial packaging atomically consumes accepted sets and its recipe, freezes manufacturing cost and creates one finished receipt/lot. Stable sellable SKU identity survives cost-only BOM revisions and display edits; actual product changes remain distinct. Code128 SVG labels and selected packaging-batch references are locally generated and independently decoded in tests.
+
+Cartons itemize existing stock, with explicit mixed-SKU permission and optional single-use counted-box consumption. Finished locations, paired transfers/quality changes, stale-safe approved counts, source details, valuation, seventeen reports, six charts, search/alerts, CSV and eight A4 documents are connected to central state. Historical quantities and reservations remain unchanged, with qualified aggregate cost estimates where original lineage is unknown.
+
+Verification complete: **374 tests in 19 files passed** (326 preserved +44 Phase 9 domain +4 UI). Strict TypeScript, lint and production build passed. **All nine Edge browser suites passed**; a final Phase 9 rerun after Urdu status/unit label corrections also passed. A-H, negative operations, eight A4 documents, CSV, JSON round trip/preferences, refresh and 375/768/1024/1440px light/dark RTL layouts passed with zero page errors. No known outstanding Phase 9 failures remain. See [acceptance evidence](PHASE_9_ACCEPTANCE.md) for actual logs and intentional limits.
+
+Next: Phase 10 wholesale customer orders and source-aware reservations, only after its brief. Reuse unified finished availability and traceable lots, keep held/damaged stock unavailable and protect existing reservations. No backend, payment gateway or wholesale order lifecycle was added in Phase 9.

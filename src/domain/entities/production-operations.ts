@@ -4,7 +4,7 @@ import { bomLineSchema } from './design-operations';
 export const productionText=z.string().trim().min(1).max(500),productionNotes=z.string().max(1000);
 const text=productionText,notes=productionNotes,positive=qty.refine(v=>v>0),count=z.number().int().nonnegative().safe(),positiveCount=count.refine(v=>v>0);
 export const componentUnit=z.enum(['PIECE','PANEL','SET']);
-export const componentState=z.enum(['QC_PENDING','EMBROIDERY_OUT','QC_HOLD','REWORK','ACCEPTED','REJECTED','SCRAP']);
+export const componentState=z.enum(['QC_PENDING','EMBROIDERY_OUT','QC_HOLD','REWORK','ACCEPTED','REJECTED','SCRAP','ASSEMBLY_CONSUMED']);
 export const productionStatus=z.enum(['DRAFT','APPROVED','PARTIALLY_RESERVED','MATERIAL_RESERVED','MATERIALS_ISSUED','CUTTING','EMBROIDERY','QUALITY_CONTROL','COMPONENTS_READY','CLOSED','CANCELLED']);
 const meta=z.object({id,companyId:id,createdAt:z.string().datetime(),updatedAt:z.string().datetime(),createdBy:id,updatedBy:id,origin:z.literal('USER')});
 const doc=meta.extend({number:text,date:day});
@@ -21,7 +21,7 @@ export const productionOperationsSchema=z.object({version:z.literal(8),companyId
  returns:map(doc.extend({orderId:id,issueId:id,quantityMeters:positive,reason:text})),
  cuttings:map(doc.extend({orderId:id,issueId:id,bomLineKey:id,inputMeters:positive,usableMeters:qty,leftoverMeters:qty,scrapMeters:qty,remainingMeters:qty,outputQuantity:count,unit:componentUnit,method:text,operatorId:id,startOn:day,finishOn:day,reason:notes,approvedById:id.optional(),status:z.enum(['DRAFT','IN_PROGRESS','POSTED','CANCELLED'])})),
  componentLots:map(meta.extend({orderId:id,designId:id,variantId:id,bomId:id,bomLineKey:id,component:text,sourceLotId:id,sourceRollId:id.optional(),issueId:id,cuttingId:id,quantity:positiveCount,unit:componentUnit,consumedMeters:positive})),
- componentMovements:map(meta.extend({status:z.literal('POSTED'),sourceType:z.enum(['CUTTING','EMBROIDERY_ISSUE','EMBROIDERY_RECEIPT','INSPECTION','DISPOSAL']),sourceDocumentId:id,componentLotId:id,orderId:id,quantity:z.number().int().safe().refine(v=>v!==0),unit:componentUnit,state:componentState,custodyId:id,occurredAt:z.string().datetime()})),
+ componentMovements:map(meta.extend({status:z.literal('POSTED'),sourceType:z.enum(['CUTTING','EMBROIDERY_ISSUE','EMBROIDERY_RECEIPT','INSPECTION','DISPOSAL','ASSEMBLY_ISSUE','ASSEMBLY_RETURN','MATCHING','ASSEMBLY_REPLACEMENT']),sourceDocumentId:id,componentLotId:id,orderId:id,quantity:z.number().int().safe().refine(v=>v!==0),unit:componentUnit,state:componentState,custodyId:id,occurredAt:z.string().datetime()})),
  embroidery:map(doc.extend({orderId:id,contractorId:id,service:text,pattern:text,expectedOn:day,lines:z.array(embroideryInput).min(1).max(100),unit:componentUnit,rateUnit:z.enum(['PIECE','PANEL','SET','SUIT','METER','DESIGN','BATCH']),ratePaisa:money,serviceQuantity:positive,rateBasis:notes,additionalPaisa:money,discountPaisa:money,status:z.enum(['DRAFT','ISSUED','PARTIALLY_RECEIVED','COMPLETED','CANCELLED'])})),
  embroideryReceipts:map(doc.extend({jobId:id,inspectorId:id,parts:z.array(receiptPart).min(1).max(100),approvedById:id.optional(),status:z.enum(['DRAFT','POSTED','CANCELLED']),remarks:notes})),
  inspections:map(doc.extend({orderId:id,componentLotId:id,stage:z.enum(['CUTTING','EMBROIDERY','PREPARATION','PRE_ASSEMBLY']),fromState:z.enum(['QC_PENDING','ACCEPTED','QC_HOLD','REWORK']),inspectorId:id,quantity:positiveCount,accepted:count,held:count,rejected:count,rework:count,defect:notes,remarks:notes,reworkId:id.optional(),status:z.enum(['DRAFT','POSTED','CANCELLED'])})),

@@ -108,3 +108,11 @@ No initialization migration rewrites movements or resets storage. Known roll ope
 ## Phase 8 production extension
 
 Optional `production.version:8` holds source documents, component counts and audit events. Existing Phase 5 reservation profiles own work-order allocations; the shared meter ledger owns processed/WIP movements. Component counts use a separate typed-unit ledger within the same snapshot. Actual embroidery bills/payments reuse Phase 6 accounts. Pure commands validate one candidate snapshot before persistence; imported effects are reconstructed independently. See [contract assessment](PRODUCTION_CONTRACT_ASSESSMENT.md).
+
+## Phase 9 finishing boundary
+
+`domain/entities/finishing.ts` defines the optional strict version-9 extension. `services/transactions/finishing.ts` accepts typed commands, checks actor/state/source constraints, creates a candidate state and commits only after complete domain validation. `services/finished-goods/effects.ts` independently reconstructs component, set, material and finished movements; `services/validation/finishing.ts` compares source effects and conserved balances. A failed transaction leaves the shared Zustand state and localStorage unchanged.
+
+Component issues, assembly consumption, returns and replacements extend the existing Phase 8 component ledger. Set-quality counts, counted materials and finished suits have separate units. Historical finished movements and new operational effects are read once through the unified finished projection. Memoized selectors build indexed table rows, metrics, search and alerts for reusable Urdu forms, details, CSV, A4 documents and charts. JsBarcode is bundled locally; independent ZXing decoding is test-only.
+
+The released schema-1 storage envelope is retained. Missing `finishing` is a lossless no-op; no initialization write occurs on view. Explicit commands add version 9 without resetting earlier optional extensions or independent UI preferences. See [contract assessment](FINISHED_GOODS_CONTRACT_ASSESSMENT.md).
