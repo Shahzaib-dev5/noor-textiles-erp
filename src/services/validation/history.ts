@@ -10,7 +10,7 @@ export function inspectHistory(state: DomainState): ValidationIssue[] {
   const ref = (value: unknown, recordId: string, name: string) => { if (!value) fail(recordId, 'Invalid reference: ' + name); return Boolean(value); };
   const eq = (a: number, b: number, recordId: string, name: string) => { if (!Number.isFinite(a) || Math.abs(a - b) > .00005) fail(recordId, name + ': ' + a + ' != ' + b); };
   const sum = <T>(list: T[], f: (r: T) => number) => list.reduce((n, r) => n + f(r), 0);
-  const ids = new Set(Object.entries(state).filter(([key]) => !['history','procurement','warehouse','processing','studio','production','finishing'].includes(key)).flatMap(([, records]) => Object.keys(records)));
+  const ids = new Set(Object.entries(state).filter(([key]) => !['history','procurement','warehouse','processing','studio','production','finishing','wholesale'].includes(key)).flatMap(([, records]) => Object.keys(records)));
   const numbers = new Set([...Object.values(state.purchaseOrders), ...Object.values(state.goodsReceipts), ...Object.values(state.challans), ...Object.values(state.processingReceipts)].map((r) => r.number));
   ref(state.companies[h.companyId], h.companyId, 'company');
   for (const [collection, entries] of Object.entries(h)) {

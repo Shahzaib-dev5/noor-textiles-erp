@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { wholesaleSchema } from '@/domain/entities/wholesale-operations';
+import { inspectWholesale } from '@/services/validation/wholesale';
 import { finishingSchema } from '@/domain/entities/finishing';
 import { inspectFinishing } from '@/services/validation/finishing';
 import type { DomainState, InventoryMovement } from '@/domain/entities';
@@ -42,6 +44,7 @@ const lengthUnit = z.enum(['METER', 'YARD']);
 const entityMap = <T extends z.ZodTypeAny>(schema: T) => z.record(id, schema);
 
 const rawStateSchema = z.object({
+  wholesale: wholesaleSchema.optional(),
   finishing: finishingSchema.optional(),
   production: productionOperationsSchema.optional(),
   studio: designOperationsSchema.optional(),
@@ -85,7 +88,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   const allIds = new Set<string>();
   const numberIds = new Set<string>();
   for (const [collection, entries] of Object.entries(state)) {
-    if (collection === 'history' || collection === 'procurement' || collection === 'warehouse' || collection === 'processing' || collection === 'studio' || collection === 'production' || collection === 'finishing') continue;
+    if (collection === 'history' || collection === 'procurement' || collection === 'warehouse' || collection === 'processing' || collection === 'studio' || collection === 'production' || collection === 'finishing' || collection === 'wholesale') continue;
     for (const [key, entity] of Object.entries(entries as Record<string, EntityMeta>)) {
       if (key !== entity.id || allIds.has(entity.id)) fail(`Duplicate or mismatched entity key: ${collection}/${key}`);
       allIds.add(entity.id);
@@ -253,6 +256,7 @@ function checkRelationships(state: DomainState, context: z.RefinementCtx): void 
   inspectDesigns(state).forEach(fail);
   inspectProduction(state).forEach(fail);
   inspectFinishing(state).forEach(fail);
+  inspectWholesale(state).forEach(fail);
 }
 
 export const domainStateSchema: z.ZodType<DomainState> = rawStateSchema.superRefine((state, context) => {

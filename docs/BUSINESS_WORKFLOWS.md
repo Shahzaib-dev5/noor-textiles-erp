@@ -286,3 +286,15 @@ Approved design/BOM -> approved plan -> frozen work order -> explicit reservatio
 6. Put away finished lots, pack itemized cartons, transfer loose stock or whole cartons, quarantine damaged stock and post approved stale-safe counts. Use warehouse, cost and seventeen report views for reconciliation, CSV and A4.
 
 [Suit matching diagram](SUIT_MATCHING_WORKFLOW.md) connects the modules. [Packaging](PACKAGING_WORKFLOW.md), [set QC](FINAL_SUIT_QUALITY_CONTROL.md) and [finished ledger](FINISHED_GOODS_LEDGER.md) document states and exceptions. Wholesale customer orders, dispatch reservation ownership and invoicing remain Phase 10 handoff work.
+
+## Phase 10 wholesale customer to invoice-ready dispatch
+
+1. Create/review a shared customer, primary group and recorded credit/discount policy. Existing historical invoices and allocated payments remain authoritative.
+2. Activate an effective SKU/design/collection price list with non-overlapping whole-suit tiers. Enter a multi-SKU quotation or direct draft order; manual rates/discounts require explicit evidence and later owner approval.
+3. Submit/approve a quotation, mark presented/accepted and convert it once. Submit the draft order; owner approval freezes terms and checks exposure. Exceptions must be explicitly recorded, bounded, unexpired and selected.
+4. Reserve actual eligible finished lots or a complete itemized carton for that order line. Allow partial booking only by recorded order policy; display shortages.
+5. Assign/start picking and confirm actual partial/full quantities with unique references. Picking is stock-neutral. Create/ready/approve a dispatch against those owned confirmations.
+6. Post dispatch once to consume reservations and physical suits together. Track manual logistics, cumulative receipt, discrepancy or sender-return evidence. No extra stock, invoice or cash event follows a delivery flag.
+7. Carry immutable invoice-ready quantities/values to Phase11. Apply controlled cancellation/amendment to remaining order quantities rather than reversing posted shipment by editing status.
+
+[Complete workflow diagram](QUOTATION_AND_SALES_ORDER_WORKFLOW.md), [credit policy](CUSTOMER_CREDIT_CONTROL.md), [dispatch/delivery](DISPATCH_AND_DELIVERY_WORKFLOW.md) and [equations/handoff](SALES_RECONCILIATION.md) supersede the earlier proposed wholesale/dispatch phase labels. Invoicing remains Phase11; actual receipts/returns remain their later authorized workflows.

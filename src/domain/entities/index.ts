@@ -12,6 +12,7 @@ import type { ProcessingOperations } from './processing-operations';
 import type { DesignOperations } from './design-operations';
 import type { FinishingState } from './finishing';
 import type { ProductionOperations } from './production-operations';
+import type { WholesaleState } from './wholesale-operations';
 
 export * from './company';
 export * from './purchasing';
@@ -22,6 +23,7 @@ export * from './wholesale';
 
 /** The shared meter foundation and optional validated Phase 3 historical extension. */
 export interface DomainState {
+  wholesale?: WholesaleState;
   finishing?: FinishingState;
   production?: ProductionOperations;
   studio?: DesignOperations;

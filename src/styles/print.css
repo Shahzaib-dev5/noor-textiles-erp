@@ -44,3 +44,10 @@
  .finishing-screen .print-document td, .finishing-screen .print-document th { overflow-wrap: anywhere; font-size: 9pt; padding: 4px; }
  .finishing-screen .print-document svg { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }
+
+@media print {
+ :where(.wholesale-screen, .wholesale-screen *):has(.print-document) > :not(.print-document):not(:has(.print-document)) { display: none !important; }
+ :where(.wholesale-screen, .wholesale-screen *):has(.print-document) { padding: 0 !important; border: 0 !important; box-shadow: none !important; }
+ .wholesale-screen .print-document table { table-layout: fixed; white-space: normal; }
+ .wholesale-screen .print-document td, .wholesale-screen .print-document th { overflow-wrap: anywhere; font-size: 9pt; padding: 4px; }
+}

@@ -1,0 +1,13 @@
+# Phase 10 contract assessment
+
+The expected `phase-10-wholesale-sales` branch contains committed Phase 9 at `8844401`. Its actual accepted-component assembly, packaging receipts, finished lots, unified stock projection, carton membership, cost snapshots and independent validators are present. The existing user-manual PDF/script and README/progress additions are unrelated user work and are preserved.
+
+Missing operational contracts: core `Customer` is only a shared catalogue; `entities/wholesale.ts` contains future interfaces, while actual historical orders/dispatches/invoices/payments live in the immutable version-3 history extension. There are no operational sales commands, credit approvals, order-owned lot reservations, picking confirmations or dispatch posting services. Existing historical records must remain readable without being copied or replayed.
+
+The implementation will add optional `wholesale.version:10` within the released schema-1 envelope. Shared core customers remain the only customer identities. Profiles, groups, effective pricing, quotes, orders, stock claims, picking, logistics and audit documents extend the central state. Missing extension is a lossless no-op; no automatic reset, seed replay or view-time write is permitted.
+
+Finished-stock authority remains the existing Phase 9 movement map. Dispatch will append source-validated DISPATCH movements there, with no second sales stock balance. The shared reservation projection will include historical reservations exactly once and operational lot/location claims. Carton reservations overlap their contained physical suits; that overlap must be explicitly accounted for instead of subtracting both the carton and its reserved contents. Full cartons dispatch together. Partial carton fulfillment requires controlled release/unpack and loose reservation; no hidden content edits.
+
+Credit will reuse existing posted invoice/payment selectors. Exposure separates outstanding receivables, remaining approved order commitments and uninvoiced posted dispatches; a quantity cannot occupy two exposure stages. Prices freeze in approved commercial documents. Order and dispatch approval exceptions require explicit simulated-owner evidence. Dispatch creates no invoice, payment or duplicate receivable. Returned-to-sender delivery evidence never automatically restores saleable stock.
+
+Baseline verification completed before integrating the extension: all 374 tests in 19 files passed (383.78s). Actual final results, pricing/rounding policies, safe additive persistence, inventory equations and Phase 11 billing handoff will be recorded in the acceptance and business-rule documents after execution.

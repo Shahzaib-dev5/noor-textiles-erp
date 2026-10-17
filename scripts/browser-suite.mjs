@@ -8,3 +8,5 @@ await import('./browser-phase6.mjs');
 await import('./browser-phase7.mjs');
 await import('./browser-phase8.mjs');
 await import('./browser-phase9.mjs');
+
+await import('./browser-phase10.mjs');

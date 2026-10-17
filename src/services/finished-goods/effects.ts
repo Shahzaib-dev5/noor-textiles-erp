@@ -1,4 +1,5 @@
 import type { DomainState } from '@/domain/entities';
+import { dispatchEffects } from '@/services/wholesale/fulfillment';
 import type { ComponentMovement } from '@/domain/entities/production-operations';
 import type { FinishingState } from '@/domain/entities/finishing';
 type ComponentEffect=Pick<ComponentMovement,'sourceType'|'sourceDocumentId'|'componentLotId'|'orderId'|'quantity'|'unit'|'state'|'custodyId'>;
@@ -34,5 +35,5 @@ export function finishedEffects(d:DomainState){const f=d.finishing,e:FinishedEff
  for(const t of Object.values(f.transfers))if(t.status==='POSTED')for(const l of t.lines){add('TRANSFER',t.id,l.lotId,t.fromLocationId,t.quality,-l.quantity);add('TRANSFER',t.id,l.lotId,t.toLocationId,t.quality,l.quantity);}
  for(const a of Object.values(f.adjustments))if(a.status==='POSTED')add('ADJUSTMENT',a.id,a.lotId,a.locationId,a.quality,a.delta);
  for(const r of Object.values(f.quality))if(r.status==='POSTED'){add('QUALITY',r.id,r.lotId,r.locationId,r.fromState,-r.quantity);add('QUALITY',r.id,r.lotId,r.locationId,r.toState,r.quantity);}
- return e;
+ return [...e,...dispatchEffects(d)];
 }

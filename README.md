@@ -1,6 +1,6 @@
 # نور ٹیکسٹائلز لاہور — Noor Textiles ERP
 
-For one business guide explaining every module through Phase 5, its use and its connections, with workflow diagrams, see [Module guide through Phase 5](docs/MODULE_GUIDE_THROUGH_PHASE_5.md).
+For a visual client manual with annotated screenshots of all main and child screens, visible form fields, and the supplier-to-finished-goods workflow (including the planned wholesale handoff), see the [ERP screen-by-screen user manual](docs/Noor_Textiles_ERP_User_Manual.pdf). For business workflows and module connections through Phase 5, see the [Module guide through Phase 5](docs/MODULE_GUIDE_THROUGH_PHASE_5.md).
 
 Frontend-only Urdu RTL textile ERP foundation. Phase 1 implements a connected local demo state, movement-based fabric inventory, three validated transactions and an operational architecture dashboard. It has no backend, real authentication or payment gateway.
 
@@ -110,3 +110,9 @@ Production plans, work orders, processed-fabric allocation/issue, cutting, compo
 The operational Urdu RTL workflow now continues from accepted Phase 8 components through matching, final set QC/rework, counted packaging materials, stable SKU labels, partial packaging and finished receipts. Cartons contain existing stock; transfers, quality holds and approved counts preserve source traceability and protect historical reservations. Start at `/assembly`, `/packaging` or `/inventory/finished`. No demo stock is created merely by opening these pages.
 
 Read the [matching workflow and diagram](docs/SUIT_MATCHING_WORKFLOW.md), [packaging workflow](docs/PACKAGING_WORKFLOW.md), [finished ledger](docs/FINISHED_GOODS_LEDGER.md) and [Phase 9 acceptance](docs/PHASE_9_ACCEPTANCE.md). The optional version-9 extension preserves old exports and all historical records without replaying packaged output. Phase 10 will implement the wholesale order lifecycle using the unified source-aware availability projection.
+
+## Phase 10 wholesale sales
+
+Customers, customer groups/credit profiles, effective wholesale prices, quotations, multi-SKU orders, order-owned reservations, picking, dispatch challans, fictional transport and manual delivery are implemented in the shared Urdu RTL demo. Start at `/sales/dashboard`, `/customers` or `/sales/orders`. Stock is read from Phase 9 and dispatch posts there once; quotes, order approval and printing never create or deduct goods. No invoice/payment is created from shipment.
+
+Read the [workflow diagram](docs/QUOTATION_AND_SALES_ORDER_WORKFLOW.md), [credit control](docs/CUSTOMER_CREDIT_CONTROL.md), [reservation/picking policy](docs/SALES_RESERVATION_AND_PICKING.md), [dispatch/delivery](docs/DISPATCH_AND_DELIVERY_WORKFLOW.md), [reconciliation and Phase 11 handoff](docs/SALES_RECONCILIATION.md) and [actual acceptance status](docs/PHASE_10_ACCEPTANCE.md). The existing client PDF is preserved as its earlier capture; these documents describe the new operational screens.

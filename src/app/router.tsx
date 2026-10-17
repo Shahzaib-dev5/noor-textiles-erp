@@ -15,10 +15,12 @@ const ProcessingPage = lazy(() => import('@/features/processing/ProcessingPage')
 
 const DesignStudioPage = lazy(() => import('@/features/designs/DesignStudioPage'));
 
+const WholesalePage = lazy(() => import('@/features/sales/WholesalePage'));
 const FinishingPage = lazy(() => import('@/features/finishing/FinishingPage'));
 const ProductionPage = lazy(() => import('@/features/production/ProductionPage'));
 
 function routeElement(route: ERPRoute) {
+  if(route.module==='wholesale')return <WholesalePage key={route.id}/>;
   if(route.module==='finishing')return <FinishingPage key={route.id}/>;
   if(['production','cutting','embroidery','quality-control'].includes(route.module))return <ProductionPage key={route.id} route={route}/>;
   if(route.module==='designs')return <DesignStudioPage key={route.id} route={route}/>;

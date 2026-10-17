@@ -1,0 +1,13 @@
+# Sales reservations and picking
+
+Sales reads the same finished balances used by Phase 9. Each operational reservation names an approved order, stable order-line ID, existing SKU, actual finished/historical aggregate lot, active location and quantity. Reservations reduce availability only. Historical reservations remain immutable and are included exactly once. There is no hardcoded sales-stock table.
+
+Only accepted active-location stock of the exact SKU/warehouse is eligible. Held, damaged, inactive, already dispatched or otherwise reserved counts are excluded. Partial reservation is permitted only when the order explicitly allows it. The source order's remaining quantity caps all claims. Release records reference the original reservation and reason; consumed or picking-allocated quantities cannot be released. Replacement explicitly releases an unused loose claim and reserves a real compatible source in one candidate state.
+
+Picking documents at `/sales/picking` identify the order, employee, dates and exact reservation portions. DRAFT -> ASSIGNED -> IN_PROGRESS -> PARTIALLY_PICKED/PICKED. Each partial confirmation has a unique per-pick reference and positive source quantities; duplicate references and quantities beyond plan/reservation fail. Picking is a logical count confirmation at the original source location. It does not move or deduct physical goods, and there is no fabricated dispatch staging balance.
+
+Shortage notes preserve evidence without changing stock. Cancelling unused picking allocations leaves prior consumed shipment evidence intact; pending dispatch drafts must first be cancelled. Confirmed/pending picking claims cannot be stolen by another order. Original lot/location/SKU and reservation ownership remain linked through every pick and dispatch line.
+
+Whole cartons are reserved as all their itemized lot/SKU portions for one order. Every carton SKU must exist in that order; picking and dispatch select the complete carton together. Its reserved quantity overlaps its contained carton membership, so `protected = reservations + cartoned - reservedCartoned`, not reservations plus the same cartons twice. Loose free stock excludes unreserved carton membership. Phase 9 unpack/whole-carton transfer is blocked while the carton is reserved.
+
+Partial-carton policy is explicit: cancel unused pick allocations, release the entire carton reservation, use Phase 9 UNPACK, then create loose reservations/picks for the selected quantity. Repack any remaining loose contents through a new valid Phase 9 carton operation. No dispatch silently edits a packed carton. A posted whole carton becomes DISPATCHED with its original dispatch reference; it cannot be shipped again or counted as additional inventory.

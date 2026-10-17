@@ -148,3 +148,38 @@ The existing `/suit-assembly`, `/packaging` and `/inventory/finished` routes now
 - `/finished-goods/reports`
 
 Registers open source details with `?record=<id>` where a dedicated detail route is not listed. Shared dialogs implement receipt/issue/QC posting, rework, replacement, material allocation, completion, location, carton and quality actions. SKU details include metadata editing, real stock/movement/batch tables and labels with a selected actual packaging batch. [Workflow](SUIT_MATCHING_WORKFLOW.md).
+
+## Phase 10 wholesale routes
+
+Existing `/customers`, `/sales/orders`, `/sales/orders/:id` and `/dispatch` now open operational wholesale screens. Preserved aliases `/pricing` and `/quotations` reuse the same implementation, with one primary sidebar destination. New paths:
+
+- `/customers/new`
+- `/customers/:id`
+- `/customers/:id/edit`
+- `/customers/:id/statement`
+- `/sales`
+- `/sales/dashboard`
+- `/sales/customer-groups`
+- `/sales/credit`
+- `/sales/pricing`
+- `/sales/pricing/new`
+- `/sales/pricing/:id`
+- `/sales/quotations`
+- `/sales/quotations/new`
+- `/sales/quotations/:id`
+- `/sales/orders/new`
+- `/sales/orders/:id/edit`
+- `/sales/reservations`
+- `/sales/availability`
+- `/sales/fulfillment`
+- `/sales/picking`
+- `/sales/picking/:id`
+- `/dispatch/new`
+- `/dispatch/:id`
+- `/dispatch/transport`
+- `/dispatch/deliveries`
+- `/sales/returns-preview`
+- `/sales/invoice-ready`
+- `/sales/reports`
+
+Registers use `?record=<id>` for remaining source details. Shared dialogs implement credit exceptions, groups, releases/replacement, carton reservation, picking confirmation/cancellation, price activation, delivery evidence and controlled order remainder cancellation. Historical order/dispatch URLs remain read-only and show original invoice references; new operational source links point to working order/reservation/pick/finished-lot views. [Acceptance](PHASE_10_ACCEPTANCE.md).

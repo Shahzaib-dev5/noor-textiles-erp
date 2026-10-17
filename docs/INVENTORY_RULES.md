@@ -122,3 +122,11 @@ For every matched batch: original matched quantity = QC pending + accepted + hel
 Finished physical = historical net physical + operational receipts + posted net count adjustments. Transfers and quality reclassification net to zero. Physical = available + reserved + held + damaged. Cartoned suits are a subset, never additional stock. Counts capture a scope fingerprint and reject stale postings; adjustments cannot consume reservations or carton contents. Historical reservations remain protected and no new sales-reservation lifecycle is introduced.
 
 Recorded and estimated stock values are separate; source costs freeze at posting. Largest-remainder distribution retains every paisa when lot quantities split across bins/quality states. Counted carton handling cost is reported separately from manufacturing receipt value. See [cost rules](FINISHED_GOODS_COSTING.md).
+
+## Phase 10 sales allocation and dispatch
+
+Order approval and quotation conversion are stock-neutral. Exact operational reservations reduce accepted availability while physical remains unchanged. The shared projection includes the immutable historical70 reserved suits once. Picking confirms a logical portion at the original location and creates no transfer/outflow. Pending picks/dispatch drafts cannot overclaim another order's allocation.
+
+Only posting an approved dispatch appends signed DISPATCH outflows to the Phase 9 movement map and consumes corresponding reservations atomically. New finished conservation subtracts posted wholesale shipments once. Repeated posting, wrong SKU/order/source, insufficient picked quantities and held/damaged goods fail without persistence. Delivery status and printing cause no stock effect.
+
+Cartons remain a physical subset. A reserved packed carton overlaps its own reservation: `protected = reserved + cartoned - reservedCartoned`. Loose free quantities exclude unreserved carton membership. Full cartons dispatch together; partial fulfillment requires explicit release/unpack and loose allocation. Dispatched cartons leave current membership and retain immutable provenance. Sender-return flags do not restore saleable suits; later actual inspected return receipts are required. See [sales reservation rules](SALES_RESERVATION_AND_PICKING.md).

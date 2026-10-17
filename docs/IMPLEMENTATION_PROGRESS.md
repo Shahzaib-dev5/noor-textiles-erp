@@ -1,10 +1,10 @@
 # Implementation progress
 
-Updated: 2026-10-16 (Asia/Karachi).
+Updated: 2026-10-17 (Asia/Karachi).
 
-Current scope: **Phase 9 matching, packaging and finished goods - complete and verified**, on `phase-09-finished-goods` from committed Phase 8 baseline `1e6ba3f`. See [Phase 9 acceptance](PHASE_9_ACCEPTANCE.md).
+Current scope: **Phase 10 wholesale sales - complete and verified**, on `phase-10-wholesale-sales` from committed Phase 9 baseline `8844401`. See [Phase 10 acceptance](PHASE_10_ACCEPTANCE.md).
 
-Documentation follow-up: added [one consolidated module guide through Phase 5](MODULE_GUIDE_THROUGH_PHASE_5.md), covering each working module's purpose, usage, relationships, workflow diagrams and future-module boundaries. That guide preserves Phase 5 scope; later work is tracked below.
+Documentation follow-up: added [one consolidated module guide through Phase 5](MODULE_GUIDE_THROUGH_PHASE_5.md), covering each working module's purpose, usage, relationships, workflow diagrams and future-module boundaries. The [expanded client PDF manual](Noor_Textiles_ERP_User_Manual.pdf) now covers all 45 sidebar destinations and 113 additional statically registered child screens/forms (158 annotated screen captures: 142 available and 16 planned), including visible data-entry field labels, six purchase-to-finished-goods workflow chapters and a clear planned/not-operational wholesale handoff. Implemented versus placeholder screens are labelled throughout.
 
 Phases 1–6 are complete and verified. **Phase 6: Complete Textile Processing, Challans & Contractor Management** is implemented on `phase-06-processing`. See [acceptance evidence](PHASE_6_ACCEPTANCE.md).
 
@@ -21,13 +21,13 @@ Previous verified scope: **Phase 7 Design Studio — complete and verified**, on
 | 7 | Design studio | Complete — verified | Collections, core designs, colors, immutable BOM revisions, samples/reviews, costing, availability, readiness, catalog/reports/search/alerts/CSV/A4; 293 tests, TypeScript, lint, build and seven browser suites passed |
 | 8 | Production planning and execution | Complete - verified | Connected plans/orders, shared reserves/issues, cutting/component ledger, embroidery/payables, QC/rework, costing and reports;326 tests, TypeScript, lint, build and all eight browser suites passed |
 | 9 | Suit matching, packaging and finished inventory | Complete - verified | Accepted-component assembly, final QC/rework, counted materials, atomic partial packaging, stable SKU/barcodes, cartons, warehouse/cost/report integration; 374 tests, TypeScript, lint, build and all nine browser suites passed |
-| 10 | Pricing, quotations and wholesale orders | Not started | Proposed: price lists, quotations, credit-aware orders and exclusive reservations |
-| 11 | Dispatch and invoicing | Not started | Proposed: order-limited dispatch, reservation consumption, separate billing and receivable records |
+| 10 | Wholesale customers, pricing, orders and dispatch | Complete - verified | Shared customers/credit/pricing, quotations/orders, lot/carton reservations, picking, atomic dispatch/delivery, reports/print;424 tests, TypeScript, lint, production build and all ten browser suites passed |
+| 11 | Invoicing | Not started | Next brief: immutable invoice-ready dispatch quantities, partial billing and receivables without another stock deduction |
 | 12 | Receipts, expenses and accounts | Not started | Proposed: payment allocation, customer/supplier ledgers, expenses; demonstration accounting only |
 | 13 | Returns and batch costing | Not started | Proposed: inspected disposition, credit notes, source-linked expense allocation and unit cost |
 | 14 | Reports, notifications and audit | Not started | Proposed: cross-module read-only projections, reconciliation, activity history and final integration verification |
 
-Phases 10–14 retain provisional planning labels. Reconcile their numbering against the next authorized brief; Phase 6 does not implement design studio, cutting or finished-suit production.
+Phases 11–14 retain provisional planning labels. Reconcile their numbering against the next authorized brief; Phase 6 does not implement design studio, cutting or finished-suit production.
 
 ## Phase 1 implementation ledger
 
@@ -138,3 +138,13 @@ Cartons itemize existing stock, with explicit mixed-SKU permission and optional 
 Verification complete: **374 tests in 19 files passed** (326 preserved +44 Phase 9 domain +4 UI). Strict TypeScript, lint and production build passed. **All nine Edge browser suites passed**; a final Phase 9 rerun after Urdu status/unit label corrections also passed. A-H, negative operations, eight A4 documents, CSV, JSON round trip/preferences, refresh and 375/768/1024/1440px light/dark RTL layouts passed with zero page errors. No known outstanding Phase 9 failures remain. See [acceptance evidence](PHASE_9_ACCEPTANCE.md) for actual logs and intentional limits.
 
 Next: Phase 10 wholesale customer orders and source-aware reservations, only after its brief. Reuse unified finished availability and traceable lots, keep held/damaged stock unavailable and protect existing reservations. No backend, payment gateway or wholesale order lifecycle was added in Phase 9.
+
+## Phase 10 complete and verified (2026-10-17)
+
+Branch `phase-10-wholesale-sales`, committed Phase 9 baseline `8844401`. Existing user-manual PDF/script and its README/progress additions are preserved. The original374-test baseline passed before integration. Implemented optional strict wholesale version10, shared customer profiles/groups and statements, immutable effective price tiers/discount allocation, quotation conversion, frozen orders, explicit credit exceptions, order-owned lot/carton reservations, partial picking confirmations, atomic dispatch and cumulative manual delivery.
+
+Finished stock remains in the existing ledger. Dispatch consumes its source reservation and reduces physical stock once. Original historical20 invoices/30 payments remain authoritative; no new invoice/payment or automatic saleable return is created. Historical balances remain712 physical/70 reserved/642 available. Urdu forms, source details, eight dashboard charts, shipped-design quantities, sixteen reports/rankings, search/alerts, CSV and eight A4 documents are present.
+
+Verification: **424 tests in21 files passed**, including all374 preserved tests and50 new tests. A final focused44-domain/6-UI run passed after the last approval, cancellation, delivery-form and display changes. Strict TypeScript, ESLint and production build passed. All ten production browser suites passed. The final credit-held-order KPI also passed its selected domain regression, rebuilt production app and a targeted browser check using the actual operational export. Eight A4 PDFs, CSV, JSON/preferences/reload, historical reconciliation and four widths in both themes passed with zero page errors. Desktop/mobile screenshots were visually reviewed. No known outstanding Phase10 failures remain. See [acceptance evidence](PHASE_10_ACCEPTANCE.md).
+
+Next authorized phase: Phase11 invoicing. Consume immutable invoice-ready dispatch portions once, retain captured shipment values, transfer exposure without duplication and never deduct finished stock again.

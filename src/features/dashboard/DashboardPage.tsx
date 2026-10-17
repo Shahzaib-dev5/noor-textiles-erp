@@ -1,3 +1,4 @@
+import { WholesaleMetrics } from '@/features/sales/WholesaleMetrics';
 import { FinishingMetrics } from '@/features/finishing/FinishingMetrics';
 import { ProductionMetrics } from '@/features/production/ProductionMetrics';
 import { StudioMetrics } from '@/features/designs/StudioMetrics';
@@ -25,7 +26,7 @@ import { WarehouseDashboard } from '@/features/warehouse/WarehouseDashboard';
 export default function DashboardPage() {
   const expanded = useERPStore((s) => Boolean(s.data.history));
   const data=useERPStore((s)=>s.data);
-  return <>{expanded ? <BusinessDashboard /> : <FoundationDashboard />}<WarehouseDashboard data={data} compact/><StudioMetrics/><ProductionMetrics/>{data.finishing&&<FinishingMetrics/>}</>;
+  return <>{expanded ? <BusinessDashboard /> : <FoundationDashboard />}<WarehouseDashboard data={data} compact/><StudioMetrics/><ProductionMetrics/>{data.finishing&&<FinishingMetrics/>}{data.wholesale&&<WholesaleMetrics/>}</>;
 }
 
 type RecentTransaction = ReturnType<typeof selectEnterpriseDashboard>['recent'][number];
